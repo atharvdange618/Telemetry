@@ -5,17 +5,35 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import fastifyStatic from "@fastify/static";
+import cors from "@fastify/cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
+// routes
 import { trackRoutes } from "./routes/track";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = Fastify({
   logger: true,
 });
 
+app.register(cors, {
+  origin: true,
+  credentials: true,
+});
+
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+app.register(fastifyStatic, {
+  root: path.join(__dirname, "..", "public"),
+  prefix: "/",
+});
 
 app.withTypeProvider<ZodTypeProvider>().register(trackRoutes);
 
