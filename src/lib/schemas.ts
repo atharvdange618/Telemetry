@@ -20,3 +20,15 @@ export const createEventSchema = z.object({
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
+
+export const githubUserSchema = z.object({
+  id: z.number(),
+  name: z.string().nullable(),
+  avatar_url: z.string().url(),
+});
+
+export const githubEmailSchema = z.object({
+  email: z.string().email(),
+  primary: z.boolean(),
+  verified: z.boolean(),
+});

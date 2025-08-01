@@ -13,7 +13,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.1.0",
+    "@fastify/oauth2": "^8.1.2",
     "@fastify/static": "^8.2.0",
     "@prisma/client": "^6.13.0",
     "better-auth": "^1.3.4",

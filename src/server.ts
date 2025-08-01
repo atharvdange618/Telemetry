@@ -12,6 +12,8 @@ import { fileURLToPath } from "url";
 
 // routes
 import { trackRoutes } from "./routes/track";
+import { authRoutes } from "./routes/auth";
+import fastifyCookie from "@fastify/cookie";
 
 dotenv.config();
 
@@ -20,6 +22,10 @@ const __dirname = path.dirname(__filename);
 
 const app = Fastify({
   logger: true,
+});
+
+app.register(fastifyCookie, {
+  secret: process.env.COOKIE_SECRET,
 });
 
 app.register(cors, {
@@ -34,6 +40,8 @@ app.register(fastifyStatic, {
   root: path.join(__dirname, "..", "public"),
   prefix: "/",
 });
+
+app.register(authRoutes);
 
 app.withTypeProvider<ZodTypeProvider>().register(trackRoutes);
 
