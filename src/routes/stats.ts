@@ -138,4 +138,39 @@ export async function statsRoutes(app: FastifyInstance) {
 
     return { referrers };
   });
+
+  app.get("/api/stats/views-over-time", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden" });
+    }
+
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const dateTruncFormat = period === "24h" ? "hour" : "day";
+
+    const views = await prisma.$queryRaw`
+    SELECT
+      DATE_TRUNC(${dateTruncFormat}, "createdAt") as date,
+      COUNT(id) as views
+    FROM "Event"
+    WHERE "tenantId" = ${tenantId} AND "createdAt" >= ${startDate}
+    GROUP BY date
+    ORDER BY date ASC;
+  `;
+
+    const formattedViews = (views as any[]).map((v) => ({
+      date: v.date.toISOString(),
+      views: Number(v.views),
+    }));
+
+    return { views: formattedViews };
+  });
 }

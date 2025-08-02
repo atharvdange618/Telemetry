@@ -30,3 +30,12 @@ export interface ReferrerStat {
 export interface ReferrersResponse {
   referrers: ReferrerStat[];
 }
+
+export interface ViewsOverTimeDataPoint {
+  date: string;
+  views: number;
+}
+
+export interface ViewsOverTimeResponse {
+  views: ViewsOverTimeDataPoint[];
+}

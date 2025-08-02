@@ -1,3 +1,4 @@
+import AnalyticsChart from "@/components/AnalyticsChart";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import type {
   ReferrersResponse,
   StatsSummary,
   TenantsResponse,
+  ViewsOverTimeResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -67,6 +69,12 @@ export default function DashboardPage() {
       queryFn: () => fetchAPI(`${endpoint}/referrers${queryParams}`),
       enabled: !!selectedTenantId,
     });
+
+  const { data: viewsOverTime } = useQuery<ViewsOverTimeResponse>({
+    queryKey: ["viewsOverTime", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/views-over-time${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
 
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
@@ -142,6 +150,15 @@ export default function DashboardPage() {
             {isLoadingSummary ? "..." : `${summary?.bounceRate ?? 0}%`}
           </CardContent>
         </Card>
+
+        {viewsOverTime?.views && (
+          <div className="lg:col-span-3">
+            <AnalyticsChart
+              data={viewsOverTime.views}
+              title="Views Over Time"
+            />
+          </div>
+        )}
 
         <Card className="lg:col-span-2">
           <CardHeader>
