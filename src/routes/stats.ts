@@ -54,4 +54,47 @@ export async function statsRoutes(app: FastifyInstance) {
       bounceRate: parseFloat(bounceRate.toFixed(1)),
     };
   });
+
+  app.get("/api/stats/pages", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
+    }
+
+    // date range
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const topPages = await prisma.event.groupBy({
+      by: ["path"], // Group all events by their path
+      where: {
+        tenantId,
+        createdAt: {
+          gte: startDate,
+        },
+      },
+      _count: {
+        path: true, // Count the occurrences of each path
+      },
+      orderBy: {
+        _count: {
+          path: "desc", // Order by the count in descending order
+        },
+      },
+      take: 10, // Limit to the top 10 results
+    });
+
+    const pages = topPages.map((p) => ({
+      path: p.path,
+      views: p._count.path,
+    }));
+
+    return { pages };
+  });
 }
