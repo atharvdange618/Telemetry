@@ -97,4 +97,45 @@ export async function statsRoutes(app: FastifyInstance) {
 
     return { pages };
   });
+
+  app.get("/api/stats/referrers", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden" });
+    }
+
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const topReferrers = await prisma.event.groupBy({
+      by: ["referrer"],
+      where: {
+        tenantId: tenantId,
+        createdAt: { gte: startDate },
+        referrer: { not: null },
+      },
+      _count: {
+        referrer: true,
+      },
+      orderBy: {
+        _count: {
+          referrer: "desc",
+        },
+      },
+      take: 10,
+    });
+
+    const referrers = topReferrers.map((r) => ({
+      referrer: r.referrer === "" ? "Direct" : r.referrer,
+      views: r._count.referrer,
+    }));
+
+    return { referrers };
+  });
 }
