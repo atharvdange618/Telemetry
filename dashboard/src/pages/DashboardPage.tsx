@@ -3,6 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -19,8 +27,9 @@ import type {
   ViewsOverTimeResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
@@ -45,6 +54,10 @@ export default function DashboardPage() {
       setSelectedTenantId(tenantsData.tenants[0].id);
     }
   }, [selectedTenantId, tenantsData]);
+
+  const selectedTenant = tenantsData?.tenants.find(
+    (t) => t.id === selectedTenantId
+  );
 
   const endpoint = `http://localhost:3000/api/stats`;
   const queryParams = `?tenantId=${selectedTenantId}&period=${period}`;
@@ -82,8 +95,36 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold">
           {isLoadingTenants
             ? "Loading..."
-            : tenantsData?.tenants?.[0]?.name || "Dashboard"}
+            : selectedTenant?.name || "Dashboard"}
         </h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="text-xl font-bold p-6">
+              {isLoadingTenants
+                ? "Loading Sites..."
+                : selectedTenant?.name || "Select a Site"}
+              <ChevronsUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Your Sites</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {tenantsData?.tenants.map((tenant) => (
+              <DropdownMenuItem
+                key={tenant.id}
+                onSelect={() => setSelectedTenantId(tenant.id)}
+              >
+                {tenant.name}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => navigate("/settings")}>
+              Create New Site
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className="flex items-center gap-4">
           <div>
             <Button
@@ -105,6 +146,9 @@ export default function DashboardPage() {
               30d
             </Button>
           </div>
+          <Button asChild variant="outline">
+            <Link to="/settings">Settings</Link>
+          </Button>
           <Avatar>
             <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
             <AvatarFallback>

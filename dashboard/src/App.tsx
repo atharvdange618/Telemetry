@@ -17,6 +17,7 @@ import LoginPage from "./pages/LoginPage";
 const queryClient = new QueryClient();
 
 import React from "react";
+import SettingsPage from "./components/SettingsPage";
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <DashboardPage />,
+      },
+      {
+        path: "/settings",
+        element: <SettingsPage />,
       },
       {
         index: true,
