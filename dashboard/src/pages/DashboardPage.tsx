@@ -1,0 +1,208 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useAuthStore } from "@/lib/state/auth";
+import type {
+  PagesResponse,
+  ReferrersResponse,
+  StatsSummary,
+  TenantsResponse,
+} from "@/lib/types/dashboard.types";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const fetchAPI = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) throw new Error("Network response was not ok");
+  return res.json();
+};
+
+export default function DashboardPage() {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
+  const [period, setPeriod] = useState<string>("24h");
+
+  const { data: tenantsData, isLoading: isLoadingTenants } =
+    useQuery<TenantsResponse>({
+      queryKey: ["tenants"],
+      queryFn: () => fetchAPI("http://localhost:3000/api/tenants"),
+    });
+
+  useEffect(() => {
+    if (tenantsData?.tenants?.[0] && !selectedTenantId) {
+      setSelectedTenantId(tenantsData.tenants[0].id);
+    }
+  }, [selectedTenantId, tenantsData]);
+
+  const endpoint = `http://localhost:3000/api/stats`;
+  const queryParams = `?tenantId=${selectedTenantId}&period=${period}`;
+
+  const { data: summary, isLoading: isLoadingSummary } = useQuery<StatsSummary>(
+    {
+      queryKey: ["summary", selectedTenantId, period],
+      queryFn: () => fetchAPI(`${endpoint}/summary${queryParams}`),
+      enabled: !!selectedTenantId,
+    }
+  );
+
+  const { data: pages, isLoading: isLoadingPages } = useQuery<PagesResponse>({
+    queryKey: ["pages", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/pages${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
+  const { data: referrers, isLoading: isLoadingReferrers } =
+    useQuery<ReferrersResponse>({
+      queryKey: ["referrers", selectedTenantId, period],
+      queryFn: () => fetchAPI(`${endpoint}/referrers${queryParams}`),
+      enabled: !!selectedTenantId,
+    });
+
+  return (
+    <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">
+          {isLoadingTenants
+            ? "Loading..."
+            : tenantsData?.tenants?.[0]?.name || "Dashboard"}
+        </h1>
+        <div className="flex items-center gap-4">
+          <div>
+            <Button
+              onClick={() => setPeriod("24h")}
+              variant={period === "24h" ? "default" : "outline"}
+            >
+              24h
+            </Button>
+            <Button
+              onClick={() => setPeriod("7d")}
+              variant={period === "7d" ? "default" : "outline"}
+            >
+              7d
+            </Button>
+            <Button
+              onClick={() => setPeriod("30d")}
+              variant={period === "30d" ? "default" : "outline"}
+            >
+              30d
+            </Button>
+          </div>
+          <Avatar>
+            <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+            <AvatarFallback>
+              {user?.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await fetch("http://localhost:3000/logout", {
+                credentials: "include",
+              });
+              navigate("/login", { replace: true });
+            }}
+          >
+            Logout
+          </Button>
+        </div>
+      </header>
+
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Page Views</CardTitle>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold">
+            {isLoadingSummary ? "..." : summary?.pageViews ?? 0}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Unique Visitors</CardTitle>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold">
+            {isLoadingSummary ? "..." : summary?.uniqueVisitors ?? 0}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Bounce Rate</CardTitle>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold">
+            {isLoadingSummary ? "..." : `${summary?.bounceRate ?? 0}%`}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Top Pages</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Path</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingPages ? (
+                  <TableRow>
+                    <TableCell>Loading...</TableCell>
+                  </TableRow>
+                ) : (
+                  pages?.pages?.map((page) => (
+                    <TableRow key={page.path}>
+                      <TableCell>{page.path}</TableCell>
+                      <TableCell className="text-right">{page.views}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Referrers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Source</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingReferrers ? (
+                  <TableRow>
+                    <TableCell>Loading...</TableCell>
+                  </TableRow>
+                ) : (
+                  referrers?.referrers?.map((ref) => (
+                    <TableRow key={ref.referrer}>
+                      <TableCell>{ref.referrer}</TableCell>
+                      <TableCell className="text-right">{ref.views}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}

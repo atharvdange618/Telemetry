@@ -124,10 +124,10 @@ export async function authRoutes(app: FastifyInstance) {
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
 
-      return reply.redirect("/dashboard");
+      return reply.redirect("http://localhost:5173/dashboard");
     } catch (error) {
       app.log.error(error, "Error in GitHub OAuth callback");
-      return reply.code(500).send({ message: "Internal server error." });
+      return reply.redirect("http://localhost:5173/login");
     }
   });
 
@@ -149,6 +149,6 @@ export async function authRoutes(app: FastifyInstance) {
 
   app.get("/logout", async (request, reply) => {
     reply.clearCookie("userId", { path: "/" });
-    return reply.redirect("/");
+    return reply.send({ message: "Logged out" });
   });
 }
