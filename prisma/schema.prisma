@@ -52,20 +52,20 @@ model TenantUser {
 }
 
 model Event {
-  id       String  @id @default(cuid())
-  tenantId String
-  hostname String
-  path     String
-  referrer String?
-
+  id           String   @id @default(cuid())
+  tenantId     String
+  hostname     String
+  path         String
+  referrer     String?
   screenWidth  Int?
   screenHeight Int?
-
-  createdAt DateTime @default(now())
+  visitorId    String
+  createdAt    DateTime @default(now())
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId, createdAt])
+  @@index([tenantId, visitorId])
   @@index([tenantId, path])
   @@index([tenantId, referrer])
 }

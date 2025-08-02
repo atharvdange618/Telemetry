@@ -14,6 +14,8 @@ import { fileURLToPath } from "url";
 import { trackRoutes } from "./routes/track";
 import { authRoutes } from "./routes/auth";
 import fastifyCookie from "@fastify/cookie";
+import { statsRoutes } from "./routes/stats";
+import { tenantRoutes } from "./routes/tenants";
 
 dotenv.config();
 
@@ -42,6 +44,8 @@ app.register(fastifyStatic, {
 });
 
 app.register(authRoutes);
+app.register(tenantRoutes);
+app.register(statsRoutes);
 
 app.withTypeProvider<ZodTypeProvider>().register(trackRoutes);
 

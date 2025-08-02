@@ -71,13 +71,30 @@ export async function authRoutes(app: FastifyInstance) {
       });
 
       if (!user) {
-        user = await prisma.user.create({
-          data: {
-            email: primaryEmail.email,
-            name: name,
-            image: avatar_url,
-          },
+        const newUser = await prisma.$transaction(async (tx) => {
+          const u = await prisma.user.create({
+            data: {
+              email: primaryEmail.email,
+              name: name,
+              image: avatar_url,
+            },
+          });
+
+          const t = await tx.tenant.create({
+            data: { name: `${name}'s Site` },
+          });
+
+          await tx.tenantUser.create({
+            data: {
+              userId: u.id,
+              tenantId: t.id,
+              role: "ADMIN",
+            },
+          });
+
+          return u;
         });
+        user = newUser;
       }
 
       const account = await prisma.account.findUnique({

@@ -32,3 +32,8 @@ export const githubEmailSchema = z.object({
   primary: z.boolean(),
   verified: z.boolean(),
 });
+
+export const statsQuerySchema = z.object({
+  tenantId: z.string().cuid(),
+  period: z.enum(["24h", "7d", "30d"]).default("24h"),
+});
