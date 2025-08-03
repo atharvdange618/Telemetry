@@ -106,7 +106,7 @@ export async function statsRoutes(app: FastifyInstance) {
     });
 
     if (!tenantAccess) {
-      return reply.code(403).send({ message: "Forbidden" });
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
     }
 
     const startDate = dayjs()
@@ -147,7 +147,7 @@ export async function statsRoutes(app: FastifyInstance) {
     });
 
     if (!tenantAccess) {
-      return reply.code(403).send({ message: "Forbidden" });
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
     }
 
     const startDate = dayjs()
@@ -172,5 +172,46 @@ export async function statsRoutes(app: FastifyInstance) {
     }));
 
     return { views: formattedViews };
+  });
+
+  app.get("/api/stats/sources", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
+    }
+
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const topSources = await prisma.event.groupBy({
+      by: ["utmSource"],
+      where: {
+        tenantId,
+        createdAt: { gte: startDate },
+        utmSource: { not: null },
+      },
+      _count: {
+        utmSource: true,
+      },
+      orderBy: {
+        _count: {
+          utmSource: "desc",
+        },
+      },
+      take: 10,
+    });
+
+    const sources = topSources.map((s) => ({
+      source: s.utmSource,
+      views: s._count.utmSource,
+    }));
+
+    return { sources };
   });
 }

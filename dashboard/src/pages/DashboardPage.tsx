@@ -24,6 +24,7 @@ import type {
   ReferrersResponse,
   StatsSummary,
   TenantsResponse,
+  UtmSourcesResponse,
   ViewsOverTimeResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
@@ -88,6 +89,13 @@ export default function DashboardPage() {
     queryFn: () => fetchAPI(`${endpoint}/views-over-time${queryParams}`),
     enabled: !!selectedTenantId,
   });
+
+  const { data: sourcesData, isLoading: isLoadingSources } =
+    useQuery<UtmSourcesResponse>({
+      queryKey: ["sources", selectedTenantId, period],
+      queryFn: () => fetchAPI(`${endpoint}/sources${queryParams}`),
+      enabled: !!selectedTenantId,
+    });
 
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
@@ -226,6 +234,38 @@ export default function DashboardPage() {
                     <TableRow key={page.path}>
                       <TableCell>{page.path}</TableCell>
                       <TableCell className="text-right">{page.views}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Sources</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Source</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingSources ? (
+                  <TableRow>
+                    <TableCell colSpan={2}>Loading...</TableCell>
+                  </TableRow>
+                ) : (
+                  sourcesData?.sources?.map((source) => (
+                    <TableRow key={source.source}>
+                      <TableCell>{source.source}</TableCell>
+                      <TableCell className="text-right">
+                        {source.views}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

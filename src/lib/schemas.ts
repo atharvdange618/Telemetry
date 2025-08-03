@@ -17,6 +17,12 @@ export const createEventSchema = z.object({
 
   screenWidth: z.number().int().positive().optional(),
   screenHeight: z.number().int().positive().optional(),
+
+  utmSource: z.string().nullable().optional(),
+  utmMedium: z.string().nullable().optional(),
+  utmCampaign: z.string().nullable().optional(),
+  utmTerm: z.string().nullable().optional(),
+  utmContent: z.string().nullable().optional(),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;

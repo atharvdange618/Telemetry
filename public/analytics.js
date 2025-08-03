@@ -8,6 +8,13 @@
     return;
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const utmSource = urlParams.get("utm_source");
+  const utmMedium = urlParams.get("utm_medium");
+  const utmCampaign = urlParams.get("utm_campaign");
+  const utmTerm = urlParams.get("utm_term");
+  const utmContent = urlParams.get("utm_content");
+
   const payload = {
     tenantId: tenantId,
     hostname: window.location.hostname,
@@ -15,6 +22,11 @@
     referrer: document.referrer,
     screenWidth: window.screen.width,
     screenHeight: window.screen.height,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    utmTerm,
+    utmContent,
   };
 
   const endpoint = "http://localhost:3000/api/track";

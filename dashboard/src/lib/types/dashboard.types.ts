@@ -39,3 +39,10 @@ export interface ViewsOverTimeDataPoint {
 export interface ViewsOverTimeResponse {
   views: ViewsOverTimeDataPoint[];
 }
+
+export interface UtmSourcesResponse {
+  sources: {
+    source: string;
+    views: number;
+  }[];
+}
