@@ -8,32 +8,50 @@
     return;
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const utmSource = urlParams.get("utm_source");
-  const utmMedium = urlParams.get("utm_medium");
-  const utmCampaign = urlParams.get("utm_campaign");
-  const utmTerm = urlParams.get("utm_term");
-  const utmContent = urlParams.get("utm_content");
-
-  const payload = {
-    tenantId: tenantId,
-    hostname: window.location.hostname,
-    path: window.location.pathname,
-    referrer: document.referrer,
-    screenWidth: window.screen.width,
-    screenHeight: window.screen.height,
-    utmSource,
-    utmMedium,
-    utmCampaign,
-    utmTerm,
-    utmContent,
-  };
-
   const endpoint = "http://localhost:3000/api/track";
 
-  const blob = new Blob([JSON.stringify(payload)], {
-    type: "application/json",
-  });
+  function sendEvent(payload) {
+    const blob = new Blob([JSON.stringify(payload)], {
+      type: "application/json",
+    });
+    navigator.sendBeacon(endpoint, blob);
+  }
 
-  navigator.sendBeacon(endpoint, blob);
+  function trackGoal(goalName) {
+    if (!goalName || typeof goalName !== "string") {
+      return console.error("Telemetry: Goal name must be a non-empty string.");
+    }
+
+    const goalPayload = {
+      tenantId,
+      type: "goal",
+      goalName: goalName,
+    };
+    sendEvent(goalPayload);
+  }
+
+  function trackPageview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageviewPayload = {
+      tenantId: tenantId,
+      type: "pageview",
+      hostname: window.location.hostname,
+      path: window.location.pathname,
+      referrer: document.referrer,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
+      utmSource: urlParams.get("utm_source"),
+      utmMedium: urlParams.get("utm_medium"),
+      utmCampaign: urlParams.get("utm_campaign"),
+      utmTerm: urlParams.get("utm_term"),
+      utmContent: urlParams.get("utm_content"),
+    };
+    sendEvent(pageviewPayload);
+  }
+
+  const telemetry = window.telemetry || {};
+  window.telemetry = telemetry;
+  window.telemetry.goal = trackGoal;
+
+  trackPageview();
 })();

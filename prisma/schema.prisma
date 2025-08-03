@@ -54,13 +54,17 @@ model TenantUser {
 model Event {
   id           String   @id @default(cuid())
   tenantId     String
-  hostname     String
-  path         String
+  hostname     String?
+  path         String?
   referrer     String?
   screenWidth  Int?
   screenHeight Int?
   visitorId    String
   createdAt    DateTime @default(now())
+
+  // Goal Tracking Fields
+  type     String  @default("pageview") // 'pageview or 'goal'
+  goalName String?
 
   // UTM Fields
   utmSource   String?
@@ -77,4 +81,5 @@ model Event {
   @@index([tenantId, referrer])
   @@index([tenantId, utmSource])
   @@index([tenantId, utmCampaign])
+  @@index([tenantId, type, goalName])
 }

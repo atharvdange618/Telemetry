@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useAuthStore } from "@/lib/state/auth";
 import type {
+  GoalsResponse,
   PagesResponse,
   ReferrersResponse,
   StatsSummary,
@@ -94,6 +95,13 @@ export default function DashboardPage() {
     useQuery<UtmSourcesResponse>({
       queryKey: ["sources", selectedTenantId, period],
       queryFn: () => fetchAPI(`${endpoint}/sources${queryParams}`),
+      enabled: !!selectedTenantId,
+    });
+
+  const { data: goalsData, isLoading: isLoadingGoals } =
+    useQuery<GoalsResponse>({
+      queryKey: ["goals", selectedTenantId, period],
+      queryFn: () => fetchAPI(`${endpoint}/goals${queryParams}`),
       enabled: !!selectedTenantId,
     });
 
@@ -212,6 +220,7 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Top Pages Table */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Top Pages</CardTitle>
@@ -227,7 +236,7 @@ export default function DashboardPage() {
               <TableBody>
                 {isLoadingPages ? (
                   <TableRow>
-                    <TableCell>Loading...</TableCell>
+                    <TableCell colSpan={2}>Loading...</TableCell>
                   </TableRow>
                 ) : (
                   pages?.pages?.map((page) => (
@@ -242,6 +251,40 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        {/* Top Goals Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Goals</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Goal</TableHead>
+                  <TableHead className="text-right">Completions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingGoals ? (
+                  <TableRow>
+                    <TableCell colSpan={2}>Loading...</TableCell>
+                  </TableRow>
+                ) : (
+                  goalsData?.goals?.map((goal) => (
+                    <TableRow key={goal.name}>
+                      <TableCell>{goal.name}</TableCell>
+                      <TableCell className="text-right">
+                        {goal.completions}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Top Sources Table */}
         <Card>
           <CardHeader>
             <CardTitle>Top Sources</CardTitle>
@@ -274,7 +317,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Top Referrers Table */}
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Top Referrers</CardTitle>
           </CardHeader>
@@ -289,7 +333,7 @@ export default function DashboardPage() {
               <TableBody>
                 {isLoadingReferrers ? (
                   <TableRow>
-                    <TableCell>Loading...</TableCell>
+                    <TableCell colSpan={2}>Loading...</TableCell>
                   </TableRow>
                 ) : (
                   referrers?.referrers?.map((ref) => (

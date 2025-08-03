@@ -214,4 +214,46 @@ export async function statsRoutes(app: FastifyInstance) {
 
     return { sources };
   });
+
+  app.get("/api/stats/goals", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
+    }
+
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const topGoals = await prisma.event.groupBy({
+      by: ["goalName"],
+      where: {
+        tenantId: tenantId,
+        type: "goal",
+        createdAt: { gte: startDate },
+        goalName: { not: null },
+      },
+      _count: {
+        goalName: true,
+      },
+      orderBy: {
+        _count: {
+          goalName: "desc",
+        },
+      },
+      take: 10,
+    });
+
+    const goals = topGoals.map((g) => ({
+      name: g.goalName,
+      completions: g._count.goalName,
+    }));
+
+    return { goals };
+  });
 }

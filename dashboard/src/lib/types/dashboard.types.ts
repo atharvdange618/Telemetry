@@ -46,3 +46,10 @@ export interface UtmSourcesResponse {
     views: number;
   }[];
 }
+
+export interface GoalsResponse {
+  goals: {
+    name: string;
+    completions: number;
+  }[];
+}
