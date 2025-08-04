@@ -256,4 +256,45 @@ export async function statsRoutes(app: FastifyInstance) {
 
     return { goals };
   });
+
+  app.get("/api/stats/locations", async (request, reply) => {
+    const { tenantId, period } = statsQuerySchema.parse(request.query);
+    const requestingUserId = request.userId!;
+    const tenantAccess = await prisma.tenantUser.findUnique({
+      where: { userId_tenantId: { userId: requestingUserId, tenantId } },
+    });
+
+    if (!tenantAccess) {
+      return reply.code(403).send({ message: "Forbidden: Access denied" });
+    }
+
+    const startDate = dayjs()
+      .subtract(parseInt(period), period.endsWith("d") ? "day" : "hour")
+      .toDate();
+
+    const topCountries = await prisma.event.groupBy({
+      by: ["country"],
+      where: {
+        tenantId: tenantId,
+        createdAt: { gte: startDate },
+        country: { not: null },
+      },
+      _count: {
+        country: true,
+      },
+      orderBy: {
+        _count: {
+          country: "desc",
+        },
+      },
+      take: 20,
+    });
+
+    const locations = topCountries.map((c) => ({
+      country: c.country,
+      views: c._count.country,
+    }));
+
+    return { locations };
+  });
 }

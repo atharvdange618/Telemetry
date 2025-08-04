@@ -66,6 +66,10 @@ model Event {
   type     String  @default("pageview") // 'pageview or 'goal'
   goalName String?
 
+  // Location Fields
+  country String?
+  city    String?
+
   // UTM Fields
   utmSource   String?
   utmMedium   String?
@@ -82,4 +86,5 @@ model Event {
   @@index([tenantId, utmSource])
   @@index([tenantId, utmCampaign])
   @@index([tenantId, type, goalName])
+  @@index([tenantId, country])
 }

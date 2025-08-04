@@ -1,4 +1,5 @@
 import AnalyticsChart from "@/components/AnalyticsChart";
+import LocationMap from "@/components/LocationMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import {
 import { useAuthStore } from "@/lib/state/auth";
 import type {
   GoalsResponse,
+  LocationsResponse,
   PagesResponse,
   ReferrersResponse,
   StatsSummary,
@@ -102,6 +104,13 @@ export default function DashboardPage() {
     useQuery<GoalsResponse>({
       queryKey: ["goals", selectedTenantId, period],
       queryFn: () => fetchAPI(`${endpoint}/goals${queryParams}`),
+      enabled: !!selectedTenantId,
+    });
+
+  const { data: locationsData, isLoading: isLoadingLocations } =
+    useQuery<LocationsResponse>({
+      queryKey: ["locations", selectedTenantId, period],
+      queryFn: () => fetchAPI(`${endpoint}/locations${queryParams}`),
       enabled: !!selectedTenantId,
     });
 
@@ -219,6 +228,44 @@ export default function DashboardPage() {
             />
           </div>
         )}
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Locations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LocationMap data={locationsData} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Countries</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Country</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingLocations ? (
+                  <TableRow>
+                    <TableCell colSpan={2}>Loading...</TableCell>
+                  </TableRow>
+                ) : (
+                  locationsData?.locations?.map((loc) => (
+                    <TableRow key={loc.country}>
+                      <TableCell>{loc.country}</TableCell>
+                      <TableCell className="text-right">{loc.views}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
 
         {/* Top Pages Table */}
         <Card className="lg:col-span-2">

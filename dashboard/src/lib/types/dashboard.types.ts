@@ -53,3 +53,10 @@ export interface GoalsResponse {
     completions: number;
   }[];
 }
+
+export interface LocationsResponse {
+  locations: {
+    country: string;
+    views: number;
+  }[];
+}
