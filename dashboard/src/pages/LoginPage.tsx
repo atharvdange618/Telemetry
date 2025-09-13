@@ -9,7 +9,9 @@ export default function LoginPage() {
     <div className="flex items-center justify-center h-screen">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-4">Welcome to Telemetry</h1>
-        <Button onClick={handleLogin}>Sign in with GitHub</Button>
+        <Button className="cursor-pointer" onClick={handleLogin}>
+          Sign in with GitHub
+        </Button>
       </div>
     </div>
   );

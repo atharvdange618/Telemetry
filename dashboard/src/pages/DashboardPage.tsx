@@ -43,6 +43,7 @@ const fetchAPI = async <T,>(url: string): Promise<T> => {
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const APP_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
   const [period, setPeriod] = useState<string>("24h");
@@ -50,7 +51,7 @@ export default function DashboardPage() {
   const { data: tenantsData, isLoading: isLoadingTenants } =
     useQuery<TenantsResponse>({
       queryKey: ["tenants"],
-      queryFn: () => fetchAPI("http://localhost:3000/api/tenants"),
+      queryFn: () => fetchAPI(`${APP_URL}/api/tenants`),
     });
 
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function DashboardPage() {
     (t) => t.id === selectedTenantId
   );
 
-  const endpoint = `http://localhost:3000/api/stats`;
+  const endpoint = `${APP_URL}/api/stats`;
   const queryParams = `?tenantId=${selectedTenantId}&period=${period}`;
 
   const { data: summary, isLoading: isLoadingSummary } = useQuery<StatsSummary>(
@@ -183,7 +184,7 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             onClick={async () => {
-              await fetch("http://localhost:3000/logout", {
+              await fetch("${APP_URL}/logout", {
                 credentials: "include",
               });
               navigate("/login", { replace: true });

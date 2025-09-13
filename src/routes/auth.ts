@@ -22,7 +22,7 @@ export async function authRoutes(app: FastifyInstance) {
       auth: fastifyOAuth2.GITHUB_CONFIGURATION,
     },
     startRedirectPath: "/login/github",
-    callbackUri: "http://localhost:3000/login/github/callback",
+    callbackUri: `${process.env.BASE_URL}/login/github/callback`,
   });
 
   app.get("/login/github/callback", async (request, reply) => {
@@ -32,7 +32,7 @@ export async function authRoutes(app: FastifyInstance) {
         await app.githubOAuth.getAccessTokenFromAuthorizationCodeFlow(request);
 
       // get user info from github
-      const githubUserResponse = await fetch("https://api.github.com/user", {
+      const githubUserResponse = await fetch(`${process.env.GITHUB_URL}/user`, {
         headers: {
           Authorization: `Bearer ${token.access_token}`,
         },
@@ -47,7 +47,7 @@ export async function authRoutes(app: FastifyInstance) {
 
       // get user's primary email
       const githubEmailsResponse = await fetch(
-        "https://api.github.com/user/emails",
+        `${process.env.GITHUB_URL}/user/emails`,
         {
           headers: {
             Authorization: `Bearer ${token.access_token}`,
@@ -124,10 +124,10 @@ export async function authRoutes(app: FastifyInstance) {
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
 
-      return reply.redirect("http://localhost:5173/dashboard");
+      return reply.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
       app.log.error(error, "Error in GitHub OAuth callback");
-      return reply.redirect("http://localhost:5173/login");
+      return reply.redirect(`${process.env.FRONTEND_URL}/login`);
     }
   });
 

@@ -21,11 +21,12 @@ import SettingsPage from "./components/SettingsPage";
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const { data, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/me", {
+      const res = await fetch(`${API_URL}/me`, {
         credentials: "include",
       });
 
