@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 import { useEffect } from "react";
 import DashboardPage from "./pages/DashboardPage";
-import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -56,7 +56,7 @@ const ProtectedRoute: React.FC = () => {
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <LandingPage />,
   },
   {
     path: "/",
