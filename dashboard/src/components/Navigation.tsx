@@ -61,7 +61,7 @@ export function Navigation() {
           </div>
 
           {/* CTA Button */}
-          <Button
+          {/* <Button
             onClick={() => {
               window.location.href = `${
                 import.meta.env.VITE_API_URL
@@ -71,7 +71,7 @@ export function Navigation() {
           >
             <Github className="h-4 w-4 mr-2" />
             Sign in with GitHub
-          </Button>
+          </Button> */}
         </div>
       </div>
     </nav>

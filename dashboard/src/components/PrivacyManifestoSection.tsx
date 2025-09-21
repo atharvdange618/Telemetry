@@ -6,7 +6,7 @@ export function PrivacyManifestoSection() {
       icon: Shield,
       title: "Privacy by Design",
       description:
-        "We believe privacy isn't a feature—it's a fundamental right. Every line of code is written with user privacy as the primary consideration.",
+        "We believe privacy isn't a feature-it's a fundamental right. Every line of code is written with user privacy as the primary consideration.",
     },
     {
       icon: Heart,
@@ -18,7 +18,7 @@ export function PrivacyManifestoSection() {
       icon: Code,
       title: "Transparency Through Code",
       description:
-        "Open source isn't just about free software—it's about trust. Our code is open for inspection, contribution, and verification by anyone.",
+        "Open source isn't just about free software-it's about trust. Our code is open for inspection, contribution, and verification by anyone.",
     },
     {
       icon: Users,

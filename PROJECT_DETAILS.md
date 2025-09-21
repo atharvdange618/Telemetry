@@ -11,7 +11,28 @@
 - **You Own Your Data**: As a self-hosted solution, your website's data resides on your own infrastructure, giving you complete control.
 - **Built with Passion**: The project is crafted using modern technologies like Fastify, React, and TypeScript, reflecting a commitment to quality and maintainability.
 
-## 2. Functionality
+## 2. Technology Stack
+
+This section provides a more detailed look at the key libraries and frameworks used in the project.
+
+### Backend
+
+- **Framework**: [Fastify](https://fastify.io/) - A high-performance, low-overhead web framework for Node.js.
+- **Database ORM**: [Prisma](https://www.prisma.io/) - A next-generation ORM for Node.js and TypeScript that provides a type-safe database client.
+- **Validation**: [Zod](https://zod.dev/) - A TypeScript-first schema declaration and validation library used for validating API request bodies and environment variables.
+- **Logging**: [pino-pretty](https://github.com/pinojs/pino-pretty) - A utility for formatting Pino logs in a human-readable way during development.
+
+### Frontend (`dashboard` directory)
+
+- **Framework**: [React](https://react.dev/) with [Vite](https://vitejs.dev/) - A modern, fast build tool and development server for React applications.
+- **Language**: [TypeScript](https://www.typescriptlang.org/) - Provides static typing for JavaScript, enhancing code quality and maintainability.
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/) - A utility-first CSS framework and a collection of pre-built, accessible React components.
+- **Server State Management**: [TanStack Query (React Query)](https://tanstack.com/query/latest) - A powerful library for fetching, caching, and synchronizing server state in React applications.
+- **Client State Management**: [Zustand](https://github.com/pmndrs/zustand) - A small, fast, and scalable state-management solution for React.
+- **Charting**: [Recharts](https://recharts.org/) - A composable charting library built on React components.
+- **Mapping**: [React jVectorMap](https://github.com/kadoshms/react-jvectormap) - A library for creating interactive vector maps in React.
+
+## 3. Functionality
 
 ### Tracking Script (`public/analytics.js`)
 
@@ -130,6 +151,14 @@ The schema is defined in `prisma/schema.prisma`.
 - **`Event`**: The central table for all analytics data. It stores pageviews, goals, location data, UTM parameters, and the anonymized `visitorId`.
 
 ## 5. Changelog
+
+### 2025-09-21: `feat: Overhaul UI with new landing and docs pages`
+
+- **New Landing Page**: Replaced the previous landing page with a new, modern, and more informative home page that better showcases the project's features and guiding principles.
+- **Documentation Section**: Added a comprehensive documentation section with detailed guides on architecture, authentication, tracking, and more.
+- **Improved Logout**: The logout process now includes a confirmation dialog to prevent accidental sessions termination.
+- **Enhanced Tracking**: The `analytics.js` script now exposes a `window.telemetry.pageview()` function for manual pageview tracking.
+- **UI & Routing Fixes**: Updated application-wide routing to accommodate the new pages and improved the authentication error redirection logic.
 
 ### 2025-08-05: `feat: add location tracking and enhance logging`
 
