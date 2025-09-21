@@ -22,10 +22,10 @@ export function LocationMap({ data }: LocationMapProps) {
         series={{
           regions: [
             {
+              attribute: "fill",
               scale: ["#E0DDEF", "#5D3FD3"],
               values: mapData,
-              min: 0,
-              max: Math.max(...Object.values(mapData), 0),
+              normalizeFunction: "linear",
             },
           ],
         }}

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { BarChart3, Github } from "lucide-react";
-import { Button } from "./ui/button";
+import { BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GitHubStars } from "./GitHubStars";
 

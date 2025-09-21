@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { AnalyticsChartProps } from "@/lib/types/dashboard.types";
 import {
   Line,
   LineChart,
@@ -8,6 +7,11 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+
+type AnalyticsChartProps = {
+  data: Array<{ date: string | number | Date; views: number }>;
+  title: string;
+};
 
 export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
   return (
