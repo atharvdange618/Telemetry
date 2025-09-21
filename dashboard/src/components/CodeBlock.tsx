@@ -22,7 +22,7 @@ export function CodeBlock({ code }: { code: string }) {
           <Copy className="w-4 h-4" />
         )}
       </button>
-      <pre className="text-green-400 text-sm overflow-x-auto">{code}</pre>
+      <pre className="text-green-400 text-sm overflow-x-auto p-2">{code}</pre>
     </div>
   );
 }

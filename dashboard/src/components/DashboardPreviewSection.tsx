@@ -1,8 +1,10 @@
+import { ChevronDown } from "lucide-react";
+
 export function DashboardPreviewSection() {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-stone-50">
+    <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-stone-50">
       <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-12 md:mb-16">
           Your Dashboard: Simple & Powerful
         </h2>
 
@@ -20,29 +22,15 @@ export function DashboardPreviewSection() {
               </div>
             </div>
 
-            {/* Dashboard content matching the actual design */}
             <div className="p-6 bg-stone-50">
-              {/* Header with site selector and time controls */}
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-4 mb-8">
                 <div className="flex items-center space-x-4">
                   <h1 className="text-xl font-semibold text-stone-900">
                     My Website
                   </h1>
                   <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 border border-stone-200">
                     <span className="text-stone-700">My Website</span>
-                    <svg
-                      className="w-4 h-4 text-stone-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                    <ChevronDown />
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">

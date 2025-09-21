@@ -41,25 +41,53 @@ export function HeroSection() {
       {/* Background floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <FloatingCard delay={0}>
-          <div className="absolute top-44 left-44 w-40 h-20 bg-gradient-to-r from-chart-2/15 to-primary/15 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground text-sm font-medium">
+          <div
+            className="absolute top-20 left-6 md:top-44 md:left-44 
+                    w-28 h-12 md:w-40 md:h-20 
+                    bg-gradient-to-r from-chart-2/15 to-primary/15 
+                    rounded-lg backdrop-blur-sm border border-border 
+                    flex items-center justify-center 
+                    text-muted-foreground text-xs md:text-sm font-medium"
+          >
             Privacy First
           </div>
         </FloatingCard>
 
         <FloatingCard delay={1.5}>
-          <div className="absolute top-44 right-44 w-44 h-20 bg-gradient-to-r from-primary/15 to-chart-4/15 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground text-sm font-medium">
+          <div
+            className="absolute top-24 right-6 md:top-44 md:right-44 
+                    w-28 h-12 md:w-44 md:h-20 
+                    bg-gradient-to-r from-primary/15 to-chart-4/15 
+                    rounded-lg backdrop-blur-sm border border-border 
+                    flex items-center justify-center 
+                    text-muted-foreground text-xs md:text-sm font-medium"
+          >
             Open Source
           </div>
         </FloatingCard>
 
         <FloatingCard delay={3}>
-          <div className="absolute bottom-44 left-44 w-44 h-20 bg-gradient-to-r from-chart-3/15 to-accent/15 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground text-sm font-medium">
+          <div
+            className="absolute bottom-24 left-6 md:bottom-44 md:left-44 
+                    w-32 h-12 md:w-44 md:h-20 
+                    bg-gradient-to-r from-chart-3/15 to-accent/15 
+                    rounded-lg backdrop-blur-sm border border-border 
+                    flex items-center justify-center 
+                    text-muted-foreground text-xs md:text-sm font-medium"
+          >
             You Own Your Data
           </div>
         </FloatingCard>
 
         <FloatingCard delay={3}>
-          <div className="absolute bottom-44 right-44 w-44 h-20 bg-gradient-to-r from-chart-3/15 to-accent/15 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center text-muted-foreground text-sm font-medium">
+          <div
+            className="absolute bottom-20 right-6 md:bottom-44 md:right-44 
+                    w-32 h-12 md:w-44 md:h-20 
+                    bg-gradient-to-r from-chart-3/15 to-accent/15 
+                    rounded-lg backdrop-blur-sm border border-border 
+                    flex items-center justify-center 
+                    text-muted-foreground text-xs md:text-sm font-medium"
+          >
             Developer Friendly
           </div>
         </FloatingCard>
