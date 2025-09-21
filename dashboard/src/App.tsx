@@ -12,12 +12,12 @@ import {
 } from "react-router-dom";
 import { useEffect } from "react";
 import DashboardPage from "./pages/DashboardPage";
-import LandingPage from "./pages/LandingPage";
-
-const queryClient = new QueryClient();
-
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
+import Home from "./pages/Home";
+import DocsPage from "./pages/DocsPage";
+
+const queryClient = new QueryClient();
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
@@ -47,7 +47,7 @@ const ProtectedRoute: React.FC = () => {
   }
 
   if (!user && !data?.user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
@@ -55,11 +55,14 @@ const ProtectedRoute: React.FC = () => {
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LandingPage />,
+    path: "/",
+    element: <Home />,
   },
   {
-    path: "/",
+    path: "/docs",
+    element: <DocsPage />,
+  },
+  {
     element: <ProtectedRoute />,
     children: [
       {
@@ -70,11 +73,11 @@ const router = createBrowserRouter([
         path: "/settings",
         element: <SettingsPage />,
       },
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />,
-      },
     ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />,
   },
 ]);
 

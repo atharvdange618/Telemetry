@@ -127,7 +127,7 @@ export async function authRoutes(app: FastifyInstance) {
       return reply.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
       app.log.error(error, "Error in GitHub OAuth callback");
-      return reply.redirect(`${process.env.FRONTEND_URL}/login`);
+      return reply.redirect(`${process.env.FRONTEND_URL}/`);
     }
   });
 

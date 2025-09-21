@@ -52,6 +52,7 @@
   const telemetry = window.telemetry || {};
   window.telemetry = telemetry;
   window.telemetry.goal = trackGoal;
+  window.telemetry.pageview = trackPageview;
 
   trackPageview();
 })();

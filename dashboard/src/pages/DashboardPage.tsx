@@ -4,6 +4,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,6 +44,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
@@ -115,6 +126,21 @@ export default function DashboardPage() {
       enabled: !!selectedTenantId,
     });
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${APP_URL}/logout`, {
+        credentials: "include",
+      });
+      if (response.ok) navigate("/", { replace: true });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
       <header className="flex justify-between items-center mb-8">
@@ -181,17 +207,28 @@ export default function DashboardPage() {
               {user?.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <Button
-            variant="outline"
-            onClick={async () => {
-              await fetch("${APP_URL}/logout", {
-                credentials: "include",
-              });
-              navigate("/login", { replace: true });
-            }}
-          >
-            Logout
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Logout</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you sure you want to logout?</DialogTitle>
+                <DialogDescription>
+                  This action will log you out of your account. You will need to
+                  log back in to access your dashboard.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleLogout} className="cursor-pointer">
+                  Logout
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
