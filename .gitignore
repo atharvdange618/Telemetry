@@ -143,3 +143,5 @@ prisma/migrations
 src/generated
 
 telemetryapis
+
+.vscode/
