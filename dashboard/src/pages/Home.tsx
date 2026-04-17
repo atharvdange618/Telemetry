@@ -12,7 +12,7 @@ import { PrivacyManifestoSection } from "@/components/PrivacyManifestoSection";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-background dark:bg-gray-950">
       <Navigation />
       <HeroSection />
       <FeaturesSection />

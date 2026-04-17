@@ -37,8 +37,7 @@ export const GradientText = ({
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-stone-50">
-      {/* Background floating elements */}
+    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-stone-50 dark:bg-gray-950">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <FloatingCard delay={0}>
           <div
@@ -94,12 +93,12 @@ export function HeroSection() {
       </div>
 
       <div className="text-center max-w-4xl mx-auto relative z-10">
-        <h1 className="text-5xl md:text-7xl font-bold text-stone-900 mb-6 text-balance">
+        <h1 className="text-5xl md:text-7xl font-bold text-stone-900 dark:text-gray-100 mb-6 text-balance">
           Analytics with a{" "}
           <GradientText className="animate-pulse">Soul</GradientText>
         </h1>
 
-        <p className="text-xl md:text-2xl text-stone-600 mb-12 max-w-3xl mx-auto leading-relaxed text-pretty">
+        <p className="text-xl md:text-2xl text-stone-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed text-pretty">
           A privacy-focused, open-source analytics platform. Gain meaningful
           insights while respecting your visitors as people, not just data
           points.
@@ -122,13 +121,13 @@ export function HeroSection() {
           <Button
             size="lg"
             asChild
-            className="cursor-pointer gradient-bg text-gray-900 hover:opacity-90 transition-opacity text-lg px-8 py-4"
+            className="cursor-pointer gradient-bg text-gray-900 dark:text-gray-100 hover:opacity-90 transition-opacity text-lg px-8 py-4"
           >
             <a
               href="https://github.com/atharvdange618/Telemetry"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 px-8 py-4 cursor-pointer gradient-bg text-gray-900 hover:text-white hover:opacity-90 bg-transparent border"
+              className="inline-flex items-center justify-center rounded-md text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 px-8 py-4 cursor-pointer gradient-bg text-gray-900 dark:text-gray-100 hover:text-white hover:opacity-90 bg-transparent border"
             >
               View Source on GitHub
             </a>

@@ -25,12 +25,16 @@ function ComparisonRow({
   };
 
   return (
-    <tr className="border-b border-gray-100">
+    <tr className="border-b border-gray-100 dark:border-gray-800">
       <td className="py-4 px-6 text-left">
         <div>
-          <div className="font-medium text-gray-900">{feature}</div>
+          <div className="font-medium text-gray-900 dark:text-gray-100">
+            {feature}
+          </div>
           {description && (
-            <div className="text-sm text-gray-600 mt-1">{description}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {description}
+            </div>
           )}
         </div>
       </td>
@@ -93,34 +97,34 @@ export function ComparisonSection() {
   ];
 
   return (
-    <section className="py-20 bg-stone-50">
+    <section className="py-20 bg-stone-50 dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Why Choose Telemetry?
           </h2>
-          <p className="text-lg text-gray-900 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-900 dark:text-gray-300 max-w-2xl mx-auto">
             See how we compare to traditional analytics solutions
           </p>
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-100">
+              <thead className="bg-gray-100 dark:bg-gray-800">
                 <tr>
-                  <th className="py-4 px-6 text-left font-semibold text-gray-900">
+                  <th className="py-4 px-6 text-left font-semibold text-gray-900 dark:text-gray-100">
                     Feature
                   </th>
-                  <th className="py-4 px-6 text-center font-semibold text-gray-900">
+                  <th className="py-4 px-6 text-center font-semibold text-gray-900 dark:text-gray-100">
                     Telemetry
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                       Privacy-First
                     </div>
                   </th>
-                  <th className="py-4 px-6 text-center font-semibold text-gray-900">
+                  <th className="py-4 px-6 text-center font-semibold text-gray-900 dark:text-gray-100">
                     Google Analytics
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                       Traditional
                     </div>
                   </th>
@@ -135,12 +139,12 @@ export function ComparisonSection() {
           </div>
 
           <div className="text-center mt-8">
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Ready to make the switch to privacy-first analytics?
             </p>
             <a
               href="mailto:atharvdange.dev@gmail.com?subject=Telemetry%20Beta%20Access%20Request"
-              className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Request Early Access
             </a>

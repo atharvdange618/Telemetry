@@ -4,14 +4,14 @@ export function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="py-24 px-4 sm:px-6 lg:px-8 bg-stone-50"
+      className="py-24 px-4 sm:px-6 lg:px-8 bg-stone-50 dark:bg-gray-950"
     >
       <div className="max-w-4xl mx-auto text-center">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground dark:text-gray-100">
             <GradientText>One Line</GradientText> of Code
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground dark:text-gray-300 max-w-3xl mx-auto">
             Get powerful analytics up and running in under 60 seconds. No
             complex setup, no cookies, no tracking.
           </p>
@@ -33,7 +33,7 @@ export function HowItWorksSection() {
           </code>
         </div>
 
-        <div className="inline-flex items-center bg-green-50 text-green-800 px-6 py-3 rounded-full border border-green-200">
+        <div className="inline-flex items-center bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-6 py-3 rounded-full border border-green-200 dark:border-green-800">
           <span className="text-2xl mr-2">✨</span>
           <span className="font-medium">
             That's it! You're now tracking privacy-friendly analytics.

@@ -24,10 +24,10 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-stone-50">
+    <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-stone-50 dark:bg-gray-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Our Guiding Principles
           </h2>
         </div>
@@ -36,16 +36,16 @@ export function FeaturesSection() {
           {features.map((feature, index) => (
             <Card
               key={index}
-              className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="bg-white dark:bg-gray-900 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
             >
               <CardContent className="p-8 text-center">
                 <div className="bg-gradient-bg p-4 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center text-primary">
                   <feature.icon className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                   {feature.description}
                 </p>
               </CardContent>

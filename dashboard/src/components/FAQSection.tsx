@@ -10,21 +10,25 @@ interface FAQItemProps {
 
 function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
       <button
-        className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex items-center justify-between"
+        className="w-full px-6 py-4 text-left bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
         onClick={onToggle}
       >
-        <span className="font-medium text-gray-900 pr-4">{question}</span>
+        <span className="font-medium text-gray-900 dark:text-gray-100 pr-4">
+          {question}
+        </span>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
         )}
       </button>
       {isOpen && (
-        <div className="px-6 py-4 bg-gray-25 border-t border-gray-100">
-          <p className="text-gray-700 leading-relaxed">{answer}</p>
+        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {answer}
+          </p>
         </div>
       )}
     </div>
@@ -36,7 +40,7 @@ export function FAQSection() {
 
   const toggleItem = (index: number) => {
     setOpenItems((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
     );
   };
 
@@ -84,13 +88,13 @@ export function FAQSection() {
   ];
 
   return (
-    <section className="py-20 bg-stone-50">
+    <section className="py-20 bg-stone-50 dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             Everything you need to know about privacy-first analytics
           </p>
         </div>
@@ -108,10 +112,12 @@ export function FAQSection() {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-gray-600 mb-4">Still have questions?</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Still have questions?
+          </p>
           <a
             href="mailto:atharvdange.dev@gmail.com"
-            className="text-gray-600 hover:text-gray-800 font-medium underline"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium underline"
           >
             Contact our team
           </a>

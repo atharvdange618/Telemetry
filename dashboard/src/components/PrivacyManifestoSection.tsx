@@ -29,8 +29,7 @@ export function PrivacyManifestoSection() {
   ];
 
   return (
-    <section className="py-20 bg-stone-50 text-gray-900 relative overflow-hidden">
-      {/* Background decoration */}
+    <section className="py-20 bg-stone-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-32 h-32 border border-white/20 rounded-full"></div>
         <div className="absolute bottom-20 right-10 w-48 h-48 border border-white/10 rounded-full"></div>
@@ -39,10 +38,10 @@ export function PrivacyManifestoSection() {
 
       <div className="container mx-auto px-4 relative">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance dark:text-gray-100">
             Our Privacy Manifesto
           </h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed text-balance">
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed text-balance">
             In a world where surveillance capitalism has become the norm, we
             choose a different path. We believe the web can be both insightful
             and respectful, powerful and private.
@@ -55,17 +54,17 @@ export function PrivacyManifestoSection() {
             return (
               <div
                 key={index}
-                className="bg-stone-50 backdrop-blur-sm rounded-2xl p-8 border border-white/20"
+                className="bg-stone-50 dark:bg-gray-900 backdrop-blur-sm rounded-2xl p-8 border border-white/20 dark:border-gray-800"
               >
                 <div className="flex items-start space-x-4">
-                  <div className="bg-gray-600 p-3 rounded-lg flex-shrink-0">
+                  <div className="bg-gray-600 dark:bg-gray-700 p-3 rounded-lg flex-shrink-0">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                    <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">
                       {principle.title}
                     </h3>
-                    <p className="text-gray-700 leading-relaxed">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                       {principle.description}
                     </p>
                   </div>
@@ -76,8 +75,8 @@ export function PrivacyManifestoSection() {
         </div>
 
         <div className="text-center">
-          <div className="bg-stone-50 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto border border-white/20">
-            <blockquote className="text-2xl md:text-3xl font-light italic text-gray-900 mb-6 text-balance">
+          <div className="bg-stone-50 dark:bg-gray-900 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto border border-white/20 dark:border-gray-800">
+            <blockquote className="text-2xl md:text-3xl font-light italic text-gray-900 dark:text-gray-100 mb-6 text-balance">
               "The web was built to be decentralized, open, and empowering.
               Let's build analytics that honor those original values."
             </blockquote>
