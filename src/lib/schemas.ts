@@ -46,6 +46,7 @@ export const statsQuerySchema = z.object({
 
 export const tenantBodySchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters." }),
+  domains: z.array(z.string().url()).optional(),
 });
 
 export const tenantParamsSchema = z.object({

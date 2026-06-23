@@ -14,6 +14,7 @@ import { authRoutes } from "./routes/auth";
 import fastifyCookie from "@fastify/cookie";
 import { statsRoutes } from "./routes/stats";
 import { tenantRoutes } from "./routes/tenants";
+import { getAllowedOrigins } from "./lib/cors-cache";
 
 dotenv.config();
 
@@ -30,7 +31,14 @@ app.register(fastifyCookie, {
 });
 
 app.register(cors, {
-  origin: process.env.FRONTEND_URL || true,
+  origin: async (origin, cb) => {
+    const allowed = await getAllowedOrigins();
+    if (!origin || allowed.has(origin)) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  },
   credentials: true,
 });
 

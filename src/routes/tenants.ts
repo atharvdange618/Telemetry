@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { authHook } from "../hooks/auth";
 import { prisma } from "../lib/prisma";
 import { tenantBodySchema, tenantParamsSchema } from "../lib/schemas";
+import { invalidateOriginCache } from "../lib/cors-cache";
 
 export async function tenantRoutes(app: FastifyInstance) {
   app.addHook("preHandler", authHook);
@@ -26,16 +27,17 @@ export async function tenantRoutes(app: FastifyInstance) {
   // POST /api/tenants - Create a new tenant
   app.post("/api/tenants", async (request, reply) => {
     const userId = request.userId!;
-    const { name } = tenantBodySchema.parse(request.body);
+    const { name, domains } = tenantBodySchema.parse(request.body);
 
     const tenant = await prisma.$transaction(async (tx) => {
-      const t = await tx.tenant.create({ data: { name } });
+      const t = await tx.tenant.create({ data: { name, domains: domains ?? [] } });
       await tx.tenantUser.create({
         data: { tenantId: t.id, userId, role: "ADMIN" },
       });
       return t;
     });
 
+    invalidateOriginCache();
     return reply.code(201).send({ tenant });
   });
 
@@ -43,7 +45,7 @@ export async function tenantRoutes(app: FastifyInstance) {
   app.put("/api/tenants/:id", async (request, reply) => {
     const userId = request.userId!;
     const { id: tenantId } = tenantParamsSchema.parse(request.params);
-    const { name } = tenantBodySchema.parse(request.body);
+    const { name, domains } = tenantBodySchema.parse(request.body);
 
     const tenantUser = await prisma.tenantUser.findUnique({
       where: { userId_tenantId: { userId, tenantId } },
@@ -55,9 +57,10 @@ export async function tenantRoutes(app: FastifyInstance) {
 
     const updatedTenant = await prisma.tenant.update({
       where: { id: tenantId },
-      data: { name },
+      data: { name, ...(domains !== undefined && { domains }) },
     });
 
+    invalidateOriginCache();
     return { tenant: updatedTenant };
   });
 
@@ -76,6 +79,7 @@ export async function tenantRoutes(app: FastifyInstance) {
 
     await prisma.tenant.delete({ where: { id: tenantId } });
 
+    invalidateOriginCache();
     return reply.code(204).send();
   });
 }

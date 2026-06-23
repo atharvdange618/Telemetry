@@ -1,6 +1,7 @@
 export interface Tenant {
   id: string;
   name: string;
+  domains: string[];
 }
 
 export interface TenantsResponse {

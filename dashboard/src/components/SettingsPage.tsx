@@ -12,6 +12,8 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Tenant } from "@/lib/types/dashboard.types";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -39,22 +41,38 @@ const fetchAPI = async (url: string, options?: RequestInit) => {
 const SettingsPage = () => {
   const queryClient = useQueryClient();
   const [newSiteName, setNewSiteName] = useState("");
+  const [newSiteDomains, setNewSiteDomains] = useState("");
+  const [editingTenantId, setEditingTenantId] = useState<string | null>(null);
+  const [newDomain, setNewDomain] = useState("");
 
-  // Fetch tenants
   const { data: tenantsData, isLoading } = useQuery({
     queryKey: ["tenants"],
     queryFn: () => fetchAPI(`${API_URL}/api/tenants`),
   });
 
   const createTenant = useMutation({
-    mutationFn: (name: string) =>
+    mutationFn: (data: { name: string; domains: string[] }) =>
       fetchAPI(`${API_URL}/api/tenants`, {
         method: "POST",
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(data),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
       setNewSiteName("");
+      setNewSiteDomains("");
+    },
+  });
+
+  const updateTenant = useMutation({
+    mutationFn: ({ id, domains }: { id: string; domains: string[] }) =>
+      fetchAPI(`${API_URL}/api/tenants/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ name: tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.name, domains }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      setEditingTenantId(null);
+      setNewDomain("");
     },
   });
 
@@ -71,8 +89,25 @@ const SettingsPage = () => {
   const handleCreateSite = (e: FormEvent) => {
     e.preventDefault();
     if (newSiteName.trim()) {
-      createTenant.mutate(newSiteName.trim());
+      const domains = newSiteDomains
+        .split(",")
+        .map((d) => d.trim())
+        .filter(Boolean);
+      createTenant.mutate({ name: newSiteName.trim(), domains });
     }
+  };
+
+  const handleAddDomain = (tenant: Tenant) => {
+    const url = newDomain.trim();
+    if (!url) return;
+    const domains = [...tenant.domains, url];
+    updateTenant.mutate({ id: tenant.id, domains });
+    setNewDomain("");
+  };
+
+  const handleRemoveDomain = (tenant: Tenant, domain: string) => {
+    const domains = tenant.domains.filter((d) => d !== domain);
+    updateTenant.mutate({ id: tenant.id, domains });
   };
 
   return (
@@ -89,11 +124,16 @@ const SettingsPage = () => {
           <CardDescription>Add a new website to your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleCreateSite} className="flex gap-4">
+          <form onSubmit={handleCreateSite} className="space-y-4">
             <Input
               placeholder="My Awesome Blog"
               value={newSiteName}
               onChange={(e) => setNewSiteName(e.target.value)}
+            />
+            <Input
+              placeholder="Allowed domains (comma-separated, e.g. https://example.com)"
+              value={newSiteDomains}
+              onChange={(e) => setNewSiteDomains(e.target.value)}
             />
             <Button type="submit" disabled={createTenant.isPending}>
               {createTenant.isPending ? "Creating..." : "Create"}
@@ -117,6 +157,46 @@ const SettingsPage = () => {
                   readOnly
                   value={`<script async defer src="${API_URL}/analytics.js" data-tenant-id="${tenant.id}"></script>`}
                 />
+
+                <h3 className="font-semibold">Allowed Domains</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tenant.domains?.map((domain) => (
+                    <Badge key={domain} variant="secondary" className="gap-1">
+                      {domain}
+                      <button
+                        onClick={() => handleRemoveDomain(tenant, domain)}
+                        className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="https://example.com"
+                    value={editingTenantId === tenant.id ? newDomain : ""}
+                    onChange={(e) => {
+                      setEditingTenantId(tenant.id);
+                      setNewDomain(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddDomain(tenant);
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAddDomain(tenant)}
+                    disabled={updateTenant.isPending}
+                  >
+                    Add
+                  </Button>
+                </div>
+
                 <div className="flex justify-end">
                   <Dialog>
                     <DialogTrigger asChild>
