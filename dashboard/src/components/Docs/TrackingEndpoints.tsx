@@ -138,7 +138,7 @@ const TrackingEndpoints = () => {
             <p className="text-gray-600 mb-3 text-sm">
               Returned when the event is successfully recorded.
             </p>
-            <CodeBlock code={`{ "mesgray": "Event Received" }`} />
+            <CodeBlock code={`{ "message": "Event Received" }`} />
           </div>
           <div className="border border-stone-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -150,7 +150,7 @@ const TrackingEndpoints = () => {
               Returned if the provided <code>tenantId</code> is invalid or not
               found.
             </p>
-            <CodeBlock code={`{ "mesgray": "Tenant not found" }`} />
+            <CodeBlock code={`{ "message": "Tenant not found" }`} />
           </div>
           <div className="border border-stone-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -161,7 +161,7 @@ const TrackingEndpoints = () => {
             <p className="text-gray-600 mb-3 text-sm">
               Returned if an unexpected error occurs on the server.
             </p>
-            <CodeBlock code={`{ "mesgray": "Internal server error" }`} />
+            <CodeBlock code={`{ "message": "Internal server error" }`} />
           </div>
         </div>
       </div>

@@ -11,20 +11,16 @@ const DatabaseSchema = () => {
           Prisma.
         </p>
 
-        {/* ERD Image Placeholder */}
+        {/* ERD */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Entity Relationship Diagram
+            Entity Relationships
           </h3>
-          <div className="bg-stone-50 border border-stone-200 rounded-lg p-6 text-center">
-            <p className="text-gray-600">
-              A visual diagram helps understand the relationships between the
-              core tables.
-            </p>
-
-            <p className="text-sm text-gray-500 mt-2">
-              User ↔ Tenant (via TenantUser) | User → Account | Tenant → Event
-            </p>
+          <div className="bg-stone-50 border border-stone-200 rounded-lg p-6 font-mono text-sm text-gray-700 space-y-2">
+            <p>User ── TenantUser ── Tenant</p>
+            <p>User ── Account (OAuth provider link)</p>
+            <p>Tenant ── Event (all analytics events)</p>
+            <p className="text-xs text-gray-500 mt-3">Many-to-many: Users access Tenants via TenantUser with role (ADMIN / MEMBER)</p>
           </div>
         </div>
 
@@ -66,6 +62,7 @@ const DatabaseSchema = () => {
                   code={`model Tenant {
   id        String       @id @default(cuid())
   name      String
+  domains   String[]
   createdAt DateTime     @default(now())
 
   users     TenantUser[]
@@ -93,15 +90,12 @@ const DatabaseSchema = () => {
   visitorId    String
   createdAt    DateTime  @default(now())
 
-  // Goal Tracking Fields
-  type         String    @default("pageview") // 'pageview' or 'goal'
+  type         String    @default("pageview")
   goalName     String?
 
-  // Location Fields
   country      String?
   city         String?
 
-  // UTM Fields
   utmSource    String?
   utmMedium    String?
   utmCampaign  String?
@@ -112,7 +106,12 @@ const DatabaseSchema = () => {
 
   @@index([tenantId, createdAt])
   @@index([tenantId, visitorId])
-  // ... and 6 other indexes for performance
+  @@index([tenantId, path])
+  @@index([tenantId, referrer])
+  @@index([tenantId, utmSource])
+  @@index([tenantId, utmCampaign])
+  @@index([tenantId, type, goalName])
+  @@index([tenantId, country])
 }`}
                 />
               </div>
@@ -184,20 +183,32 @@ const DatabaseSchema = () => {
               </h4>
               <ul className="text-gray-600 text-sm space-y-1 list-disc list-inside">
                 <li>
-                  `@@index([tenantId, createdAt])`: For time-series data and
-                  filtering by period.
+                  `@@index([tenantId, createdAt])`: Time-series queries and
+                  period filtering.
                 </li>
                 <li>
-                  `@@index([tenantId, visitorId])`: For querying unique visitor
-                  information.
+                  `@@index([tenantId, visitorId])`: Unique visitor counting
+                  and engagement metrics.
                 </li>
                 <li>
-                  `@@index([tenantId, path])`: For generating "Top Pages"
+                  `@@index([tenantId, path])`: Top pages reports.
+                </li>
+                <li>
+                  `@@index([tenantId, referrer])`: Top referrers reports.
+                </li>
+                <li>
+                  `@@index([tenantId, utmSource])`: UTM source reports.
+                </li>
+                <li>
+                  `@@index([tenantId, utmCampaign])`: Campaign performance
                   reports.
                 </li>
                 <li>
-                  `@@index([tenantId, referrer])`: For generating "Top
-                  Referrers" reports.
+                  `@@index([tenantId, type, goalName])`: Goal tracking
+                  queries.
+                </li>
+                <li>
+                  `@@index([tenantId, country])`: Location-based reports.
                 </li>
               </ul>
             </div>

@@ -198,6 +198,128 @@ const Statistics = () => {
 }`}
             />
           </div>
+
+          {/* GET /api/stats/devices */}
+          <div className="border border-stone-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                GET
+              </span>
+              <code>/api/stats/devices</code>
+            </div>
+            <p className="text-gray-600 mb-3 text-sm">
+              Returns visitor breakdown by device type (inferred from screen
+              width): mobile (&lt;768px), tablet (768-1024px), desktop
+              (&gt;1024px).
+            </p>
+            <CodeBlock
+              code={`{
+  "devices": {
+    "mobile": 450,
+    "tablet": 120,
+    "desktop": 680
+  }
+}`}
+            />
+          </div>
+
+          {/* GET /api/stats/engagement */}
+          <div className="border border-stone-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                GET
+              </span>
+              <code>/api/stats/engagement</code>
+            </div>
+            <p className="text-gray-600 mb-3 text-sm">
+              Returns engagement metrics: average pages per session, and new vs
+              returning visitor split (compares against the previous period).
+            </p>
+            <CodeBlock
+              code={`{
+  "avgPagesPerSession": 3.2,
+  "newVisitors": 620,
+  "returningVisitors": 270,
+  "totalVisitors": 890
+}`}
+            />
+          </div>
+
+          {/* GET /api/stats/campaigns */}
+          <div className="border border-stone-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                GET
+              </span>
+              <code>/api/stats/campaigns</code>
+            </div>
+            <p className="text-gray-600 mb-3 text-sm">
+              Returns top UTM mediums and campaigns for measuring marketing
+              channel effectiveness.
+            </p>
+            <CodeBlock
+              code={`{
+  "mediums": [
+    { "medium": "social", "views": 200 },
+    { "medium": "cpc", "views": 150 }
+  ],
+  "campaigns": [
+    { "campaign": "spring-launch", "views": 180 },
+    { "campaign": "newsletter-june", "views": 90 }
+  ]
+}`}
+            />
+          </div>
+
+          {/* GET /api/stats/cities */}
+          <div className="border border-stone-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                GET
+              </span>
+              <code>/api/stats/cities</code>
+            </div>
+            <p className="text-gray-600 mb-3 text-sm">
+              Returns the top 20 cities by page views.
+            </p>
+            <CodeBlock
+              code={`{
+  "cities": [
+    { "city": "Pune", "views": 120 },
+    { "city": "Mumbai", "views": 85 }
+  ]
+}`}
+            />
+          </div>
+
+          {/* GET /api/stats/compare */}
+          <div className="border border-stone-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                GET
+              </span>
+              <code>/api/stats/compare</code>
+            </div>
+            <p className="text-gray-600 mb-3 text-sm">
+              Compares the current period against the previous period. Returns
+              current/previous values and percentage change for page views and
+              unique visitors.
+            </p>
+            <CodeBlock
+              code={`{
+  "pageViews": {
+    "current": 1250,
+    "previous": 1100,
+    "change": 13.6
+  },
+  "uniqueVisitors": {
+    "current": 890,
+    "previous": 820,
+    "change": 8.5
+  }
+}`}
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -161,7 +161,7 @@ const Authentication = () => {
                 <p className="text-xs font-semibold text-gray-500 mb-2">
                   ERROR RESPONSE (401 UNAUTHORIZED)
                 </p>
-                <CodeBlock code={`{ "mesgray": "Unauthorized" }`} />
+                <CodeBlock code={`{ "message": "Unauthorized" }`} />
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ const Authentication = () => {
             <p className="text-xs font-semibold text-gray-500 mb-2">
               SUCCESS RESPONSE (200 OK)
             </p>
-            <CodeBlock code={`{ "mesgray": "Logged out" }`} />
+            <CodeBlock code={`{ "message": "Logged out" }`} />
           </div>
         </div>
       </div>

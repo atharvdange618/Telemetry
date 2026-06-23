@@ -51,7 +51,7 @@ const TrackingScript = () => {
             where the visitor came from.
           </li>
           <li>
-            <strong>Screen Dimensions:</strong> For understanding device ugray
+            <strong>Screen Dimensions:</strong> For understanding device usage
             (e.g., 1920x1080).
           </li>
           <li>

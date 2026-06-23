@@ -69,14 +69,19 @@ The main dashboard is a single-page interface for viewing all analytics data.
 - **Features**:
   - **Site (Tenant) Selection**: Users can switch between different websites they've registered from a dropdown menu.
   - **Time Period Filter**: Data can be filtered to show metrics for the last 24 hours, 7 days, or 30 days.
-  - **Key Metrics**: At-a-glance cards for **Page Views**, **Unique Visitors**, and **Bounce Rate**.
+  - **Period Comparison**: Summary cards show percentage change vs the previous period.
+  - **Key Metrics**: At-a-glance cards for **Page Views**, **Unique Visitors**, and **Engagement** (pages/session, new vs returning).
   - **Visualizations**:
     - **Views Over Time**: A line chart showing page view trends.
-    - **Locations**: A world map (`VectorMap`) and a table showing the top countries by page views.
+    - **Locations**: A world map and a table showing the top countries by page views.
+    - **Devices**: Mobile/tablet/desktop breakdown with progress bars.
   - **Data Tables**:
     - Top Pages
     - Top Referrers
     - Top UTM Sources
+    - Top Cities
+    - Top UTM Mediums
+    - Top Campaigns
     - Top Goal Completions
 
 ### Settings (`dashboard/src/components/SettingsPage.tsx`)
@@ -84,8 +89,9 @@ The main dashboard is a single-page interface for viewing all analytics data.
 The settings page allows users to manage their sites.
 
 - **Features**:
-  - **Create New Site**: Users can add a new website (tenant) to their account.
+  - **Create New Site**: Users can add a new website (tenant) to their account with optional allowed domains.
   - **View Embed Script**: For each site, the page displays the unique `<script>` tag that needs to be embedded.
+  - **Manage Domains**: Users can add or remove allowed domains for CORS. Only requests from registered domains are accepted.
   - **Delete Site**: Users can permanently delete a site and all its associated analytics data.
 
 ## 3. API Reference
@@ -132,6 +138,7 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 - **Authentication**: All routes are protected by the `authHook`.
 - **Query Parameters**: All routes require `tenantId` and accept a `period` (`24h`, `7d`, `30d`).
 
+- **`POST /api/track`**: The main endpoint for collecting analytics data from the `analytics.js` script.
 - **`GET /api/stats/summary`**: Returns the core metrics: `pageViews`, `uniqueVisitors`, and `bounceRate`.
 - **`GET /api/stats/pages`**: Returns a list of the top 10 most viewed pages.
 - **`GET /api/stats/referrers`**: Returns the top 10 referrers.
@@ -139,6 +146,11 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 - **`GET /api/stats/sources`**: Returns the top 10 UTM sources.
 - **`GET /api/stats/goals`**: Returns the top 10 completed goals.
 - **`GET /api/stats/locations`**: Returns the top 20 countries by page views.
+- **`GET /api/stats/devices`**: Returns mobile/tablet/desktop breakdown from screen width.
+- **`GET /api/stats/engagement`**: Returns pages/session, new vs returning visitor split.
+- **`GET /api/stats/campaigns`**: Returns top UTM mediums and campaigns.
+- **`GET /api/stats/cities`**: Returns the top 20 cities by page views.
+- **`GET /api/stats/compare`**: Compares current vs previous period with percentage change.
 
 ## 4. Database Schema
 
@@ -151,6 +163,19 @@ The schema is defined in `prisma/schema.prisma`.
 - **`Event`**: The central table for all analytics data. It stores pageviews, goals, location data, UTM parameters, and the anonymized `visitorId`.
 
 ## 5. Changelog
+
+### 2026-06-23: `feat: advanced analytics, dynamic CORS, and UI overhaul`
+
+- **Advanced Analytics Endpoints**: Added 5 new stats endpoints: devices, engagement, campaigns, cities, and period comparison.
+- **Dashboard UI**: Added device breakdown bars, engagement card, city/medium/campaign tables, and period comparison badges on summary cards.
+- **Dynamic CORS**: CORS origins are now managed per-tenant via a `domains` field in the database. Dashboard URL is always allowed via `FRONTEND_URL` env var.
+- **Responsive Dashboard**: Fixed mobile overflow on dashboard header, added segmented period controls, responsive stat card sizing.
+- **Mobile Navigation**: Added hamburger menu for mobile users on the landing page with dark mode toggle.
+- **Global Dark Mode**: Dark mode now initializes on all pages, not just the landing page. Removed `next-themes` dependency in favor of custom `useDarkMode` hook.
+- **Accurate Geolocation**: Replaced outdated `geoip-lite` with `ip-api.com` for city-level accuracy.
+- **Trust Proxy**: Enabled `trustProxy` on Fastify to read real client IPs behind reverse proxies.
+- **Build Script**: Added `prisma generate` and generated client copy to the build pipeline.
+- **Tenant Domains**: Added `domains String[]` field to Tenant model for per-site CORS management.
 
 ### 2025-09-21: `feat: Overhaul UI with new landing and docs pages`
 
