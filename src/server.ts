@@ -19,6 +19,7 @@ import { refreshOrigins, isOriginAllowed } from "./lib/cors-cache";
 dotenv.config();
 
 const app = Fastify({
+  trustProxy: true,
   logger: {
     transport: {
       target: "pino-pretty",
