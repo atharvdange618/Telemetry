@@ -34,6 +34,7 @@ app.register(cors, {
   origin: (origin, cb) => {
     cb(null, isOriginAllowed(origin));
   },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 });
 
