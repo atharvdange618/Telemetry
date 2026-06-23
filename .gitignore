@@ -138,8 +138,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-prisma/migrations
-
 src/generated
 
 # Dashboard build output (generated into public/)
