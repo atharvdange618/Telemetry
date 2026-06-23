@@ -14,7 +14,7 @@ import { authRoutes } from "./routes/auth";
 import fastifyCookie from "@fastify/cookie";
 import { statsRoutes } from "./routes/stats";
 import { tenantRoutes } from "./routes/tenants";
-import { getAllowedOrigins } from "./lib/cors-cache";
+import { refreshOrigins, isOriginAllowed } from "./lib/cors-cache";
 
 dotenv.config();
 
@@ -31,13 +31,8 @@ app.register(fastifyCookie, {
 });
 
 app.register(cors, {
-  origin: async (origin, cb) => {
-    const allowed = await getAllowedOrigins();
-    if (!origin || allowed.has(origin)) {
-      cb(null, true);
-    } else {
-      cb(null, false);
-    }
+  origin: (origin, cb) => {
+    cb(null, isOriginAllowed(origin));
   },
   credentials: true,
 });
@@ -62,9 +57,11 @@ app.get("/health", async () => {
 
 const port = Number(process.env.PORT) || 3000;
 
-app.listen({ port, host: "0.0.0.0" }, (err) => {
-  if (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
+refreshOrigins().then(() => {
+  app.listen({ port, host: "0.0.0.0" }, (err) => {
+    if (err) {
+      app.log.error(err);
+      process.exit(1);
+    }
+  });
 });
