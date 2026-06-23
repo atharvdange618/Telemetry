@@ -140,10 +140,6 @@ vite.config.ts.timestamp-*
 
 src/generated
 
-# Dashboard build output (generated into public/)
-public/index.html
-public/assets/
-
 # PM2 logs
 logs/
 

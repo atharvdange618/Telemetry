@@ -3,17 +3,21 @@ import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
 import path from "path";
-import { fileURLToPath } from "url";
 import maxmind, { CityResponse } from "maxmind";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(
   __dirname,
   "../../node_modules/geoip-lite/data/GeoLite2-City.mmdb"
 );
-const geoIpLookup = await maxmind.open<CityResponse>(dbPath);
+
+let geoIpLookup: any = null;
+
+async function getGeoIpLookup() {
+  if (!geoIpLookup) {
+    geoIpLookup = await maxmind.open<CityResponse>(dbPath);
+  }
+  return geoIpLookup;
+}
 
 export async function trackRoutes(app: FastifyInstance) {
   app.post<{ Body: CreateEventInput }>(
@@ -38,7 +42,8 @@ export async function trackRoutes(app: FastifyInstance) {
         }
 
         const ip = request.ip;
-        const location = geoIpLookup.get(ip);
+        const lookup = await getGeoIpLookup();
+        const location = lookup.get(ip);
         const country = location?.country?.iso_code || null;
         const city = location?.city?.names?.en || null;
 
