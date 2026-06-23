@@ -23,6 +23,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const fetchAPI = async (url: string, options?: RequestInit) => {
   const res = await fetch(url, {
     credentials: "include",
@@ -41,12 +43,12 @@ const SettingsPage = () => {
   // Fetch tenants
   const { data: tenantsData, isLoading } = useQuery({
     queryKey: ["tenants"],
-    queryFn: () => fetchAPI("http://localhost:3000/api/tenants"),
+    queryFn: () => fetchAPI(`${API_URL}/api/tenants`),
   });
 
   const createTenant = useMutation({
     mutationFn: (name: string) =>
-      fetchAPI("http://localhost:3000/api/tenants", {
+      fetchAPI(`${API_URL}/api/tenants`, {
         method: "POST",
         body: JSON.stringify({ name }),
       }),
@@ -58,7 +60,7 @@ const SettingsPage = () => {
 
   const deleteTenant = useMutation({
     mutationFn: (tenantId: string) =>
-      fetchAPI(`http://localhost:3000/api/tenants/${tenantId}`, {
+      fetchAPI(`${API_URL}/api/tenants/${tenantId}`, {
         method: "DELETE",
       }),
     onSuccess: () => {
@@ -113,7 +115,7 @@ const SettingsPage = () => {
                 <h3 className="font-semibold">Embed Script</h3>
                 <Input
                   readOnly
-                  value={`<script async defer src="http://localhost:3000/analytics.js" data-tenant-id="${tenant.id}"></script>`}
+                  value={`<script async defer src="${API_URL}/analytics.js" data-tenant-id="${tenant.id}"></script>`}
                 />
                 <div className="flex justify-end">
                   <Dialog>

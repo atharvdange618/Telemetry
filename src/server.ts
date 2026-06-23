@@ -10,7 +10,6 @@ import cors from "@fastify/cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// routes
 import { trackRoutes } from "./routes/track";
 import { authRoutes } from "./routes/auth";
 import fastifyCookie from "@fastify/cookie";
@@ -47,6 +46,14 @@ app.register(fastifyStatic, {
   prefix: "/",
 });
 
+app.setNotFoundHandler(async (request, reply) => {
+  if (request.url.startsWith("/api/") || request.url.startsWith("/login")) {
+    reply.code(404).send({ error: "Not found" });
+    return;
+  }
+  reply.code(404).send({ error: "Not found" });
+});
+
 app.register(authRoutes);
 app.register(tenantRoutes);
 app.register(statsRoutes);
@@ -57,7 +64,9 @@ app.get("/health", async () => {
   return { status: "ok" };
 });
 
-app.listen({ port: 3000 }, (err) => {
+const port = Number(process.env.PORT) || 3000;
+
+app.listen({ port, host: "0.0.0.0" }, (err) => {
   if (err) {
     app.log.error(err);
     process.exit(1);

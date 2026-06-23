@@ -142,6 +142,16 @@ prisma/migrations
 
 src/generated
 
+# Dashboard build output (generated into public/)
+public/index.html
+public/assets/
+
+# PM2 logs
+logs/
+
 telemetryapis
 
 .vscode/
+
+# Project context (AI agent working files)
+.context/

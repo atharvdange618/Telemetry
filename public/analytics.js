@@ -8,7 +8,8 @@
     return;
   }
 
-  const endpoint = "http://localhost:3000/api/track";
+  const scriptOrigin = scriptEl.src ? new URL(scriptEl.src).origin : window.location.origin;
+  const endpoint = scriptOrigin + "/api/track";
 
   function sendEvent(payload) {
     const blob = new Blob([JSON.stringify(payload)], {
