@@ -2,22 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
-import path from "path";
-import maxmind, { CityResponse } from "maxmind";
-
-const dbPath = path.join(
-  __dirname,
-  "../../node_modules/geoip-lite/data/GeoLite2-City.mmdb"
-);
-
-let geoIpLookup: any = null;
-
-async function getGeoIpLookup() {
-  if (!geoIpLookup) {
-    geoIpLookup = await maxmind.open<CityResponse>(dbPath);
-  }
-  return geoIpLookup;
-}
+import geoip from "geoip-lite";
 
 export async function trackRoutes(app: FastifyInstance) {
   app.post<{ Body: CreateEventInput }>(
@@ -42,10 +27,9 @@ export async function trackRoutes(app: FastifyInstance) {
         }
 
         const ip = request.ip;
-        const lookup = await getGeoIpLookup();
-        const location = lookup.get(ip);
-        const country = location?.country?.iso_code || null;
-        const city = location?.city?.names?.en || null;
+        const geo = geoip.lookup(ip);
+        const country = geo?.country || null;
+        const city = geo?.city || null;
 
         console.log(
           `Tracking event for tenant ${tenantId} from IP ${ip}, country: ${country}, city: ${city}`

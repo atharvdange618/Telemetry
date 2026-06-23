@@ -30,6 +30,7 @@
     "fastify-type-provider-zod": "^5.0.2",
     "inquirer": "^12.9.0",
     "maxmind": "^4.3.29",
+    "geoip-lite": "^1.4.10",
     "prisma": "^6.13.0",
     "zod": "^4.0.14"
   },
