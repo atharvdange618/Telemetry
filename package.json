@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "@types/geoip-lite": "^1.4.7",
     "geoip-lite": "^1.4.10",
     "pino-pretty": "^13.1.1",
     "tsx": "^4.20.3",
