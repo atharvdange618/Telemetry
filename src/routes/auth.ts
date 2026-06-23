@@ -81,7 +81,7 @@ export async function authRoutes(app: FastifyInstance) {
           });
 
           const t = await tx.tenant.create({
-            data: { name: `${name}'s Site` },
+            data: { name: `${name}'s Site`, domains: [] },
           });
 
           await tx.tenantUser.create({
