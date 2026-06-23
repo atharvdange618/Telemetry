@@ -142,74 +142,70 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">
+    <div className="p-4 md:p-8 bg-background min-h-screen">
+      <header className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl md:text-3xl font-bold truncate">
           {isLoadingTenants
             ? "Loading..."
             : selectedTenant?.name || "Dashboard"}
         </h1>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="text-xl font-bold p-6">
-              {isLoadingTenants
-                ? "Loading Sites..."
-                : selectedTenant?.name || "Select a Site"}
-              <ChevronsUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Your Sites</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {tenantsData?.tenants.map((tenant) => (
-              <DropdownMenuItem
-                key={tenant.id}
-                onSelect={() => setSelectedTenantId(tenant.id)}
-              >
-                {tenant.name}
+        <div className="flex flex-wrap items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="text-sm font-semibold">
+                {isLoadingTenants
+                  ? "Loading Sites..."
+                  : selectedTenant?.name || "Select a Site"}
+                <ChevronsUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Your Sites</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {tenantsData?.tenants.map((tenant) => (
+                <DropdownMenuItem
+                  key={tenant.id}
+                  onSelect={() => setSelectedTenantId(tenant.id)}
+                >
+                  {tenant.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => navigate("/settings")}>
+                Create New Site
               </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => navigate("/settings")}>
-              Create New Site
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-        <div className="flex items-center gap-4">
-          <div>
-            <Button
-              onClick={() => setPeriod("24h")}
-              variant={period === "24h" ? "default" : "outline"}
-            >
-              24h
-            </Button>
-            <Button
-              onClick={() => setPeriod("7d")}
-              variant={period === "7d" ? "default" : "outline"}
-            >
-              7d
-            </Button>
-            <Button
-              onClick={() => setPeriod("30d")}
-              variant={period === "30d" ? "default" : "outline"}
-            >
-              30d
-            </Button>
+          <div className="flex rounded-md border border-border">
+            {(["24h", "7d", "30d"] as const).map((p) => (
+              <Button
+                key={p}
+                onClick={() => setPeriod(p)}
+                variant={period === p ? "default" : "ghost"}
+                size="sm"
+                className="rounded-none first:rounded-l-md last:rounded-r-md"
+              >
+                {p}
+              </Button>
+            ))}
           </div>
-          <Button asChild variant="outline">
+
+          <Button asChild variant="outline" size="sm">
             <Link to="/settings">Settings</Link>
           </Button>
-          <Avatar>
+
+          <Avatar className="h-8 w-8">
             <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-            <AvatarFallback>
+            <AvatarFallback className="text-xs">
               {user?.name?.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
+
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">Logout</Button>
+              <Button variant="outline" size="sm">Logout</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -232,12 +228,12 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Page Views</CardTitle>
           </CardHeader>
-          <CardContent className="text-4xl font-bold">
+          <CardContent className="text-3xl md:text-4xl font-bold">
             {isLoadingSummary ? "..." : summary?.pageViews ?? 0}
           </CardContent>
         </Card>
@@ -245,7 +241,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Unique Visitors</CardTitle>
           </CardHeader>
-          <CardContent className="text-4xl font-bold">
+          <CardContent className="text-3xl md:text-4xl font-bold">
             {isLoadingSummary ? "..." : summary?.uniqueVisitors ?? 0}
           </CardContent>
         </Card>
@@ -253,7 +249,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Bounce Rate</CardTitle>
           </CardHeader>
-          <CardContent className="text-4xl font-bold">
+          <CardContent className="text-3xl md:text-4xl font-bold">
             {isLoadingSummary ? "..." : `${summary?.bounceRate ?? 0}%`}
           </CardContent>
         </Card>
@@ -305,7 +301,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top Pages Table */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Top Pages</CardTitle>
@@ -336,7 +331,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top Goals Table */}
         <Card>
           <CardHeader>
             <CardTitle>Top Goals</CardTitle>
@@ -369,7 +363,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top Sources Table */}
         <Card>
           <CardHeader>
             <CardTitle>Top Sources</CardTitle>
@@ -402,7 +395,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top Referrers Table */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Top Referrers</CardTitle>

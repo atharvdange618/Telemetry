@@ -111,7 +111,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-4 md:p-8 bg-background min-h-screen">
       <div className="mb-8">
         <Button asChild variant="outline">
           <Link to="/dashboard">← Back to Dashboard</Link>

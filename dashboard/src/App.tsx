@@ -16,8 +16,14 @@ import React from "react";
 import SettingsPage from "./components/SettingsPage";
 import Home from "./pages/Home";
 import DocsPage from "./pages/DocsPage";
+import { useDarkMode } from "./hooks/useDarkMode";
 
 const queryClient = new QueryClient();
+
+function DarkModeInit() {
+  useDarkMode();
+  return null;
+}
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
@@ -84,6 +90,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <DarkModeInit />
       <RouterProvider router={router} />
     </QueryClientProvider>
   );
