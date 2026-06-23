@@ -14,6 +14,7 @@ export async function refreshOrigins() {
 
 export function isOriginAllowed(origin: string | undefined): boolean {
   if (!origin) return true;
+  if (origin === process.env.FRONTEND_URL) return true;
   if (Date.now() - lastFetch >= CACHE_TTL) {
     refreshOrigins().catch(() => {});
   }
