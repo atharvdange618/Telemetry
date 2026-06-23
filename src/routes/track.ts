@@ -2,7 +2,19 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
-import geoip from "geoip-lite";
+
+async function getGeoLocation(ip: string): Promise<{ country: string | null; city: string | null }> {
+  if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.")) {
+    return { country: null, city: null };
+  }
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,city`);
+    const data = await res.json();
+    return { country: data.country || null, city: data.city || null };
+  } catch {
+    return { country: null, city: null };
+  }
+}
 
 export async function trackRoutes(app: FastifyInstance) {
   app.post<{ Body: CreateEventInput }>(
@@ -27,9 +39,7 @@ export async function trackRoutes(app: FastifyInstance) {
         }
 
         const ip = request.ip;
-        const geo = geoip.lookup(ip);
-        const country = geo?.country || null;
-        const city = geo?.city || null;
+        const { country, city } = await getGeoLocation(ip);
 
         console.log(
           `Tracking event for tenant ${tenantId} from IP ${ip}, country: ${country}, city: ${city}`
