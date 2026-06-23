@@ -31,6 +31,11 @@ import {
 } from "@/components/ui/table";
 import { useAuthStore } from "@/lib/state/auth";
 import type {
+  CampaignsResponse,
+  CitiesResponse,
+  CompareResponse,
+  DevicesResponse,
+  EngagementResponse,
   GoalsResponse,
   LocationsResponse,
   PagesResponse,
@@ -126,6 +131,36 @@ export default function DashboardPage() {
       enabled: !!selectedTenantId,
     });
 
+  const { data: devicesData } = useQuery<DevicesResponse>({
+    queryKey: ["devices", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/devices${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
+  const { data: engagementData } = useQuery<EngagementResponse>({
+    queryKey: ["engagement", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/engagement${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
+  const { data: campaignsData } = useQuery<CampaignsResponse>({
+    queryKey: ["campaigns", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/campaigns${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
+  const { data: citiesData } = useQuery<CitiesResponse>({
+    queryKey: ["cities", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/cities${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
+  const { data: compareData } = useQuery<CompareResponse>({
+    queryKey: ["compare", selectedTenantId, period],
+    queryFn: () => fetchAPI(`${endpoint}/compare${queryParams}`),
+    enabled: !!selectedTenantId,
+  });
+
   const handleLogout = async () => {
     try {
       const response = await fetch(`${APP_URL}/logout`, {
@@ -140,6 +175,12 @@ export default function DashboardPage() {
       }
     }
   };
+
+  const ChangeBadge = ({ change }: { change: number }) => (
+    <span className={`text-xs font-medium ml-2 ${change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+      {change >= 0 ? "+" : ""}{change}%
+    </span>
+  );
 
   return (
     <div className="p-4 md:p-8 bg-background min-h-screen">
@@ -231,7 +272,7 @@ export default function DashboardPage() {
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Page Views</CardTitle>
+            <CardTitle className="flex items-center">Page Views{compareData && <ChangeBadge change={compareData.pageViews.change} />}</CardTitle>
           </CardHeader>
           <CardContent className="text-3xl md:text-4xl font-bold">
             {isLoadingSummary ? "..." : summary?.pageViews ?? 0}
@@ -239,7 +280,7 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Unique Visitors</CardTitle>
+            <CardTitle className="flex items-center">Unique Visitors{compareData && <ChangeBadge change={compareData.uniqueVisitors.change} />}</CardTitle>
           </CardHeader>
           <CardContent className="text-3xl md:text-4xl font-bold">
             {isLoadingSummary ? "..." : summary?.uniqueVisitors ?? 0}
@@ -247,10 +288,23 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Bounce Rate</CardTitle>
+            <CardTitle>Engagement</CardTitle>
           </CardHeader>
-          <CardContent className="text-3xl md:text-4xl font-bold">
-            {isLoadingSummary ? "..." : `${summary?.bounceRate ?? 0}%`}
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Pages / Session</span>
+                <span className="font-semibold">{engagementData?.avgPagesPerSession ?? "..."}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">New Visitors</span>
+                <span className="font-semibold">{engagementData?.newVisitors ?? "..."}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Returning</span>
+                <span className="font-semibold">{engagementData?.returningVisitors ?? "..."}</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -419,6 +473,126 @@ export default function DashboardPage() {
                       <TableCell className="text-right">{ref.views}</TableCell>
                     </TableRow>
                   ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Devices</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {devicesData && (() => {
+                const total = devicesData.devices.mobile + devicesData.devices.tablet + devicesData.devices.desktop;
+                const items = [
+                  { label: "Desktop", value: devicesData.devices.desktop, color: "bg-primary" },
+                  { label: "Mobile", value: devicesData.devices.mobile, color: "bg-accent" },
+                  { label: "Tablet", value: devicesData.devices.tablet, color: "bg-chart-3" },
+                ];
+                return items.map((item) => (
+                  <div key={item.label}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-muted-foreground">{item.label}</span>
+                      <span className="font-medium">{total > 0 ? Math.round(item.value / total * 100) : 0}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className={`h-full rounded-full ${item.color}`} style={{ width: `${total > 0 ? item.value / total * 100 : 0}%` }} />
+                    </div>
+                  </div>
+                ));
+              })()}
+              {!devicesData && <p className="text-sm text-muted-foreground">No data</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Cities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>City</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {citiesData?.cities?.length ? (
+                  citiesData.cities.map((c) => (
+                    <TableRow key={c.city}>
+                      <TableCell>{c.city}</TableCell>
+                      <TableCell className="text-right">{c.views}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={2}>No data</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Mediums</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Medium</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {campaignsData?.mediums?.length ? (
+                  campaignsData.mediums.map((m) => (
+                    <TableRow key={m.medium}>
+                      <TableCell>{m.medium}</TableCell>
+                      <TableCell className="text-right">{m.views}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={2}>No data</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Top Campaigns</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead className="text-right">Views</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {campaignsData?.campaigns?.length ? (
+                  campaignsData.campaigns.map((c) => (
+                    <TableRow key={c.campaign}>
+                      <TableCell>{c.campaign}</TableCell>
+                      <TableCell className="text-right">{c.views}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={2}>No data</TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>

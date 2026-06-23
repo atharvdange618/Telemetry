@@ -61,3 +61,32 @@ export interface LocationsResponse {
     views: number;
   }[];
 }
+
+export interface DevicesResponse {
+  devices: {
+    mobile: number;
+    tablet: number;
+    desktop: number;
+  };
+}
+
+export interface EngagementResponse {
+  avgPagesPerSession: number;
+  newVisitors: number;
+  returningVisitors: number;
+  totalVisitors: number;
+}
+
+export interface CampaignsResponse {
+  mediums: { medium: string; views: number }[];
+  campaigns: { campaign: string; views: number }[];
+}
+
+export interface CitiesResponse {
+  cities: { city: string; views: number }[];
+}
+
+export interface CompareResponse {
+  pageViews: { current: number; previous: number; change: number };
+  uniqueVisitors: { current: number; previous: number; change: number };
+}
