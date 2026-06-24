@@ -35,12 +35,14 @@ export async function authRoutes(app: FastifyInstance) {
       const githubUserResponse = await fetch(`${process.env.GITHUB_URL}/user`, {
         headers: {
           Authorization: `Bearer ${token.access_token}`,
+          "User-Agent": "Telemetry-App",
         },
       });
 
       const githubUserData = await githubUserResponse.json();
       const {
         id: githubId,
+        login,
         name,
         avatar_url,
       } = githubUserSchema.parse(githubUserData);
@@ -51,8 +53,9 @@ export async function authRoutes(app: FastifyInstance) {
         {
           headers: {
             Authorization: `Bearer ${token.access_token}`,
+            "User-Agent": "Telemetry-App",
           },
-        }
+        },
       );
       const githubEmailsData = await githubEmailsResponse.json();
       const primaryEmail = z
@@ -71,17 +74,19 @@ export async function authRoutes(app: FastifyInstance) {
       });
 
       if (!user) {
+        const displayName = name || login || primaryEmail.email.split("@")[0];
+
         const newUser = await prisma.$transaction(async (tx) => {
-          const u = await prisma.user.create({
+          const u = await tx.user.create({
             data: {
               email: primaryEmail.email,
-              name: name,
+              name: displayName,
               image: avatar_url,
             },
           });
 
           const t = await tx.tenant.create({
-            data: { name: `${name}'s Site`, domains: [] },
+            data: { name: `${displayName}'s Site`, domains: [] },
           });
 
           await tx.tenantUser.create({

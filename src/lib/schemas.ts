@@ -29,6 +29,7 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 
 export const githubUserSchema = z.object({
   id: z.number(),
+  login: z.string(),
   name: z.string().nullable(),
   avatar_url: z.string().url(),
 });
