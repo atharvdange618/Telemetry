@@ -10,9 +10,6 @@ import {
   Link as LinkIcon,
   Crosshair,
   BarChart3,
-  Smartphone,
-  TrendingUp,
-  MapPin,
   Megaphone,
 } from "lucide-react";
 
