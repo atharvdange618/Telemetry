@@ -39,7 +39,7 @@ export function LocationMap({ data }: LocationMapProps) {
           },
           hover: {
             fill: "var(--primary)",
-            "fill-opacity": 0.7,
+            fillOpacity: 0.7,
           },
         }}
       />
