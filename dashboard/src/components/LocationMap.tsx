@@ -23,7 +23,7 @@ export function LocationMap({ data }: LocationMapProps) {
           regions: [
             {
               attribute: "fill",
-              scale: ["hsl(var(--muted))", "hsl(var(--primary))"],
+              scale: ["var(--muted)", "var(--primary)"],
               values: mapData,
               normalizeFunction: "linear",
             },
@@ -35,10 +35,11 @@ export function LocationMap({ data }: LocationMapProps) {
         }}
         regionStyle={{
           initial: {
-            fill: "hsl(var(--muted))",
+            fill: "var(--muted)",
           },
           hover: {
-            fill: "hsl(var(--primary) / 0.7)",
+            fill: "var(--primary)",
+            "fill-opacity": 0.7,
           },
         }}
       />

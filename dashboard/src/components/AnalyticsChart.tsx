@@ -26,20 +26,20 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
             />
             <YAxis
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -47,8 +47,8 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
                 fontSize: "13px",
               }}
@@ -57,10 +57,10 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
             <Area
               type="monotone"
               dataKey="views"
-              stroke="hsl(var(--primary))"
+              stroke="var(--primary)"
               strokeWidth={2}
               fill="url(#viewsGradient)"
-              activeDot={{ r: 5, strokeWidth: 2 }}
+              activeDot={{ r: 5, strokeWidth: 2, fill: "var(--primary)", stroke: "var(--card)" }}
             />
           </AreaChart>
         </ResponsiveContainer>
