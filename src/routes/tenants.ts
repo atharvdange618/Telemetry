@@ -8,7 +8,7 @@ export async function tenantRoutes(app: FastifyInstance) {
   app.addHook("preHandler", authHook);
 
   // GET /api/tenants
-  app.get("/api/tenants", async (request, reply) => {
+  app.get("/api/tenants", async (request, _reply) => {
     const userId = request.userId!;
 
     const tenants = await prisma.tenant.findMany({

@@ -153,7 +153,7 @@ export async function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/logout", async (request, reply) => {
+  app.get("/logout", async (_request, reply) => {
     reply.clearCookie("userId", { path: "/" });
     return reply.send({ message: "Logged out" });
   });
