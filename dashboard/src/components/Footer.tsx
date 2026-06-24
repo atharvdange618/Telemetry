@@ -7,8 +7,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-gradient-bg p-2 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-white" />
+            <div className="bg-primary/20 p-2 rounded-lg">
+              <BarChart3 className="h-6 w-6 text-primary" />
             </div>
             <Link to="/" className="text-xl font-bold">
               Telemetry
@@ -33,7 +33,7 @@ export function Footer() {
           </div>
 
           <div className="text-center md:text-right text-gray-400 dark:text-gray-500">
-            © {new Date().getFullYear()} Telemetry. Built with ❤️ for a better
+            © {new Date().getFullYear()} Telemetry. Built with care for a better
             web.
           </div>
         </div>

@@ -38,7 +38,7 @@ export function OnPageNavigation() {
 
   return (
     <nav className="sticky top-8 w-64">
-      <h3 className="font-semibold text-gray-900 mb-2">On This Page</h3>
+      <h3 className="font-semibold text-foreground mb-2">On This Page</h3>
       <ul className="space-y-1">
         {headings.map((heading) => (
           <li key={heading.id}>
@@ -48,8 +48,8 @@ export function OnPageNavigation() {
                 "w-full text-left text-sm transition-colors",
                 heading.level === 3 && "pl-4",
                 activeId === heading.id
-                  ? "text-sky-600 font-medium"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {heading.text}

@@ -13,7 +13,7 @@ import TrackingScript from "./Docs/TrackingScript";
 
 export function DocsContent() {
   return (
-    <div className="prose prose-stone">
+    <div className="prose prose-stone dark:prose-invert">
       {/* Introduction */}
       <Introduction />
 

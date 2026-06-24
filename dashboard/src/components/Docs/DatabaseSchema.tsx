@@ -3,37 +3,35 @@ import { CodeBlock } from "../CodeBlock";
 const DatabaseSchema = () => {
   return (
     <section id="database" className="mb-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">Database Schema</h2>
-      <div className="bg-white rounded-lg border border-stone-200 p-6">
-        <p className="text-gray-700 mb-6">
+      <h2 className="text-3xl font-bold text-foreground mb-6">Database Schema</h2>
+      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+        <p className="text-muted-foreground mb-6">
           Telemetry uses a PostgreSQL database with a clean, normalized schema
           designed for performance and scalability. The schema is defined using
           Prisma.
         </p>
 
-        {/* ERD */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <h3 className="text-xl font-semibold text-foreground mb-4">
             Entity Relationships
           </h3>
-          <div className="bg-stone-50 border border-stone-200 rounded-lg p-6 font-mono text-sm text-gray-700 space-y-2">
+          <div className="bg-muted border border-border rounded-lg p-6 font-mono text-sm text-muted-foreground space-y-2">
             <p>User ── TenantUser ── Tenant</p>
             <p>User ── Account (OAuth provider link)</p>
             <p>Tenant ── Event (all analytics events)</p>
-            <p className="text-xs text-gray-500 mt-3">Many-to-many: Users access Tenants via TenantUser with role (ADMIN / MEMBER)</p>
+            <p className="text-xs text-muted-foreground mt-3">Many-to-many: Users access Tenants via TenantUser with role (ADMIN / MEMBER)</p>
           </div>
         </div>
 
-        {/* Core Tables Section */}
         <div className="space-y-8">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Core Models
             </h3>
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">User</h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <h4 className="font-medium text-foreground mb-2">User</h4>
+                <p className="text-muted-foreground text-sm mb-3">
                   Stores user account information, typically synced from GitHub
                   OAuth.
                 </p>
@@ -53,8 +51,8 @@ const DatabaseSchema = () => {
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Tenant</h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <h4 className="font-medium text-foreground mb-2">Tenant</h4>
+                <p className="text-muted-foreground text-sm mb-3">
                   Represents a single website or project being tracked. Each
                   tenant is isolated.
                 </p>
@@ -72,8 +70,8 @@ const DatabaseSchema = () => {
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Event</h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <h4 className="font-medium text-foreground mb-2">Event</h4>
+                <p className="text-muted-foreground text-sm mb-3">
                   The central table storing all incoming analytics events
                   (pageviews and goals). It's optimized with multiple indexes
                   for fast querying.
@@ -118,15 +116,14 @@ const DatabaseSchema = () => {
             </div>
           </div>
 
-          {/* Join Tables Section */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Relational / Join Tables
             </h3>
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">Account</h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <h4 className="font-medium text-foreground mb-2">Account</h4>
+                <p className="text-muted-foreground text-sm mb-3">
                   Links a `User` to a specific OAuth provider account (e.g.,
                   their GitHub account).
                 </p>
@@ -144,8 +141,8 @@ const DatabaseSchema = () => {
               </div>
 
               <div>
-                <h4 className="font-medium text-gray-900 mb-2">TenantUser</h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <h4 className="font-medium text-foreground mb-2">TenantUser</h4>
+                <p className="text-muted-foreground text-sm mb-3">
                   A many-to-many join table that connects `User`s and `Tenant`s,
                   assigning a role to each user for a specific tenant.
                 </p>
@@ -166,22 +163,21 @@ const DatabaseSchema = () => {
             </div>
           </div>
 
-          {/* Performance & Indexing Section */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Performance & Indexing
             </h3>
-            <div className="border border-stone-200 rounded-lg p-4">
-              <p className="text-gray-700 mb-4">
+            <div className="border border-border rounded-lg p-4">
+              <p className="text-muted-foreground mb-4">
                 The `Event` table is heavily indexed to ensure that dashboard
                 queries remain fast, even with millions of rows. Indexes are
                 placed on columns commonly used for filtering and sorting, such
                 as `createdAt`, `path`, `referrer`, and UTM parameters.
               </p>
-              <h4 className="font-semibold text-gray-900 mb-3">
+              <h4 className="font-semibold text-foreground mb-3">
                 Key Indexes on `Event` Table
               </h4>
-              <ul className="text-gray-600 text-sm space-y-1 list-disc list-inside">
+              <ul className="text-muted-foreground text-sm space-y-1 list-disc list-inside">
                 <li>
                   `@@index([tenantId, createdAt])`: Time-series queries and
                   period filtering.

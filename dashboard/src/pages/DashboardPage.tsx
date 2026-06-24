@@ -4,16 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -46,9 +36,24 @@ import type {
   ViewsOverTimeResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronsUpDown } from "lucide-react";
+import {
+  ChevronsUpDown,
+  Settings,
+  LogOut,
+  BarChart3,
+  Users,
+  Eye,
+  TrendingUp,
+  Globe,
+  FileText,
+  Target,
+  Link2,
+  Monitor,
+  MapPin,
+  Megaphone,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
@@ -176,428 +181,543 @@ export default function DashboardPage() {
     }
   };
 
-  const ChangeBadge = ({ change }: { change: number }) => (
-    <span className={`text-xs font-medium ml-2 ${change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-      {change >= 0 ? "+" : ""}{change}%
+  const ChangeIndicator = ({ change }: { change: number }) => (
+    <span
+      className={`inline-flex items-center gap-0.5 text-xs font-medium px-1.5 py-0.5 rounded ${
+        change >= 0
+          ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+          : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+      }`}
+    >
+      {change >= 0 ? "↑" : "↓"} {Math.abs(change)}%
     </span>
+  );
+
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    change,
+    isLoading,
+  }: {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<{ className?: string }>;
+    change?: number;
+    isLoading?: boolean;
+  }) => (
+    <Card className="relative overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-baseline gap-2">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight">
+            {isLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            ) : (
+              value
+            )}
+          </div>
+          {change !== undefined && <ChangeIndicator change={change} />}
+        </div>
+      </CardContent>
+    </Card>
   );
 
   return (
     <div className="p-4 md:p-8 bg-background min-h-screen">
       <header className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold truncate">
-          {isLoadingTenants
-            ? "Loading..."
-            : selectedTenant?.name || "Dashboard"}
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <BarChart3 className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">
+              {isLoadingTenants
+                ? "Loading..."
+                : selectedTenant?.name || "Dashboard"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Analytics overview
+            </p>
+          </div>
+        </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="text-sm font-semibold">
+              <Button variant="outline" size="sm" className="gap-2">
                 {isLoadingTenants
                   ? "Loading Sites..."
                   : selectedTenant?.name || "Select a Site"}
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
+                <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuLabel>Your Sites</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {tenantsData?.tenants.map((tenant) => (
                 <DropdownMenuItem
                   key={tenant.id}
                   onSelect={() => setSelectedTenantId(tenant.id)}
+                  className={tenant.id === selectedTenantId ? "bg-accent" : ""}
                 >
                   {tenant.name}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => navigate("/settings")}>
-                Create New Site
+                <Settings className="h-4 w-4 mr-2" />
+                Manage Sites
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex rounded-md border border-border">
+          <div className="flex rounded-lg border border-border bg-muted/50 p-0.5">
             {(["24h", "7d", "30d"] as const).map((p) => (
-              <Button
+              <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                variant={period === p ? "default" : "ghost"}
-                size="sm"
-                className="rounded-none first:rounded-l-md last:rounded-r-md"
+                className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
+                  period === p
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {p}
-              </Button>
+              </button>
             ))}
           </div>
 
-          <Button asChild variant="outline" size="sm">
-            <Link to="/settings">Settings</Link>
-          </Button>
-
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-            <AvatarFallback className="text-xs">
-              {user?.name?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">Logout</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Are you sure you want to logout?</DialogTitle>
-                <DialogDescription>
-                  This action will log you out of your account. You will need to
-                  log back in to access your dashboard.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button onClick={handleLogout} className="cursor-pointer">
-                  Logout
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-border transition-all">
+                <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  {user?.name?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span className="font-medium">{user?.name}</span>
+                  <span className="text-xs text-muted-foreground font-normal">{user?.email}</span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => navigate("/settings")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={handleLogout} className="text-destructive focus:text-destructive">
+                <LogOut className="h-4 w-4 mr-2" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">Page Views{compareData && <ChangeBadge change={compareData.pageViews.change} />}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl md:text-4xl font-bold">
-            {isLoadingSummary ? "..." : summary?.pageViews ?? 0}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">Unique Visitors{compareData && <ChangeBadge change={compareData.uniqueVisitors.change} />}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl md:text-4xl font-bold">
-            {isLoadingSummary ? "..." : summary?.uniqueVisitors ?? 0}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Engagement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Pages / Session</span>
-                <span className="font-semibold">{engagementData?.avgPagesPerSession ?? "..."}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">New Visitors</span>
-                <span className="font-semibold">{engagementData?.newVisitors ?? "..."}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Returning</span>
-                <span className="font-semibold">{engagementData?.returningVisitors ?? "..."}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <main className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Page Views"
+            value={summary?.pageViews ?? 0}
+            icon={Eye}
+            change={compareData?.pageViews.change}
+            isLoading={isLoadingSummary}
+          />
+          <StatCard
+            title="Unique Visitors"
+            value={summary?.uniqueVisitors ?? 0}
+            icon={Users}
+            change={compareData?.uniqueVisitors.change}
+            isLoading={isLoadingSummary}
+          />
+          <StatCard
+            title="Pages / Session"
+            value={engagementData?.avgPagesPerSession ?? "—"}
+            icon={TrendingUp}
+            isLoading={!engagementData}
+          />
+          <StatCard
+            title="Bounce Rate"
+            value={summary?.bounceRate != null ? `${summary.bounceRate}%` : "—"}
+            icon={BarChart3}
+            isLoading={isLoadingSummary}
+          />
+        </div>
 
         {viewsOverTime?.views && (
-          <div className="lg:col-span-3">
-            <AnalyticsChart
-              data={viewsOverTime.views}
-              title="Views Over Time"
-            />
-          </div>
+          <AnalyticsChart
+            data={viewsOverTime.views}
+            title="Views Over Time"
+          />
         )}
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Locations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LocationMap data={locationsData} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Countries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Country</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingLocations ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Locations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LocationMap data={locationsData} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Countries</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={2}>Loading...</TableCell>
+                    <TableHead>Country</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
                   </TableRow>
-                ) : (
-                  locationsData?.locations?.map((loc) => (
-                    <TableRow key={loc.country}>
-                      <TableCell>{loc.country}</TableCell>
-                      <TableCell className="text-right">{loc.views}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Top Pages</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Path</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingPages ? (
-                  <TableRow>
-                    <TableCell colSpan={2}>Loading...</TableCell>
-                  </TableRow>
-                ) : (
-                  pages?.pages?.map((page) => (
-                    <TableRow key={page.path}>
-                      <TableCell>{page.path}</TableCell>
-                      <TableCell className="text-right">{page.views}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Goals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Goal</TableHead>
-                  <TableHead className="text-right">Completions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingGoals ? (
-                  <TableRow>
-                    <TableCell colSpan={2}>Loading...</TableCell>
-                  </TableRow>
-                ) : (
-                  goalsData?.goals?.map((goal) => (
-                    <TableRow key={goal.name}>
-                      <TableCell>{goal.name}</TableCell>
-                      <TableCell className="text-right">
-                        {goal.completions}
+                </TableHeader>
+                <TableBody>
+                  {isLoadingLocations ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : locationsData?.locations?.length ? (
+                    locationsData.locations.map((loc) => (
+                      <TableRow key={loc.country}>
+                        <TableCell className="font-medium">{loc.country}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{loc.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No location data yet
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Sources</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Source</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingSources ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-row items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Pages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={2}>Loading...</TableCell>
+                    <TableHead>Path</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
                   </TableRow>
-                ) : (
-                  sourcesData?.sources?.map((source) => (
-                    <TableRow key={source.source}>
-                      <TableCell>{source.source}</TableCell>
-                      <TableCell className="text-right">
-                        {source.views}
+                </TableHeader>
+                <TableBody>
+                  {isLoadingPages ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-32 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : pages?.pages?.length ? (
+                    pages.pages.map((page) => (
+                      <TableRow key={page.path}>
+                        <TableCell className="font-mono text-sm">{page.path}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{page.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No page data yet
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Top Referrers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Source</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoadingReferrers ? (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Link2 className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Referrers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={2}>Loading...</TableCell>
+                    <TableHead>Source</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
                   </TableRow>
-                ) : (
-                  referrers?.referrers?.map((ref) => (
-                    <TableRow key={ref.referrer}>
-                      <TableCell>{ref.referrer}</TableCell>
-                      <TableCell className="text-right">{ref.views}</TableCell>
+                </TableHeader>
+                <TableBody>
+                  {isLoadingReferrers ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : referrers?.referrers?.length ? (
+                    referrers.referrers.map((ref) => (
+                      <TableRow key={ref.referrer}>
+                        <TableCell className="font-medium truncate max-w-[200px]">{ref.referrer}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{ref.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No referrer data yet
+                      </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Devices</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {devicesData && (() => {
-                const total = devicesData.devices.mobile + devicesData.devices.tablet + devicesData.devices.desktop;
-                const items = [
-                  { label: "Desktop", value: devicesData.devices.desktop, color: "bg-primary" },
-                  { label: "Mobile", value: devicesData.devices.mobile, color: "bg-accent" },
-                  { label: "Tablet", value: devicesData.devices.tablet, color: "bg-chart-3" },
-                ];
-                return items.map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-muted-foreground">{item.label}</span>
-                      <span className="font-medium">{total > 0 ? Math.round(item.value / total * 100) : 0}%</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Monitor className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Devices</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {devicesData ? (() => {
+                  const total = devicesData.devices.mobile + devicesData.devices.tablet + devicesData.devices.desktop;
+                  const items = [
+                    { label: "Desktop", value: devicesData.devices.desktop, color: "bg-primary" },
+                    { label: "Mobile", value: devicesData.devices.mobile, color: "bg-accent" },
+                    { label: "Tablet", value: devicesData.devices.tablet, color: "bg-chart-3" },
+                  ];
+                  return items.map((item) => (
+                    <div key={item.label}>
+                      <div className="flex justify-between text-sm mb-1.5">
+                        <span className="text-muted-foreground">{item.label}</span>
+                        <span className="font-medium tabular-nums">{total > 0 ? Math.round(item.value / total * 100) : 0}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${item.color}`}
+                          style={{ width: `${total > 0 ? item.value / total * 100 : 0}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div className={`h-full rounded-full ${item.color}`} style={{ width: `${total > 0 ? item.value / total * 100 : 0}%` }} />
-                    </div>
-                  </div>
-                ));
-              })()}
-              {!devicesData && <p className="text-sm text-muted-foreground">No data</p>}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Cities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>City</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {citiesData?.cities?.length ? (
-                  citiesData.cities.map((c) => (
-                    <TableRow key={c.city}>
-                      <TableCell>{c.city}</TableCell>
-                      <TableCell className="text-right">{c.views}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={2}>No data</TableCell>
-                  </TableRow>
+                  ));
+                })() : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No device data yet</p>
                 )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Mediums</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Medium</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {campaignsData?.mediums?.length ? (
-                  campaignsData.mediums.map((m) => (
-                    <TableRow key={m.medium}>
-                      <TableCell>{m.medium}</TableCell>
-                      <TableCell className="text-right">{m.views}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Target className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Goals</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={2}>No data</TableCell>
+                    <TableHead>Goal</TableHead>
+                    <TableHead className="text-right">Count</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {isLoadingGoals ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : goalsData?.goals?.length ? (
+                    goalsData.goals.map((goal) => (
+                      <TableRow key={goal.name}>
+                        <TableCell className="font-medium">{goal.name}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{goal.completions}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
+                        No goals set
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Top Campaigns</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Campaign</TableHead>
-                  <TableHead className="text-right">Views</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {campaignsData?.campaigns?.length ? (
-                  campaignsData.campaigns.map((c) => (
-                    <TableRow key={c.campaign}>
-                      <TableCell>{c.campaign}</TableCell>
-                      <TableCell className="text-right">{c.views}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Megaphone className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Sources</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={2}>No data</TableCell>
+                    <TableHead>Source</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {isLoadingSources ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : sourcesData?.sources?.length ? (
+                    sourcesData.sources.map((source) => (
+                      <TableRow key={source.source}>
+                        <TableCell className="font-medium">{source.source}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{source.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
+                        No source data yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Cities</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>City</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoadingLocations ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
+                      </TableRow>
+                    ))
+                  ) : citiesData?.cities?.length ? (
+                    citiesData.cities.map((c) => (
+                      <TableRow key={c.city}>
+                        <TableCell className="font-medium">{c.city}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{c.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
+                        No city data yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Megaphone className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Campaigns</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {campaignsData?.campaigns?.length ? (
+                    campaignsData.campaigns.map((c) => (
+                      <TableRow key={c.campaign}>
+                        <TableCell className="font-medium">{c.campaign}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{c.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No campaign data yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Megaphone className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Top Mediums</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Medium</TableHead>
+                    <TableHead className="text-right">Views</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {campaignsData?.mediums?.length ? (
+                    campaignsData.mediums.map((m) => (
+                      <TableRow key={m.medium}>
+                        <TableCell className="font-medium">{m.medium}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">{m.views.toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                        No medium data yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );

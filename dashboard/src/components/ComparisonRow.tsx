@@ -143,10 +143,10 @@ export function ComparisonSection() {
               Ready to make the switch to privacy-first analytics?
             </p>
             <a
-              href="mailto:atharvdange.dev@gmail.com?subject=Telemetry%20Beta%20Access%20Request"
-              className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              href={`${import.meta.env.VITE_API_URL}/login/github`}
+              className="inline-flex items-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium transition-colors"
             >
-              Request Early Access
+              Get Started - it's free
             </a>
           </div>
         </div>

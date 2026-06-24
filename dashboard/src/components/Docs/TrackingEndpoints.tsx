@@ -3,33 +3,31 @@ import { CodeBlock } from "../CodeBlock";
 const TrackingEndpoints = () => {
   return (
     <section id="tracking-endpoint" className="mb-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">
+      <h2 className="text-3xl font-bold text-foreground mb-6">
         Tracking Endpoint
       </h2>
-      <div className="bg-white rounded-lg border border-stone-200 p-6">
-        {/* --- Endpoint Definition --- */}
+      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+          <span className="bg-green-500/15 text-green-600 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium">
             POST
           </span>
-          <code className="text-lg font-mono">/api/track</code>
+          <code className="text-lg font-mono text-foreground">/api/track</code>
         </div>
-        <p className="text-gray-700 mb-8">
+        <p className="text-muted-foreground mb-8">
           The main endpoint for collecting analytics data. It's called
           automatically by the tracking script but can also be used directly.
         </p>
 
-        {/* --- Request Body --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+        <h3 className="text-xl font-semibold text-foreground mb-4">
           Request Body
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           The endpoint accepts a JSON body with two event types: `pageview` or
           `goal`.
         </p>
         <div className="space-y-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Page View Event</h4>
+            <h4 className="font-medium text-foreground mb-2">Page View Event</h4>
             <CodeBlock
               code={`{
   "type": "pageview",
@@ -48,7 +46,7 @@ const TrackingEndpoints = () => {
             />
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Goal Event</h4>
+            <h4 className="font-medium text-foreground mb-2">Goal Event</h4>
             <CodeBlock
               code={`{
   "type": "goal",
@@ -59,34 +57,33 @@ const TrackingEndpoints = () => {
           </div>
         </div>
 
-        {/* --- Server-Side Processing --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
           Server-Side Processing
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           Upon receiving an event, the server performs the following
           privacy-focused steps:
         </p>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="bg-gray-100 text-gray-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+            <div className="bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
               1
             </div>
             <div>
-              <p className="font-medium text-gray-900">Tenant Validation</p>
-              <p className="text-gray-600 text-sm">
+              <p className="font-medium text-foreground">Tenant Validation</p>
+              <p className="text-muted-foreground text-sm">
                 Validates the provided <code>tenantId</code>. If invalid, a{" "}
                 <code>403 Forbidden</code> response is returned.
               </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="bg-gray-100 text-gray-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+            <div className="bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
               2
             </div>
             <div>
-              <p className="font-medium text-gray-900">Geolocation</p>
-              <p className="text-gray-600 text-sm">
+              <p className="font-medium text-foreground">Geolocation</p>
+              <p className="text-muted-foreground text-sm">
                 The request IP address is used to look up the visitor's country
                 and city. The IP address is then immediately discarded and never
                 stored.
@@ -94,14 +91,14 @@ const TrackingEndpoints = () => {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="bg-gray-100 text-gray-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+            <div className="bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
               3
             </div>
             <div>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-foreground">
                 Anonymous Visitor Hashing
               </p>
-              <p className="text-gray-600 text-sm">
+              <p className="text-muted-foreground text-sm">
                 An anonymous <code>visitorId</code> is generated by creating a
                 SHA-256 hash of the visitor's IP, User-Agent, Tenant ID, and a
                 server-side salt. This creates a unique but anonymous identifier
@@ -110,12 +107,12 @@ const TrackingEndpoints = () => {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="bg-gray-100 text-gray-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+            <div className="bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
               4
             </div>
             <div>
-              <p className="font-medium text-gray-900">Event Storage</p>
-              <p className="text-gray-600 text-sm">
+              <p className="font-medium text-foreground">Event Storage</p>
+              <p className="text-muted-foreground text-sm">
                 The complete event, including the generated{" "}
                 <code>visitorId</code> and location data, is saved to the
                 database.
@@ -124,41 +121,40 @@ const TrackingEndpoints = () => {
           </div>
         </div>
 
-        {/* --- Responses --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-4">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
           Responses
         </h3>
         <div className="space-y-4">
-          <div className="border border-stone-200 rounded-lg p-4">
+          <div className="border border-border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
+              <span className="bg-green-500/15 text-green-600 dark:text-green-400 px-2 py-1 rounded text-sm font-semibold">
                 201 Created
               </span>
             </div>
-            <p className="text-gray-600 mb-3 text-sm">
+            <p className="text-muted-foreground mb-3 text-sm">
               Returned when the event is successfully recorded.
             </p>
             <CodeBlock code={`{ "message": "Event Received" }`} />
           </div>
-          <div className="border border-stone-200 rounded-lg p-4">
+          <div className="border border-border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-semibold">
+              <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-1 rounded text-sm font-semibold">
                 403 Forbidden
               </span>
             </div>
-            <p className="text-gray-600 mb-3 text-sm">
+            <p className="text-muted-foreground mb-3 text-sm">
               Returned if the provided <code>tenantId</code> is invalid or not
               found.
             </p>
             <CodeBlock code={`{ "message": "Tenant not found" }`} />
           </div>
-          <div className="border border-stone-200 rounded-lg p-4">
+          <div className="border border-border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
+              <span className="bg-red-500/15 text-red-600 dark:text-red-400 px-2 py-1 rounded text-sm font-semibold">
                 500 Internal Server Error
               </span>
             </div>
-            <p className="text-gray-600 mb-3 text-sm">
+            <p className="text-muted-foreground mb-3 text-sm">
               Returned if an unexpected error occurs on the server.
             </p>
             <CodeBlock code={`{ "message": "Internal server error" }`} />

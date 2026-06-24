@@ -1,4 +1,3 @@
-import { BuiltBySection } from "@/components/BuiltBySection";
 import { ComparisonSection } from "@/components/ComparisonRow";
 import { DashboardPreviewSection } from "@/components/DashboardPreviewSection";
 import { FAQSection } from "@/components/FAQSection";
@@ -19,7 +18,6 @@ export default function Home() {
       <ComparisonSection />
       <PrivacyManifestoSection />
       <FAQSection />
-      <BuiltBySection />
       <FinalCtaSection />
       <Footer />
     </main>

@@ -15,7 +15,7 @@ export function LocationMap({ data }: LocationMapProps) {
   });
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
+    <div style={{ width: "100%", height: "360px" }}>
       <VectorMap
         map={worldMill}
         backgroundColor="transparent"
@@ -23,7 +23,7 @@ export function LocationMap({ data }: LocationMapProps) {
           regions: [
             {
               attribute: "fill",
-              scale: ["#E0DDEF", "#5D3FD3"],
+              scale: ["hsl(var(--muted))", "hsl(var(--primary))"],
               values: mapData,
               normalizeFunction: "linear",
             },
@@ -31,14 +31,14 @@ export function LocationMap({ data }: LocationMapProps) {
         }}
         onRegionTipShow={(_, el, code) => {
           (el as HTMLElement).innerHTML =
-            (el as HTMLElement).innerHTML + ` (Views - ${mapData[code] || 0})`;
+            (el as HTMLElement).innerHTML + ` (Views: ${mapData[code]?.toLocaleString() || 0})`;
         }}
         regionStyle={{
           initial: {
-            fill: "#D6D6DA",
+            fill: "hsl(var(--muted))",
           },
           hover: {
-            fill: "#A486F5",
+            fill: "hsl(var(--primary) / 0.7)",
           },
         }}
       />

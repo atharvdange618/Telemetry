@@ -10,14 +10,14 @@ export default function DocsPage() {
 
   return (
     <>
-      <div className="bg-stone-50">
+      <div className="bg-stone-50 dark:bg-gray-950 min-h-screen">
         <DocsHeader />
 
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="lg:hidden mb-4">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="flex items-center gap-2 rounded-md border p-2 text-stone-600"
+              className="flex items-center gap-2 rounded-md border border-border p-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Menu />
               Menu

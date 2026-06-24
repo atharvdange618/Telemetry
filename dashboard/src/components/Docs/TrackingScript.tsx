@@ -3,21 +3,20 @@ import { CodeBlock } from "../CodeBlock";
 const TrackingScript = () => {
   return (
     <section id="tracking-script" className="mb-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">Tracking Script</h2>
-      <div className="bg-white rounded-lg border border-stone-200 p-6">
-        <p className="text-gray-700 mb-6">
+      <h2 className="text-3xl font-bold text-foreground mb-6">Tracking Script</h2>
+      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+        <p className="text-muted-foreground mb-6">
           Once you have Telemetry set up, add the tracking script to your
           website. It's a lightweight (~1KB), privacy-focused script that won't
           slow down your site.
         </p>
 
-        {/* --- Basic Implementation --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mb-3">
+        <h3 className="text-xl font-semibold text-foreground mb-3">
           Basic Implementation
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           Add this script tag to the{" "}
-          <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+          <code className="bg-muted px-2 py-1 rounded text-sm">
             &lt;head&gt;
           </code>{" "}
           section of all pages you want to track.
@@ -29,8 +28,8 @@ const TrackingScript = () => {
   data-tenant-id="your-site-id"
 ></script>`}
         />
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mt-4">
+          <p className="text-amber-600 dark:text-amber-400 text-sm">
             <strong>Important:</strong> Replace{" "}
             <code>your-telemetry-domain.com</code> with your Telemetry instance
             URL and <code>your-site-id</code> with the tenant ID from your
@@ -38,14 +37,13 @@ const TrackingScript = () => {
           </p>
         </div>
 
-        {/* --- What Gets Tracked --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">
           What Gets Tracked
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           The script automatically collects the following on each pageview:
         </p>
-        <ul className="text-gray-600 mb-6 space-y-2 list-disc list-inside">
+        <ul className="text-muted-foreground mb-6 space-y-2 list-disc list-inside">
           <li>
             <strong>Hostname, Path & Referrer:</strong> The current URL and
             where the visitor came from.
@@ -65,16 +63,15 @@ const TrackingScript = () => {
           </li>
         </ul>
 
-        {/* --- Tracking in Single-Page Applications (SPAs) --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">
           Tracking in Single-Page Applications (SPAs)
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           The script automatically tracks the initial page load. For SPAs
           (React, Vue, etc.), you must manually trigger a pageview event on each
           route change.
         </p>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           Use the <code>window.telemetry.pageview()</code> function after a
           navigation event occurs in your application.
         </p>
@@ -94,11 +91,10 @@ function usePageViews() {
 }`}
         />
 
-        {/* --- Custom Goal Tracking --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">
           Custom Goal Tracking
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           Track custom events like newsletter signups or button clicks using the{" "}
           <code>goal</code> function.
         </p>
@@ -113,27 +109,26 @@ signupButton.addEventListener('click', () => {
 });`}
         />
 
-        {/* --- Performance & Privacy --- */}
-        <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
+        <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">
           Performance & Privacy
         </h3>
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h5 className="font-medium text-gray-900 mb-2">
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <h5 className="font-medium text-foreground mb-2">
               Performance-First
             </h5>
-            <p className="text-gray-700 text-sm">
+            <p className="text-muted-foreground text-sm">
               The script is asynchronous and uses{" "}
               <code>navigator.sendBeacon</code> to send data, which doesn't
               block page rendering or unloading. This ensures no performance
               impact on your site.
             </p>
           </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h5 className="font-medium text-gray-900 mb-2">
+          <div className="bg-muted border border-border rounded-lg p-4">
+            <h5 className="font-medium text-foreground mb-2">
               Privacy by Design
             </h5>
-            <p className="text-gray-700 text-sm">
+            <p className="text-muted-foreground text-sm">
               No cookies or local storage are used. Visitor identification is
               done anonymously using a hashed IP and User Agent, ensuring GDPR
               compliance without consent banners.

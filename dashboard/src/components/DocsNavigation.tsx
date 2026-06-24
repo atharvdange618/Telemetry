@@ -53,10 +53,10 @@ export function DocsNavigation() {
 
   return (
     <nav className="sticky top-8">
-      <div className="bg-white rounded-lg border border-stone-200 p-4">
+      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-4">
         {sections.map((section) => (
           <div key={section.title} className="mb-6 last:mb-0">
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-foreground mb-2">
               {section.title}
             </h3>
             <ul className="space-y-1">
@@ -67,8 +67,8 @@ export function DocsNavigation() {
                     className={cn(
                       "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
                       activeSection === item.id
-                        ? "bg-gray-100 text-gray-800 font-medium"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-stone-50"
+                        ? "bg-accent text-accent-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     )}
                   >
                     {item.title}

@@ -34,9 +34,8 @@ export function HowItWorksSection() {
         </div>
 
         <div className="inline-flex items-center bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-6 py-3 rounded-full border border-green-200 dark:border-green-800">
-          <span className="text-2xl mr-2">✨</span>
           <span className="font-medium">
-            That's it! You're now tracking privacy-friendly analytics.
+            That's it. You're now tracking privacy-friendly analytics.
           </span>
         </div>
       </div>

@@ -1,9 +1,9 @@
 const Introduction = () => {
   return (
     <section id="introduction" className="mb-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">Introduction</h2>
-      <div className="bg-white rounded-lg border border-stone-200 p-6 mb-6">
-        <p className="text-lg text-gray-700 mb-4">
+      <h2 className="text-3xl font-bold text-foreground mb-6">Introduction</h2>
+      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6 mb-6">
+        <p className="text-lg text-muted-foreground mb-4">
           Telemetry is a privacy-focused, open-source analytics platform
           designed to provide meaningful insights without compromising user
           privacy. Built for creators, developers, and anyone who believes in a
@@ -11,8 +11,8 @@ const Introduction = () => {
         </p>
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div>
-            <h4 className="font-semibold text-gray-900 mb-2">Key Features</h4>
-            <ul className="text-gray-600 space-y-1">
+            <h4 className="font-semibold text-foreground mb-2">Key Features</h4>
+            <ul className="text-muted-foreground space-y-1">
               <li>• Privacy-first, cookieless tracking</li>
               <li>• Self-hosted data ownership</li>
               <li>• Clean, intuitive dashboard</li>
@@ -20,10 +20,10 @@ const Introduction = () => {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900 mb-2">
+            <h4 className="font-semibold text-foreground mb-2">
               Technology Stack
             </h4>
-            <ul className="text-gray-600 space-y-1">
+            <ul className="text-muted-foreground space-y-1">
               <li>• Fastify backend</li>
               <li>• React + TypeScript frontend</li>
               <li>• Prisma ORM</li>
