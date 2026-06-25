@@ -1,16 +1,36 @@
 {
   "name": "telemetry",
   "version": "1.0.0",
-  "description": "",
+  "description": "A professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, and weighing in at under 1KB.",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc && mkdir -p dist/generated && cp -r src/generated/prisma dist/generated/prisma",
     "start": "node dist/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "telemetry",
+    "analytics",
+    "web-analytics",
+    "privacy",
+    "privacy-first",
+    "cookieless",
+    "gdpr",
+    "ccpa",
+    "fastify",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "Atharv Dange <atharvdange618@gmail.com> (https://github.com/atharvdange618)",
+  "license": "MIT",
+  "homepage": "https://usetelemetry.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atharvdange618/Telemetry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atharvdange618/Telemetry/issues"
+  },
   "type": "commonjs",
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

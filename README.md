@@ -1,8 +1,98 @@
 # Telemetry
 
-Privacy-first, open-source analytics. Cookieless by design, self-hosted, one line of code.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Dashboard](https://img.shields.io/badge/Dashboard-usetelemetry.vercel.app-blue.svg)](https://usetelemetry.vercel.app)
+[![API Server](https://img.shields.io/badge/API-usetelemetry.hogyoku.cloud-green.svg)](https://usetelemetry.hogyoku.cloud)
+[![Privacy First](https://img.shields.io/badge/Privacy-Cookieless-success.svg)](#privacy--compliance)
 
-## Quick Start
+Telemetry is a professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, and weighing in at under 1KB, it offers complete visitor insights with just one line of code.
+
+Eliminate intrusive cookie banners, keep your site lightning fast, and retain absolute ownership of your data.
+
+**Get Started on the Cloud:** [usetelemetry.vercel.app](https://usetelemetry.vercel.app)
+
+---
+
+## Why Telemetry?
+
+- **Zero Cookies, Zero Banner Fatigue**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. You don't need a privacy banner to use Telemetry, improving your site's conversion rates.
+- **Privacy-First & Compliant**: Built from the ground up to respect user privacy. We anonymize and aggregate session details immediately on the server. Fully GDPR, CCPA, and PECR compliant.
+- **Ultralight Script (<1KB)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and transmits data efficiently using native browser beaconing.
+- **Absolute Data Ownership**: Keep your data safe from advertising giants. Self-host it on your own server or run it securely on our managed cloud.
+
+---
+
+## Key Features
+
+### Real-Time Dashboard
+
+A clean, visual dashboard designed for immediate clarity. See page views, unique visitors, referral traffic, and live engagement metrics.
+
+### Core Web Vitals Tracking
+
+Monitor real-time performance indicators (LCP, INP, CLS, TTFB, FCP) directly from your users' actual sessions. Find speed bottlenecks before they impact your search rankings.
+
+### Funnels & Conversion Analytics
+
+Define multi-step user paths (e.g., Landing Page → Pricing → Sign Up) to track conversion drop-offs and optimize your product flows.
+
+### Cohort Retention Matrices
+
+Visualize weekly user retention cohorts to measure long-term engagement and product stickiness over time.
+
+### Automated Insights & Anomaly Detection
+
+Get automatically flagged for traffic spikes, drop-offs, or behavioral anomalies, ensuring you never miss a critical event.
+
+### Location & Device Analytics
+
+Understand your audience. Aggregate browser type, operating systems, languages, screen resolutions, and country/city-level geolocation.
+
+### Engagement Metrics
+
+Automatically capture scroll depth (max percentage) and clicks on outbound links to see how visitors interact with your content.
+
+---
+
+## Quick Start (Cloud & Managed)
+
+To start tracking your website using the hosted service:
+
+1. Sign up/Log in at the Telemetry Dashboard: [usetelemetry.vercel.app](https://usetelemetry.vercel.app).
+2. Register a new site under **Settings** to receive your unique **Tenant ID**.
+3. Paste the snippet before the closing `</body>` tag on your website:
+
+```html
+<script
+  async
+  defer
+  src="https://usetelemetry.hogyoku.cloud/analytics.js"
+  data-tenant-id="YOUR_TENANT_ID"
+></script>
+```
+
+### Custom Event & Goal Tracking
+
+```javascript
+// Track conversions (e.g., signups)
+window.telemetry?.goal("signup");
+
+// Track rich custom properties (e.g., purchases)
+window.telemetry?.goal("purchase", { plan: "pro", amount: 49 });
+```
+
+---
+
+## Self-Hosting & Development
+
+For developers looking to host their own Telemetry instance:
+
+### Prerequisites
+
+- Node.js (v18+)
+- PostgreSQL database
+
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/atharvdange618/Telemetry.git
@@ -10,144 +100,85 @@ cd Telemetry
 npm install
 ```
 
-### 1. Create a GitHub OAuth App
+### 2. Configure Environment Variables
 
-Go to [GitHub Developer Settings](https://github.com/settings/developers) → **New OAuth App**:
-- **Homepage URL**: `http://localhost:3000`
-- **Authorization callback URL**: `http://localhost:3000/login/github/callback`
+Create a `.env` file in the root directory:
 
-Copy the Client ID and Client Secret.
-
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and fill in:
 ```env
+PORT=3000
 DATABASE_URL=postgresql://user:password@localhost:5432/telemetry
-GITHUB_CLIENT_ID=your_client_id
-GITHUB_CLIENT_SECRET=your_client_secret
-COOKIE_SECRET=run_openssl_rand_base64_32
-VISITOR_SALT=run_openssl_rand_base64_32
+
+# GitHub OAuth Setup (Get Client ID/Secret at github.com/settings/developers)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Security Secrets (Generate using: openssl rand -base64 32)
+COOKIE_SECRET=your_random_32_char_string
+VISITOR_SALT=another_random_32_char_string
+
+# Application URLs
 BASE_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
 ```
 
-Generate secrets:
-```bash
-openssl rand -base64 32
-```
-
-### 3. Set Up Database
+### 3. Run Migrations & Start
 
 ```bash
+# Push database schema
 npx prisma migrate dev
-```
 
-### 4. Start Development
-
-```bash
-# Backend (port 3000)
+# Run backend (Express/Fastify)
 npm run dev
 
-# Dashboard (port 5173)
-cd dashboard && npm install && npm run dev
+# Run frontend dashboard
+cd dashboard
+npm install
+npm run dev
 ```
 
-Open `http://localhost:5173`, sign in with GitHub, and you're running.
+Visit `http://localhost:5173` to access your self-hosted dashboard.
 
-## Add Analytics to Your Site
+### Production Deployments
 
-Paste this before `</body>` on any page you want to track:
-
-```html
-<script async defer src="https://your-server.com/analytics.js" data-tenant-id="YOUR_TENANT_ID"></script>
-```
-
-Find your Tenant ID in the dashboard under **Settings**.
-
-### SPA Support
-
-```javascript
-// On route change
-window.telemetry?.pageview("/new-page");
-```
-
-### Goal Tracking
-
-```javascript
-// Track conversions
-window.telemetry?.goal("signup");
-
-// Track with custom properties
-window.telemetry?.goal("purchase", { plan: "pro", amount: 49 });
-```
-
-### What's Automatically Tracked
-
-The script automatically captures:
-- **Browser & OS**: Name, version (Chrome 125, Windows 11, etc.)
-- **Language**: Browser language setting
-- **Session ID**: Groups events per visit (stored in sessionStorage)
-- **Scroll Depth**: Max scroll percentage on page leave
-- **Outbound Links**: Clicks on external links
-- **Core Web Vitals**: LCP, INP, CLS, TTFB, FCP (sent once per page load)
-- **UTM Parameters**: Source, medium, campaign, term, content
-- **Geolocation**: Country and city (server-side via IP)
-
-## Production Deployment
+For production hosting on a VPS or cloud provider, build the production bundle:
 
 ```bash
+# Compile TypeScript and generate Prisma clients
 npm run build
+
+# Start the Node.js production server
 npm start
 ```
 
-Use PM2 for process management:
+Alternatively, process managers like PM2 can be used:
 
 ```bash
 pm2 start ecosystem.config.cjs
 ```
 
+---
+
+## API Reference (Integration)
+
+Telemetry exposes a rich HTTP REST API for exporting metrics or posting events directly:
+
+| Endpoint              | Method | Description                                         |
+| --------------------- | ------ | --------------------------------------------------- |
+| `/api/track`          | POST   | Log pageviews, custom goals, or performance metrics |
+| `/api/stats/summary`  | GET    | Basic stats (views, visitors, bounce rate)          |
+| `/api/stats/pages`    | GET    | Most-visited pages                                  |
+| `/api/stats/funnels`  | POST   | Query conversion funnel reports                     |
+| `/api/stats/cohorts`  | GET    | Retrieve user cohort retention metrics              |
+| `/api/stats/insights` | GET    | Get automated anomalies and highlights              |
+| `/api/export/events`  | GET    | Export raw event datasets as CSV/JSON               |
+
+For full endpoint definitions and query options, see the [PROJECT_DETAILS.md](PROJECT_DETAILS.md) file.
+
+---
+
 ## Tech Stack
 
 - **Backend**: Fastify, Prisma, PostgreSQL
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui
-- **Auth**: GitHub OAuth, httpOnly cookies
-- **Deploy**: Vercel (dashboard), VPS (API)
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/track` | POST | Track pageview, goal, outbound, performance, or scroll event |
-| `/api/tenants` | GET/POST | List or create sites |
-| `/api/tenants/:id` | PUT/DELETE | Update or delete a site |
-| `/api/stats/summary` | GET | Page views, visitors, bounce rate |
-| `/api/stats/pages` | GET | Top pages by views |
-| `/api/stats/referrers` | GET | Top referrer sources |
-| `/api/stats/views-over-time` | GET | Views over time series |
-| `/api/stats/sources` | GET | Top UTM sources |
-| `/api/stats/campaigns` | GET | UTM mediums and campaigns |
-| `/api/stats/devices` | GET | Mobile/tablet/desktop breakdown |
-| `/api/stats/engagement` | GET | Pages/session, new vs returning |
-| `/api/stats/cities` | GET | Top cities |
-| `/api/stats/locations` | GET | Top countries |
-| `/api/stats/goals` | GET | Goal completions |
-| `/api/stats/compare` | GET | Period vs previous period |
-| `/api/stats/browsers` | GET | Top browsers with percentages |
-| `/api/stats/os` | GET | Top operating systems with percentages |
-| `/api/stats/languages` | GET | Top languages with percentages |
-| `/api/stats/sessions` | GET | Session count and avg duration |
-| `/api/stats/scroll-depth` | GET | Average scroll depth and distribution |
-| `/api/stats/performance` | GET | Core Web Vitals (p50/p75/p90/p99) |
-| `/api/stats/outbound` | GET | Top outbound links by clicks |
-| `/api/stats/funnels` | POST | Funnel conversion analysis |
-| `/api/stats/cohorts` | GET | Weekly cohort retention matrix |
-| `/api/stats/insights` | GET | Automated insights and anomalies |
-| `/api/export/events` | GET | Export events as CSV or JSON |
-
-## License
-
-ISC
+- **Deployment**: Vercel (Dashboard), CloudPanel / Hostinger KVM VPS (API backend)
+- **License**: MIT
