@@ -15,7 +15,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Tenant } from "@/lib/types/dashboard.types";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Copy, Check } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -53,6 +53,7 @@ const SettingsPage = () => {
   const [editingNameId, setEditingNameId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [newDomain, setNewDomain] = useState("");
+  const [copiedTenantId, setCopiedTenantId] = useState<string | null>(null);
 
   const { data: tenantsData, isLoading } = useQuery({
     queryKey: ["tenants"],
@@ -138,6 +139,17 @@ const SettingsPage = () => {
   const handleRemoveDomain = (tenant: Tenant, domain: string) => {
     const domains = tenant.domains.filter((d) => d !== domain);
     updateTenant.mutate({ id: tenant.id, domains });
+  };
+
+  const getEmbedScript = (tenant: Tenant) => {
+    const apiKeyAttr = tenant.apiKey ? ` data-api-key="${tenant.apiKey}"` : "";
+    return `<script async defer src="${API_URL}/analytics.js" data-tenant-id="${tenant.id}"${apiKeyAttr}></script>`;
+  };
+
+  const handleCopyScript = async (tenant: Tenant) => {
+    await navigator.clipboard.writeText(getEmbedScript(tenant));
+    setCopiedTenantId(tenant.id);
+    setTimeout(() => setCopiedTenantId(null), 2000);
   };
 
   return (
@@ -247,10 +259,25 @@ const SettingsPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <h3 className="font-semibold">Embed Script</h3>
-                <Input
-                  readOnly
-                  value={`<script async defer src="${API_URL}/analytics.js" data-tenant-id="${tenant.id}"></script>`}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={getEmbedScript(tenant)}
+                    className="font-mono text-xs"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleCopyScript(tenant)}
+                    title="Copy to clipboard"
+                  >
+                    {copiedTenantId === tenant.id ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
 
                 <h3 className="font-semibold">Allowed Domains</h3>
                 <div className="flex flex-wrap gap-2">

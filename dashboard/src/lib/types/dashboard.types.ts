@@ -1,6 +1,7 @@
 export interface Tenant {
   id: string;
   name: string;
+  apiKey: string | null;
   domains: string[];
 }
 
