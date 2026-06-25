@@ -4,12 +4,33 @@ import { DocsNavigation } from "@/components/DocsNavigation";
 import { Footer } from "@/components/Footer";
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import { SEO } from "@/components/SEO";
 
 export default function DocsPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const docsSchema = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Telemetry Documentation",
+    "description": "Learn how to deploy, configure, integrate the tracking script, and set up custom goals on Telemetry.",
+    "inLanguage": "en",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Telemetry",
+      "logo": `${window.location.origin}/logo.svg`
+    }
+  };
+
   return (
     <>
+      <SEO
+        title="Documentation | Integration & Self-Hosting Guide"
+        description="Comprehensive guides for setting up and running Telemetry. Learn how to embed the tracking script, track SPA route changes, monitor custom conversion goals, and self-host the analytics stack."
+        keywords="telemetry documentation, web tracking guide, self-hosting analytics, analytics integration, custom goal tracking"
+        canonicalPath="/docs"
+        schema={docsSchema}
+      />
       <div className="bg-stone-50 dark:bg-gray-950 min-h-screen">
         <DocsHeader />
 
