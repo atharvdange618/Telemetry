@@ -63,8 +63,8 @@ model Event {
   visitorId    String
   createdAt    DateTime @default(now())
 
-  // Goal Tracking Fields
-  type     String  @default("pageview") // 'pageview or 'goal'
+  // Event Type
+  type     String  @default("pageview") // 'pageview', 'goal', 'outbound', 'performance'
   goalName String?
 
   // Location Fields
@@ -78,6 +78,33 @@ model Event {
   utmTerm     String?
   utmContent  String?
 
+  // Browser & OS Fields
+  browser        String?
+  browserVersion String?
+  os             String?
+  osVersion      String?
+  language       String?
+
+  // Session Fields
+  sessionId String?
+
+  // Engagement Fields
+  scrollDepth Int? // 0-100 percentage
+
+  // Outbound Link Fields
+  outboundUrl    String?
+  outboundDomain String?
+
+  // Performance Fields (Core Web Vitals)
+  lcp  Float? // Largest Contentful Paint (ms)
+  fid  Float? // First Input Delay (ms)
+  cls  Float? // Cumulative Layout Shift
+  ttfb Float? // Time to First Byte (ms)
+  fcp  Float? // First Contentful Paint (ms)
+
+  // Custom Event Properties
+  properties Json? // arbitrary key-value pairs
+
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId, createdAt])
@@ -88,4 +115,9 @@ model Event {
   @@index([tenantId, utmCampaign])
   @@index([tenantId, type, goalName])
   @@index([tenantId, country])
+  @@index([tenantId, browser])
+  @@index([tenantId, os])
+  @@index([tenantId, language])
+  @@index([tenantId, sessionId])
+  @@index([tenantId, createdAt, visitorId])
 }
