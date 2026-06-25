@@ -26,18 +26,18 @@ function DevicesBar({ data }: { data: DevicesResponse | undefined }) {
   ];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {items.map((item) => (
         <div key={item.label}>
-          <div className="flex justify-between text-sm mb-1.5">
+          <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">{item.label}</span>
-            <span className="font-medium tabular-nums font-mono text-xs">
+            <span className="font-medium tabular-nums font-mono text-xs text-foreground">
               {total > 0 ? Math.round((item.value / total) * 100) : 0}%
             </span>
           </div>
-          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+          <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${item.color}`}
+              className={`h-full rounded-full transition-all duration-700 ease-out ${item.color}`}
               style={{
                 width: `${total > 0 ? (item.value / total) * 100 : 0}%`,
               }}
@@ -62,9 +62,11 @@ export function TechSection({
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
+      <Card className="transition-all duration-300 hover:border-border/20">
         <CardHeader className="flex flex-row items-center gap-2">
-          <Monitor className="h-4 w-4 text-muted-foreground/60" />
+          <div className="p-1.5 rounded-lg bg-primary/8">
+            <Monitor className="h-3.5 w-3.5 text-primary/70" />
+          </div>
           <CardTitle className="text-base">Browsers</CardTitle>
         </CardHeader>
         <CardContent>
@@ -76,9 +78,11 @@ export function TechSection({
           />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="transition-all duration-300 hover:border-border/20">
         <CardHeader className="flex flex-row items-center gap-2">
-          <Monitor className="h-4 w-4 text-muted-foreground/60" />
+          <div className="p-1.5 rounded-lg bg-primary/8">
+            <Monitor className="h-3.5 w-3.5 text-primary/70" />
+          </div>
           <CardTitle className="text-base">Operating Systems</CardTitle>
         </CardHeader>
         <CardContent>
@@ -90,9 +94,11 @@ export function TechSection({
           />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="transition-all duration-300 hover:border-border/20">
         <CardHeader className="flex flex-row items-center gap-2">
-          <Globe className="h-4 w-4 text-muted-foreground/60" />
+          <div className="p-1.5 rounded-lg bg-primary/8">
+            <Globe className="h-3.5 w-3.5 text-primary/70" />
+          </div>
           <CardTitle className="text-base">Languages</CardTitle>
         </CardHeader>
         <CardContent>
@@ -104,9 +110,11 @@ export function TechSection({
           />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="transition-all duration-300 hover:border-border/20">
         <CardHeader className="flex flex-row items-center gap-2">
-          <Monitor className="h-4 w-4 text-muted-foreground/60" />
+          <div className="p-1.5 rounded-lg bg-primary/8">
+            <Monitor className="h-3.5 w-3.5 text-primary/70" />
+          </div>
           <CardTitle className="text-base">Devices</CardTitle>
         </CardHeader>
         <CardContent>

@@ -18,13 +18,15 @@ export function PerformanceSection({
   ];
 
   return (
-    <Card>
+    <Card className="transition-all duration-300 hover:border-border/20">
       <CardHeader className="flex flex-row items-center gap-2">
-        <Gauge className="h-4 w-4 text-muted-foreground/60" />
+        <div className="p-1.5 rounded-lg bg-primary/8">
+          <Gauge className="h-3.5 w-3.5 text-primary/70" />
+        </div>
         <CardTitle className="text-base">Performance (Core Web Vitals)</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
           {metrics.map((m) => {
             const val = m.data?.p75 || 0;
             const status =
@@ -35,14 +37,23 @@ export function PerformanceSection({
                 : status === "needs-improvement"
                   ? "text-yellow-500"
                   : "text-red-500";
+            const dotColor =
+              status === "good"
+                ? "bg-green-500"
+                : status === "needs-improvement"
+                  ? "bg-yellow-500"
+                  : "bg-red-500";
             return (
-              <div key={m.label} className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">{m.label}</p>
-                <p className={`text-2xl font-bold font-mono ${color}`}>
+              <div key={m.label} className="text-center p-3 rounded-xl bg-secondary/30">
+                <div className="flex items-center justify-center gap-1.5 mb-2">
+                  <div className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                  <p className="text-xs text-muted-foreground font-medium">{m.label}</p>
+                </div>
+                <p className={`text-2xl font-bold font-mono tabular-nums ${color}`}>
                   {m.label === "CLS" ? val.toFixed(3) : Math.round(val)}
-                  {m.unit}
+                  <span className="text-sm font-normal text-muted-foreground">{m.unit}</span>
                 </p>
-                <p className="text-[10px] text-muted-foreground/60">
+                <p className="text-[10px] text-muted-foreground/60 mt-1">
                   p75 &middot; {m.data?.count || 0} samples
                 </p>
               </div>

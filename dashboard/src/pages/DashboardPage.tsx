@@ -264,7 +264,8 @@ export default function DashboardPage() {
   const hasActiveFilters = Object.values(segments).some(Boolean);
 
   return (
-    <div className="p-4 md:p-8 min-h-screen">
+    <div className="p-4 md:p-8 min-h-screen relative">
+      <div className="noise" />
       <SEO
         title={`${tenantName} Overview`}
         description="View real-time privacy-friendly website analytics."
