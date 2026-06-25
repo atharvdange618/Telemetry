@@ -3,7 +3,9 @@ import { CodeBlock } from "../CodeBlock";
 const TrackingScript = () => {
   return (
     <section id="tracking-script" className="mb-16">
-      <h2 className="text-3xl font-bold text-foreground mb-6">Tracking Script</h2>
+      <h2 className="text-3xl font-bold text-foreground mb-6">
+        Tracking Script
+      </h2>
       <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
           Once you have Telemetry set up, add the tracking script to your

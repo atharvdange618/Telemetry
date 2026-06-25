@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { SEO } from "@/components/SEO";
 import { Input } from "@/components/ui/input";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -29,8 +30,11 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchAPI = async (url: string, options?: RequestInit) => {
-  const headers: Record<string, string> = { ...(options?.headers as Record<string, string>) };
-  if (options?.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+  const headers: Record<string, string> = {
+    ...(options?.headers as Record<string, string>),
+  };
+  if (options?.body && !headers["Content-Type"])
+    headers["Content-Type"] = "application/json";
   const res = await fetch(url, {
     ...options,
     credentials: "include",
@@ -72,7 +76,10 @@ const SettingsPage = () => {
     mutationFn: ({ id, domains }: { id: string; domains: string[] }) =>
       fetchAPI(`${API_URL}/api/tenants/${id}`, {
         method: "PUT",
-        body: JSON.stringify({ name: tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.name, domains }),
+        body: JSON.stringify({
+          name: tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.name,
+          domains,
+        }),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
@@ -87,7 +94,9 @@ const SettingsPage = () => {
         method: "PUT",
         body: JSON.stringify({
           name,
-          domains: tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.domains ?? [],
+          domains:
+            tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.domains ??
+            [],
         }),
       }),
     onSuccess: () => {
@@ -138,10 +147,11 @@ const SettingsPage = () => {
         description="Configure your tracked domains, view tracking snippet integration scripts, and manage site parameters."
         noindex={true}
       />
-      <div className="mb-8">
+      <div className="flex items-center justify-between mb-8">
         <Button asChild variant="outline">
           <Link to="/dashboard">← Back to Dashboard</Link>
         </Button>
+        <DarkModeToggle />
       </div>
 
       <Card>
@@ -184,7 +194,10 @@ const SettingsPage = () => {
                         if (e.key === "Enter") {
                           e.preventDefault();
                           if (editingName.trim()) {
-                            renameTenant.mutate({ id: tenant.id, name: editingName.trim() });
+                            renameTenant.mutate({
+                              id: tenant.id,
+                              name: editingName.trim(),
+                            });
                           }
                         }
                         if (e.key === "Escape") {
@@ -199,7 +212,10 @@ const SettingsPage = () => {
                       size="sm"
                       onClick={() => {
                         if (editingName.trim()) {
-                          renameTenant.mutate({ id: tenant.id, name: editingName.trim() });
+                          renameTenant.mutate({
+                            id: tenant.id,
+                            name: editingName.trim(),
+                          });
                         }
                       }}
                       disabled={renameTenant.isPending || !editingName.trim()}

@@ -2,7 +2,10 @@ import { ChevronDown } from "lucide-react";
 
 export function DashboardPreviewSection() {
   return (
-    <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-stone-50 dark:bg-gray-950">
+    <section
+      id="features"
+      className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-stone-50 dark:bg-gray-950"
+    >
       <div className="max-w-7xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-stone-900 dark:text-gray-100 mb-12 md:mb-16">
           Your Dashboard: Simple & Powerful

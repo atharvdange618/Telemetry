@@ -37,7 +37,7 @@ const sections = [
 ];
 
 const sectionIds = sections.flatMap((section) =>
-  section.items.map((item) => item.id)
+  section.items.map((item) => item.id),
 );
 export function DocsNavigation() {
   const activeSection = useScrollSpy(sectionIds, {
@@ -68,7 +68,7 @@ export function DocsNavigation() {
                       "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
                       activeSection === item.id
                         ? "bg-accent text-accent-foreground font-medium"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted",
                     )}
                   >
                     {item.title}

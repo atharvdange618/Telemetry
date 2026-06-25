@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function useScrollSpy(
   ids: string[],
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ) {
   const [activeId, setActiveId] = useState<string | null>("");
   const observer = useRef<IntersectionObserver | null>(null);

@@ -13,7 +13,7 @@ export function OnPageNavigation() {
 
   useEffect(() => {
     const headingElements = Array.from(
-      document.querySelectorAll(".prose h2, .prose h3")
+      document.querySelectorAll(".prose h2, .prose h3"),
     ) as HTMLElement[];
 
     const newHeadings = headingElements.map((el) => ({
@@ -26,7 +26,7 @@ export function OnPageNavigation() {
 
   const activeId = useScrollSpy(
     headings.map((h) => h.id),
-    { rootMargin: "0% 0% -75% 0%" }
+    { rootMargin: "0% 0% -75% 0%" },
   );
 
   const scrollToSection = (id: string) => {
@@ -49,7 +49,7 @@ export function OnPageNavigation() {
                 heading.level === 3 && "pl-4",
                 activeId === heading.id
                   ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {heading.text}

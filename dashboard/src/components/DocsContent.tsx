@@ -14,40 +14,28 @@ import TrackingScript from "./Docs/TrackingScript";
 export function DocsContent() {
   return (
     <div className="prose prose-stone dark:prose-invert">
-      {/* Introduction */}
       <Introduction />
 
-      {/* Installation */}
       <Installation />
 
-      {/* Dashboard Overview */}
       <DashboardOverview />
 
-      {/* Key Metrics */}
       <Metrics />
 
-      {/* Site Settings */}
       <SiteSettings />
 
-      {/* Tracking Script */}
       <TrackingScript />
 
-      {/* Tracking Endpoint */}
       <TrackingEndpoints />
 
-      {/* Authentication */}
       <Authentication />
 
-      {/* Statistics API */}
       <Statistics />
 
-      {/* Architecture */}
       <Architecture />
 
-      {/* Database Schema */}
       <DatabaseSchema />
 
-      {/* Privacy & Security */}
       <PrivacyAndSecurity />
     </div>
   );
