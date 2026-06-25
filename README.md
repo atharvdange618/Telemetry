@@ -68,6 +68,7 @@ To start tracking your website using the hosted service:
   defer
   src="https://usetelemetry.hogyoku.cloud/analytics.js"
   data-tenant-id="YOUR_TENANT_ID"
+  data-api-key="YOUR_API_KEY"
 ></script>
 ```
 
@@ -80,6 +81,16 @@ window.telemetry?.goal("signup");
 // Track rich custom properties (e.g., purchases)
 window.telemetry?.goal("purchase", { plan: "pro", amount: 49 });
 ```
+
+---
+
+## Security
+
+Telemetry includes built-in protections for the event ingestion endpoint:
+
+- **Bot Detection**: Known bots, crawlers, and scrapers (Googlebot, GPTBot, curl, etc.) are automatically blocked from sending events.
+- **Rate Limiting**: The `/api/track` endpoint is rate-limited to 30 requests per minute per IP address. Dashboard API calls are not affected.
+- **API Key Authentication**: Each tenant has a unique API key (`tlv_1_...`). When set, only requests with a valid key are accepted. Legacy tenants without a key remain accessible for backwards compatibility.
 
 ---
 

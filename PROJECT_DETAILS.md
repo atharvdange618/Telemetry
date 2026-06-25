@@ -41,12 +41,13 @@ The core of the data collection is a lightweight JavaScript snippet that website
 - **How it works**:
   1. The script is loaded asynchronously to avoid blocking page rendering.
   2. It requires a `data-tenant-id` attribute in the `<script>` tag to associate the data with the correct site.
-  3. On page load, it automatically captures a `pageview` event, collecting information like:
+  3. It optionally reads a `data-api-key` attribute for authenticated event ingestion.
+  4. On page load, it automatically captures a `pageview` event, collecting information like:
      - Hostname, path, and referrer
      - Screen dimensions
      - UTM parameters from the URL
-  4. It uses `navigator.sendBeacon()` to send this data to the backend API (`/api/track`) reliably, without impacting the subsequent page's load time.
-  5. A global `window.telemetry.goal(goalName)` function is exposed, allowing website owners to track custom conversion events (e.g., newsletter sign-ups, button clicks).
+  5. It uses `navigator.sendBeacon()` to send this data to the backend API (`/api/track`) reliably, without impacting the subsequent page's load time.
+  6. A global `window.telemetry.goal(goalName)` function is exposed, allowing website owners to track custom conversion events (e.g., newsletter sign-ups, button clicks).
 
 ### Authentication
 
@@ -89,8 +90,8 @@ The main dashboard is a single-page interface for viewing all analytics data.
 The settings page allows users to manage their sites.
 
 - **Features**:
-  - **Create New Site**: Users can add a new website (tenant) to their account with optional allowed domains.
-  - **View Embed Script**: For each site, the page displays the unique `<script>` tag that needs to be embedded.
+  - **Create New Site**: Users can add a new website (tenant) to their account with optional allowed domains. A unique API key (`tlv_1_...`) is automatically generated for each new site.
+  - **View Embed Script**: For each site, the page displays the unique `<script>` tag (including `data-api-key` when available) with a one-click copy button.
   - **Manage Domains**: Users can add or remove allowed domains for CORS. Only requests from registered domains are accepted.
   - **Delete Site**: Users can permanently delete a site and all its associated analytics data.
 
@@ -103,17 +104,20 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 - **File**: `src/routes/track.ts`
 - **Description**: The main endpoint for collecting analytics data from the `analytics.js` script.
 - **Request Body**: A JSON object that can be a `pageview`, `goal`, `outbound`, `performance`, or `scroll` event.
-  - **`pageview`**: `{ type: "pageview", tenantId, hostname, path, browser, os, language, sessionId, ... }`
-  - **`goal`**: `{ type: "goal", tenantId, goalName, properties?, sessionId, ... }`
-  - **`outbound`**: `{ type: "outbound", tenantId, url, domain, path, sessionId }`
-  - **`performance`**: `{ type: "performance", tenantId, path, lcp, fid, cls, ttfb, fcp, sessionId }`
-  - **`scroll`**: `{ type: "scroll", tenantId, path, scrollDepth, sessionId }`
+  - **`pageview`**: `{ type: "pageview", tenantId, apiKey?, hostname, path, browser, os, language, sessionId, ... }`
+  - **`goal`**: `{ type: "goal", tenantId, apiKey?, goalName, properties?, sessionId, ... }`
+  - **`outbound`**: `{ type: "outbound", tenantId, apiKey?, url, domain, path, sessionId }`
+  - **`performance`**: `{ type: "performance", tenantId, apiKey?, path, lcp, fid, cls, ttfb, fcp, sessionId }`
+  - **`scroll`**: `{ type: "scroll", tenantId, apiKey?, path, scrollDepth, sessionId }`
 - **Processing**:
-  1. Validates the incoming event against `createEventSchema`.
-  2. Verifies that the `tenantId` exists.
-  3. Anonymizes the user by creating a unique `visitorId` hash from their IP address, User-Agent, and a server-side salt. This ensures privacy as the raw IP is not stored with the event.
-  4. Uses the `maxmind` library to perform a GeoIP lookup on the request IP to determine the country and city.
-  5. Saves the event to the `Event` table in the database.
+  1. **Rate Limiting**: IP-based rate limit of 30 requests/minute. Returns `429` when exceeded.
+  2. **Bot Detection**: Checks the `User-Agent` header against a list of ~40 known bot patterns (crawlers, scrapers, AI bots, monitoring tools). Returns `403` if matched.
+  3. Validates the incoming event against `createEventSchema`.
+  4. Verifies that the `tenantId` exists.
+  5. **API Key Validation**: If the tenant has an `apiKey` set, the request must include a matching `apiKey` in the body. Returns `403` on mismatch.
+  6. Anonymizes the user by creating a unique `visitorId` hash from their IP address, User-Agent, and a server-side salt. This ensures privacy as the raw IP is not stored with the event.
+  7. Uses the `ip-api.com` service to perform a GeoIP lookup on the request IP to determine the country and city.
+  8. Saves the event to the `Event` table in the database.
 - **Response**: `201 Created` on success.
 
 ### Authentication Routes
@@ -172,11 +176,21 @@ The schema is defined in `prisma/schema.prisma`.
 
 - **`User`**: Stores user information (email, name, image).
 - **`Account`**: Links a `User` to an OAuth provider (e.g., GitHub).
-- **`Tenant`**: Represents a website being tracked.
+- **`Tenant`**: Represents a website being tracked. Includes an optional `apiKey` field for authenticated event ingestion.
 - **`TenantUser`**: A join table linking `User` and `Tenant`, defining roles (e.g., 'ADMIN', 'MEMBER').
 - **`Event`**: The central table for all analytics data. It stores pageviews, goals, outbound clicks, performance metrics, scroll depth, location data, browser/OS/language info, session tracking, UTM parameters, custom event properties, and the anonymized `visitorId`.
 
 ## 5. Changelog
+
+### 2026-06-25: `feat: bot protection, rate limiting, API key auth, and SQL injection fix`
+
+- **Bot Detection**: The `/api/track` endpoint now filters ~40 known bot patterns (Googlebot, GPTBot, ClaudeBot, curl, scrapers, monitoring tools, etc.) and returns `403` for matches.
+- **Rate Limiting**: IP-based rate limit of 30 requests/minute on `/api/track` only. Dashboard API endpoints are unaffected.
+- **API Key Authentication**: New `apiKey` field on the `Tenant` model (nullable, unique). Auto-generated (`tlv_1_...` format, 256-bit entropy) on tenant creation. When set, `/api/track` validates the key from the request body. Legacy tenants without a key remain accessible.
+- **Client Update**: `analytics.js` reads `data-api-key` from the script tag and includes it in all event payloads.
+- **Dashboard Update**: Settings page now shows the full embed script (with `data-api-key`) and a one-click copy button.
+- **SQL Injection Fix**: Replaced `prisma.$queryRawUnsafe()` with parameterized Prisma ORM queries in the `views-over-time` endpoint. All segment filter values are now properly escaped.
+- **Dependency Swap**: Replaced incompatible `fastify-rate-limit` with `@fastify/rate-limit` for Fastify 5 compatibility.
 
 ### 2026-06-25: `feat: enhanced tracking, performance metrics, funnel analysis, and data export`
 
