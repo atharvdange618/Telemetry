@@ -53,12 +53,7 @@ export function Navigation() {
             >
               How it Works
             </a>
-            <a
-              href="/docs"
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            >
-              Documentation
-            </a>
+
             <DarkModeToggle />
           </div>
 
@@ -81,7 +76,11 @@ export function Navigation() {
               className="md:hidden p-2 text-gray-900 dark:text-gray-100"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -104,13 +103,7 @@ export function Navigation() {
             >
               How it Works
             </a>
-            <a
-              href="/docs"
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 py-2 transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
-              Documentation
-            </a>
+
             <div className="flex items-center justify-between py-2">
               <DarkModeToggle />
               <Button

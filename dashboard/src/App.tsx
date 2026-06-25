@@ -15,7 +15,6 @@ import DashboardPage from "./pages/DashboardPage";
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
 import Home from "./pages/Home";
-import DocsPage from "./pages/DocsPage";
 import { useDarkMode } from "./hooks/useDarkMode";
 
 const queryClient = new QueryClient();
@@ -63,10 +62,6 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-  },
-  {
-    path: "/docs",
-    element: <DocsPage />,
   },
   {
     element: <ProtectedRoute />,
