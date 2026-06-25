@@ -8,6 +8,8 @@ const features = [
   { name: "Self-Hosted Option", telemetry: true, analytics: false },
   { name: "Real-Time Data", telemetry: true, analytics: true },
   { name: "Lightweight Script", telemetry: true, analytics: false },
+  { name: "Built-in Bot Filtering", telemetry: true, analytics: false },
+  { name: "API Key Authentication", telemetry: true, analytics: false },
   { name: "No Data Retention Limit", telemetry: true, analytics: false },
 ];
 
