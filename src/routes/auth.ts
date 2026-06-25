@@ -147,9 +147,15 @@ export async function authRoutes(app: FastifyInstance) {
       const user = await prisma.user.findUnique({
         where: { id: userId.value },
       });
+
+      if (!user) {
+        return reply.code(401).send({ message: "Unauthorized" });
+      }
+
       return { user };
     } catch (error) {
-      return reply.code(401).send({ message: "Unauthorized" });
+      app.log.error(error, "Error fetching user");
+      return reply.code(500).send({ message: "Internal server error" });
     }
   });
 

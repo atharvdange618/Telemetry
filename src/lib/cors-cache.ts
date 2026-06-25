@@ -16,7 +16,9 @@ export function isOriginAllowed(origin: string | undefined): boolean {
   if (!origin) return true;
   if (origin === process.env.FRONTEND_URL) return true;
   if (Date.now() - lastFetch >= CACHE_TTL) {
-    refreshOrigins().catch(() => {});
+    refreshOrigins().catch((err) => {
+      console.error("Failed to refresh CORS origins:", err.message);
+    });
   }
   return allowedOrigins.has(origin);
 }

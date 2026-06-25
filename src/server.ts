@@ -8,6 +8,9 @@ import {
 import fastifyStatic from "@fastify/static";
 import cors from "@fastify/cors";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import { trackRoutes } from "./routes/track";
 import { authRoutes } from "./routes/auth";
@@ -59,11 +62,21 @@ app.get("/health", async () => {
 
 const port = Number(process.env.PORT) || 3000;
 
-refreshOrigins().then(() => {
-  app.listen({ port, host: "0.0.0.0" }, (err) => {
-    if (err) {
-      app.log.error(err);
-      process.exit(1);
-    }
+refreshOrigins()
+  .then(() => {
+    app.listen({ port, host: "0.0.0.0" }, (err) => {
+      if (err) {
+        app.log.error(err);
+        process.exit(1);
+      }
+    });
+  })
+  .catch((err) => {
+    app.log.error(err, "Failed to initialize CORS origins, starting server anyway");
+    app.listen({ port, host: "0.0.0.0" }, (listenErr) => {
+      if (listenErr) {
+        app.log.error(listenErr);
+        process.exit(1);
+      }
+    });
   });
-});

@@ -28,7 +28,7 @@ export function HowItWorksSection() {
           </div>
           <code className="text-green-400 font-mono text-sm md:text-base">
             {
-              '<script async defer src="https://analytics.telemetry.dev/analytics.js" data-tenant-id="YOUR_TENANT_ID"></script>'
+              '<script async defer src="https://usetelemetry.hogyoku.cloud/analytics.js" data-tenant-id="YOUR_TENANT_ID"></script>'
             }
           </code>
         </div>

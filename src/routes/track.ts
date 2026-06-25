@@ -33,7 +33,7 @@ export async function trackRoutes(app: FastifyInstance) {
         });
 
         if (!tenant) {
-          return reply.code(403).send({
+          return reply.code(404).send({
             message: "Tenant not found",
           });
         }
@@ -41,8 +41,9 @@ export async function trackRoutes(app: FastifyInstance) {
         const ip = request.ip;
         const { country, city } = await getGeoLocation(ip);
 
-        console.log(
-          `Tracking event for tenant ${tenantId} from IP ${ip}, country: ${country}, city: ${city}`
+        app.log.debug(
+          { tenantId, ip, country, city },
+          "Tracking event"
         );
 
         const userAgent = request.headers["user-agent"] || "";

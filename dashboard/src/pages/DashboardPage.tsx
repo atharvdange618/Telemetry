@@ -330,14 +330,14 @@ export default function DashboardPage() {
             title="Page Views"
             value={summary?.pageViews ?? 0}
             icon={Eye}
-            change={compareData?.pageViews.change}
+            change={compareData?.pageViews?.change}
             isLoading={isLoadingSummary}
           />
           <StatCard
             title="Unique Visitors"
             value={summary?.uniqueVisitors ?? 0}
             icon={Users}
-            change={compareData?.uniqueVisitors.change}
+            change={compareData?.uniqueVisitors?.change}
             isLoading={isLoadingSummary}
           />
           <StatCard

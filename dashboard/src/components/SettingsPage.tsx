@@ -28,12 +28,12 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchAPI = async (url: string, options?: RequestInit) => {
-  const headers: Record<string, string> = {};
-  if (options?.body) headers["Content-Type"] = "application/json";
+  const headers: Record<string, string> = { ...(options?.headers as Record<string, string>) };
+  if (options?.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
   const res = await fetch(url, {
+    ...options,
     credentials: "include",
     headers,
-    ...options,
   });
   if (!res.ok) throw new Error("An error occurred");
   if (res.status === 204) return null;
@@ -216,12 +216,14 @@ const SettingsPage = () => {
                         <DialogClose asChild>
                           <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button
-                          variant="destructive"
-                          onClick={() => deleteTenant.mutate(tenant.id)}
-                        >
-                          Delete
-                        </Button>
+                        <DialogClose asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={() => deleteTenant.mutate(tenant.id)}
+                          >
+                            Delete
+                          </Button>
+                        </DialogClose>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
