@@ -23,7 +23,7 @@ export function HowItWorksSection() {
           </div>
           <div className="p-5 text-left overflow-x-auto">
             <code className="text-sm md:text-base font-mono text-green-500/90">
-              {'<script async defer src="https://usetelemetry.hogyoku.cloud/analytics.js" data-tenant-id="YOUR_TENANT_ID"></script>'}
+              {'<script async defer src="https://usetelemetry.hogyoku.cloud/analytics.js" data-tenant-id="YOUR_TENANT_ID" data-api-key="YOUR_API_KEY"></script>'}
             </code>
           </div>
         </div>
