@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SEO } from "@/components/SEO";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,15 +23,23 @@ import {
 } from "@/components/ui/table";
 import { useAuthStore } from "@/lib/state/auth";
 import type {
+  BrowsersResponse,
   CampaignsResponse,
   CitiesResponse,
   CompareResponse,
   DevicesResponse,
   EngagementResponse,
   GoalsResponse,
+  InsightsResponse,
+  LanguagesResponse,
   LocationsResponse,
+  OsResponse,
+  OutboundResponse,
   PagesResponse,
+  PerformanceResponse,
   ReferrersResponse,
+  ScrollDepthResponse,
+  SessionsResponse,
   StatsSummary,
   TenantsResponse,
   UtmSourcesResponse,
@@ -52,8 +61,15 @@ import {
   Monitor,
   MapPin,
   Megaphone,
+  Download,
+  Filter,
+  Lightbulb,
+  Timer,
+  Scroll,
+  Gauge,
+  ExternalLink,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -63,12 +79,25 @@ const fetchAPI = async <T,>(url: string): Promise<T> => {
   return res.json();
 };
 
+type Segments = {
+  browser?: string;
+  os?: string;
+  country?: string;
+  language?: string;
+  device?: "mobile" | "tablet" | "desktop";
+};
+
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const APP_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
   const [period, setPeriod] = useState<string>("24h");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [segments, setSegments] = useState<Segments>({});
+  const [showFilters, setShowFilters] = useState(false);
+  const [customRange, setCustomRange] = useState(false);
 
   const { data: tenantsData, isLoading: isLoadingTenants } =
     useQuery<TenantsResponse>({
@@ -83,88 +112,158 @@ export default function DashboardPage() {
   }, [selectedTenantId, tenantsData]);
 
   const selectedTenant = tenantsData?.tenants.find(
-    (t) => t.id === selectedTenantId
+    (t) => t.id === selectedTenantId,
   );
 
   const endpoint = `${APP_URL}/api/stats`;
-  const queryParams = `?tenantId=${selectedTenantId}&period=${period}`;
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("tenantId", selectedTenantId || "");
+    if (customRange && startDate && endDate) {
+      params.set("startDate", new Date(startDate).toISOString());
+      params.set("endDate", new Date(endDate + "T23:59:59").toISOString());
+    } else {
+      params.set("period", period);
+    }
+    if (segments.browser) params.set("browser", segments.browser);
+    if (segments.os) params.set("os", segments.os);
+    if (segments.country) params.set("country", segments.country);
+    if (segments.language) params.set("language", segments.language);
+    if (segments.device) params.set("device", segments.device);
+    return params.toString();
+  }, [selectedTenantId, period, startDate, endDate, customRange, segments]);
+
+  const queryKey = [
+    "stats",
+    selectedTenantId,
+    period,
+    startDate,
+    endDate,
+    customRange,
+    segments,
+  ];
+  const enabled = !!selectedTenantId;
 
   const { data: summary, isLoading: isLoadingSummary } = useQuery<StatsSummary>(
     {
-      queryKey: ["summary", selectedTenantId, period],
-      queryFn: () => fetchAPI(`${endpoint}/summary${queryParams}`),
-      enabled: !!selectedTenantId,
-    }
+      queryKey: [...queryKey, "summary"],
+      queryFn: () => fetchAPI(`${endpoint}/summary?${queryParams}`),
+      enabled,
+    },
   );
 
-  const { data: pages, isLoading: isLoadingPages } = useQuery<PagesResponse>({
-    queryKey: ["pages", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/pages${queryParams}`),
-    enabled: !!selectedTenantId,
+  const { data: pages } = useQuery<PagesResponse>({
+    queryKey: [...queryKey, "pages"],
+    queryFn: () => fetchAPI(`${endpoint}/pages?${queryParams}`),
+    enabled,
   });
 
-  const { data: referrers, isLoading: isLoadingReferrers } =
-    useQuery<ReferrersResponse>({
-      queryKey: ["referrers", selectedTenantId, period],
-      queryFn: () => fetchAPI(`${endpoint}/referrers${queryParams}`),
-      enabled: !!selectedTenantId,
-    });
+  const { data: referrers } = useQuery<ReferrersResponse>({
+    queryKey: [...queryKey, "referrers"],
+    queryFn: () => fetchAPI(`${endpoint}/referrers?${queryParams}`),
+    enabled,
+  });
 
   const { data: viewsOverTime } = useQuery<ViewsOverTimeResponse>({
-    queryKey: ["viewsOverTime", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/views-over-time${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "viewsOverTime"],
+    queryFn: () => fetchAPI(`${endpoint}/views-over-time?${queryParams}`),
+    enabled,
   });
 
-  const { data: sourcesData, isLoading: isLoadingSources } =
-    useQuery<UtmSourcesResponse>({
-      queryKey: ["sources", selectedTenantId, period],
-      queryFn: () => fetchAPI(`${endpoint}/sources${queryParams}`),
-      enabled: !!selectedTenantId,
-    });
+  const { data: sourcesData } = useQuery<UtmSourcesResponse>({
+    queryKey: [...queryKey, "sources"],
+    queryFn: () => fetchAPI(`${endpoint}/sources?${queryParams}`),
+    enabled,
+  });
 
-  const { data: goalsData, isLoading: isLoadingGoals } =
-    useQuery<GoalsResponse>({
-      queryKey: ["goals", selectedTenantId, period],
-      queryFn: () => fetchAPI(`${endpoint}/goals${queryParams}`),
-      enabled: !!selectedTenantId,
-    });
+  const { data: goalsData } = useQuery<GoalsResponse>({
+    queryKey: [...queryKey, "goals"],
+    queryFn: () => fetchAPI(`${endpoint}/goals?${queryParams}`),
+    enabled,
+  });
 
-  const { data: locationsData, isLoading: isLoadingLocations } =
-    useQuery<LocationsResponse>({
-      queryKey: ["locations", selectedTenantId, period],
-      queryFn: () => fetchAPI(`${endpoint}/locations${queryParams}`),
-      enabled: !!selectedTenantId,
-    });
+  const { data: locationsData } = useQuery<LocationsResponse>({
+    queryKey: [...queryKey, "locations"],
+    queryFn: () => fetchAPI(`${endpoint}/locations?${queryParams}`),
+    enabled,
+  });
 
   const { data: devicesData } = useQuery<DevicesResponse>({
-    queryKey: ["devices", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/devices${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "devices"],
+    queryFn: () => fetchAPI(`${endpoint}/devices?${queryParams}`),
+    enabled,
   });
 
   const { data: engagementData } = useQuery<EngagementResponse>({
-    queryKey: ["engagement", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/engagement${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "engagement"],
+    queryFn: () => fetchAPI(`${endpoint}/engagement?${queryParams}`),
+    enabled,
   });
 
   const { data: campaignsData } = useQuery<CampaignsResponse>({
-    queryKey: ["campaigns", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/campaigns${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "campaigns"],
+    queryFn: () => fetchAPI(`${endpoint}/campaigns?${queryParams}`),
+    enabled,
   });
 
   const { data: citiesData } = useQuery<CitiesResponse>({
-    queryKey: ["cities", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/cities${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "cities"],
+    queryFn: () => fetchAPI(`${endpoint}/cities?${queryParams}`),
+    enabled,
   });
 
   const { data: compareData } = useQuery<CompareResponse>({
-    queryKey: ["compare", selectedTenantId, period],
-    queryFn: () => fetchAPI(`${endpoint}/compare${queryParams}`),
-    enabled: !!selectedTenantId,
+    queryKey: [...queryKey, "compare"],
+    queryFn: () => fetchAPI(`${endpoint}/compare?${queryParams}`),
+    enabled,
+  });
+
+  const { data: browsersData } = useQuery<BrowsersResponse>({
+    queryKey: [...queryKey, "browsers"],
+    queryFn: () => fetchAPI(`${endpoint}/browsers?${queryParams}`),
+    enabled,
+  });
+
+  const { data: osData } = useQuery<OsResponse>({
+    queryKey: [...queryKey, "os"],
+    queryFn: () => fetchAPI(`${endpoint}/os?${queryParams}`),
+    enabled,
+  });
+
+  const { data: languagesData } = useQuery<LanguagesResponse>({
+    queryKey: [...queryKey, "languages"],
+    queryFn: () => fetchAPI(`${endpoint}/languages?${queryParams}`),
+    enabled,
+  });
+
+  const { data: sessionsData } = useQuery<SessionsResponse>({
+    queryKey: [...queryKey, "sessions"],
+    queryFn: () => fetchAPI(`${endpoint}/sessions?${queryParams}`),
+    enabled,
+  });
+
+  const { data: scrollData } = useQuery<ScrollDepthResponse>({
+    queryKey: [...queryKey, "scrollDepth"],
+    queryFn: () => fetchAPI(`${endpoint}/scroll-depth?${queryParams}`),
+    enabled,
+  });
+
+  const { data: perfData } = useQuery<PerformanceResponse>({
+    queryKey: [...queryKey, "performance"],
+    queryFn: () => fetchAPI(`${endpoint}/performance?${queryParams}`),
+    enabled,
+  });
+
+  const { data: outboundData } = useQuery<OutboundResponse>({
+    queryKey: [...queryKey, "outbound"],
+    queryFn: () => fetchAPI(`${endpoint}/outbound?${queryParams}`),
+    enabled,
+  });
+
+  const { data: insightsData } = useQuery<InsightsResponse>({
+    queryKey: [...queryKey, "insights"],
+    queryFn: () => fetchAPI(`${endpoint}/insights?${queryParams}`),
+    enabled,
   });
 
   const handleLogout = async () => {
@@ -174,13 +273,26 @@ export default function DashboardPage() {
       });
       if (response.ok) navigate("/", { replace: true });
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("An unknown error occurred.");
-      }
+      if (error instanceof Error) toast.error(error.message);
+      else toast.error("An unknown error occurred.");
     }
   };
+
+  const handleExport = async (format: "csv" | "json") => {
+    const params = new URLSearchParams();
+    params.set("tenantId", selectedTenantId || "");
+    params.set("format", format);
+    if (startDate) params.set("startDate", new Date(startDate).toISOString());
+    if (endDate)
+      params.set("endDate", new Date(endDate + "T23:59:59").toISOString());
+    window.open(`${APP_URL}/api/export/events?${params.toString()}`, "_blank");
+  };
+
+  const setSegment = (key: keyof Segments, value: string) => {
+    setSegments((prev) => ({ ...prev, [key]: value || undefined }));
+  };
+
+  const clearSegments = () => setSegments({});
 
   const ChangeIndicator = ({ change }: { change: number }) => (
     <span
@@ -229,16 +341,69 @@ export default function DashboardPage() {
     </Card>
   );
 
+  const SimpleTable = ({
+    data,
+    labelKey,
+    valueKey,
+    valueLabel,
+  }: {
+    data: object[];
+    labelKey: string;
+    valueKey: string;
+    valueLabel: string;
+  }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>
+            {labelKey.charAt(0).toUpperCase() + labelKey.slice(1)}
+          </TableHead>
+          <TableHead className="text-right">{valueLabel}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data?.length ? (
+          data.map((item, i) => {
+            const row = item as Record<
+              string,
+              string | number | boolean | null | undefined
+            >;
+            const val = row[valueKey];
+            return (
+              <TableRow key={i}>
+                <TableCell className="font-medium">{row[labelKey]}</TableCell>
+                <TableCell className="text-right text-muted-foreground">
+                  {typeof val === "number" ? val.toLocaleString() : val}
+                </TableCell>
+              </TableRow>
+            );
+          })
+        ) : (
+          <TableRow>
+            <TableCell
+              colSpan={2}
+              className="text-center text-muted-foreground py-4"
+            >
+              No data yet
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+
   const tenantName = selectedTenant?.name || "Dashboard";
+  const hasActiveFilters = Object.values(segments).some(Boolean);
 
   return (
     <div className="p-4 md:p-8 bg-background min-h-screen">
       <SEO
         title={`${tenantName} Overview`}
-        description="View real-time privacy-friendly website analytics, visitor statistics, device breakdown, goals, and referral data."
+        description="View real-time privacy-friendly website analytics."
         noindex={true}
       />
-      <header className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
+
+      <header className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
             <img src="/logo.svg" alt="Telemetry Logo" className="h-5 w-5" />
@@ -249,9 +414,7 @@ export default function DashboardPage() {
                 ? "Loading..."
                 : selectedTenant?.name || "Dashboard"}
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Analytics overview
-            </p>
+            <p className="text-sm text-muted-foreground">Analytics overview</p>
           </div>
         </div>
 
@@ -272,26 +435,32 @@ export default function DashboardPage() {
                 <DropdownMenuItem
                   key={tenant.id}
                   onSelect={() => setSelectedTenantId(tenant.id)}
-                  className={tenant.id === selectedTenantId ? "bg-accent" : ""}
+                  className={
+                    tenant.id === selectedTenantId
+                      ? "bg-accent"
+                      : "cursor-pointer"
+                  }
                 >
                   {tenant.name}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => navigate("/settings")}>
-                <Settings className="h-4 w-4 mr-2" />
-                Manage Sites
+                <Settings className="h-4 w-4 mr-2" /> Manage Sites
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <div className="flex rounded-lg border border-border bg-muted/50 p-0.5">
-            {(["24h", "7d", "30d"] as const).map((p) => (
+            {(["24h", "7d", "30d", "90d"] as const).map((p) => (
               <button
                 key={p}
-                onClick={() => setPeriod(p)}
+                onClick={() => {
+                  setPeriod(p);
+                  setCustomRange(false);
+                }}
                 className={`px-3 py-1 text-sm font-medium rounded-md transition-all ${
-                  period === p
+                  period === p && !customRange
                     ? "bg-background text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
@@ -300,6 +469,44 @@ export default function DashboardPage() {
               </button>
             ))}
           </div>
+
+          <Button
+            variant={customRange ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCustomRange(!customRange)}
+          >
+            Custom
+          </Button>
+
+          <Button
+            variant={showFilters ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="gap-1"
+          >
+            <Filter className="h-3.5 w-3.5" />
+            {hasActiveFilters && (
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            )}
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => handleExport("csv")}>
+                Export CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleExport("json")}>
+                Export JSON
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DarkModeToggle />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -314,25 +521,143 @@ export default function DashboardPage() {
               <DropdownMenuLabel>
                 <div className="flex flex-col">
                   <span className="font-medium">{user?.name}</span>
-                  <span className="text-xs text-muted-foreground font-normal">{user?.email}</span>
+                  <span className="text-xs text-muted-foreground font-normal">
+                    {user?.email}
+                  </span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => navigate("/settings")}>
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+                <Settings className="h-4 w-4 mr-2" /> Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleLogout} className="text-destructive focus:text-destructive">
-                <LogOut className="h-4 w-4 mr-2" />
-                Log out
+              <DropdownMenuItem
+                onSelect={handleLogout}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="h-4 w-4 mr-2" /> Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
+      {customRange && (
+        <div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-lg border border-border bg-muted/30">
+          <span className="text-sm text-muted-foreground">From:</span>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="px-3 py-1 text-sm rounded-md border border-border bg-background"
+          />
+          <span className="text-sm text-muted-foreground">To:</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="px-3 py-1 text-sm rounded-md border border-border bg-background"
+          />
+        </div>
+      )}
+
+      {showFilters && (
+        <div className="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-lg border border-border bg-muted/30">
+          <span className="text-sm font-medium text-muted-foreground">
+            Filters:
+          </span>
+          <select
+            value={segments.browser || ""}
+            onChange={(e) => setSegment("browser", e.target.value)}
+            className="px-2 py-1 text-sm rounded-md border border-border bg-background"
+          >
+            <option value="">All Browsers</option>
+            {browsersData?.browsers?.map((b) => (
+              <option key={b.browser} value={b.browser}>
+                {b.browser}
+              </option>
+            ))}
+          </select>
+          <select
+            value={segments.os || ""}
+            onChange={(e) => setSegment("os", e.target.value)}
+            className="px-2 py-1 text-sm rounded-md border border-border bg-background"
+          >
+            <option value="">All OS</option>
+            {osData?.operatingSystems?.map((o) => (
+              <option key={o.os} value={o.os}>
+                {o.os}
+              </option>
+            ))}
+          </select>
+          <select
+            value={segments.country || ""}
+            onChange={(e) => setSegment("country", e.target.value)}
+            className="px-2 py-1 text-sm rounded-md border border-border bg-background"
+          >
+            <option value="">All Countries</option>
+            {locationsData?.locations?.map((l) => (
+              <option key={l.country} value={l.country}>
+                {l.country}
+              </option>
+            ))}
+          </select>
+          <select
+            value={segments.language || ""}
+            onChange={(e) => setSegment("language", e.target.value)}
+            className="px-2 py-1 text-sm rounded-md border border-border bg-background"
+          >
+            <option value="">All Languages</option>
+            {languagesData?.languages?.map((l) => (
+              <option key={l.language} value={l.language}>
+                {l.language}
+              </option>
+            ))}
+          </select>
+          <select
+            value={segments.device || ""}
+            onChange={(e) => setSegment("device", e.target.value)}
+            className="px-2 py-1 text-sm rounded-md border border-border bg-background"
+          >
+            <option value="">All Devices</option>
+            <option value="desktop">Desktop</option>
+            <option value="mobile">Mobile</option>
+            <option value="tablet">Tablet</option>
+          </select>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearSegments}
+              className="text-xs"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+      )}
+
       <main className="space-y-6">
+        {insightsData?.insights?.length ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {insightsData.insights.map((insight, i) => (
+              <Card key={i} className="border-l-4 border-l-primary">
+                <CardContent className="p-3">
+                  <div className="flex items-start gap-2">
+                    <Lightbulb className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium">{insight.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {insight.detail}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : null}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Page Views"
@@ -362,11 +687,37 @@ export default function DashboardPage() {
           />
         </div>
 
-        {viewsOverTime?.views && (
-          <AnalyticsChart
-            data={viewsOverTime.views}
-            title="Views Over Time"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Sessions"
+            value={sessionsData?.totalSessions ?? "—"}
+            icon={Timer}
+            isLoading={!sessionsData}
           />
+          <StatCard
+            title="Avg Session"
+            value={sessionsData?.avgDurationFormatted ?? "—"}
+            icon={Timer}
+            isLoading={!sessionsData}
+          />
+          <StatCard
+            title="Avg Scroll"
+            value={
+              scrollData?.avgScrollDepth ? `${scrollData.avgScrollDepth}%` : "—"
+            }
+            icon={Scroll}
+            isLoading={!scrollData}
+          />
+          <StatCard
+            title="Scroll (100%)"
+            value={scrollData?.distribution?.at100 ?? "—"}
+            icon={Scroll}
+            isLoading={!scrollData}
+          />
+        </div>
+
+        {viewsOverTime?.views && (
+          <AnalyticsChart data={viewsOverTime.views} title="Views Over Time" />
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
@@ -385,37 +736,12 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Top Countries</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Country</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingLocations ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : locationsData?.locations?.length ? (
-                    locationsData.locations.map((loc) => (
-                      <TableRow key={loc.country}>
-                        <TableCell className="font-medium">{loc.country}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{loc.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                        No location data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={locationsData?.locations || []}
+                labelKey="country"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
         </div>
@@ -427,77 +753,26 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Top Pages</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Path</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingPages ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-32 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : pages?.pages?.length ? (
-                    pages.pages.map((page) => (
-                      <TableRow key={page.path}>
-                        <TableCell className="font-mono text-sm">{page.path}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{page.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                        No page data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={pages?.pages || []}
+                labelKey="path"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <Link2 className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Top Referrers</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Source</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingReferrers ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-12 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : referrers?.referrers?.length ? (
-                    referrers.referrers.map((ref) => (
-                      <TableRow key={ref.referrer}>
-                        <TableCell className="font-medium truncate max-w-[200px]">{ref.referrer}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{ref.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                        No referrer data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={referrers?.referrers || []}
+                labelKey="referrer"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
         </div>
@@ -506,158 +781,249 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <Monitor className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Browsers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleTable
+                data={browsersData?.browsers || []}
+                labelKey="browser"
+                valueKey="percentage"
+                valueLabel="%"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Monitor className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Operating Systems</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleTable
+                data={osData?.operatingSystems || []}
+                labelKey="os"
+                valueKey="percentage"
+                valueLabel="%"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Languages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleTable
+                data={languagesData?.languages || []}
+                labelKey="language"
+                valueKey="percentage"
+                valueLabel="%"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Monitor className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Devices</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {devicesData ? (() => {
-                  const total = devicesData.devices.mobile + devicesData.devices.tablet + devicesData.devices.desktop;
-                  const items = [
-                    { label: "Desktop", value: devicesData.devices.desktop, color: "bg-primary" },
-                    { label: "Mobile", value: devicesData.devices.mobile, color: "bg-accent" },
-                    { label: "Tablet", value: devicesData.devices.tablet, color: "bg-chart-3" },
-                  ];
-                  return items.map((item) => (
-                    <div key={item.label}>
-                      <div className="flex justify-between text-sm mb-1.5">
-                        <span className="text-muted-foreground">{item.label}</span>
-                        <span className="font-medium tabular-nums">{total > 0 ? Math.round(item.value / total * 100) : 0}%</span>
+                {devicesData ? (
+                  (() => {
+                    const total =
+                      devicesData.devices.mobile +
+                      devicesData.devices.tablet +
+                      devicesData.devices.desktop;
+                    return [
+                      {
+                        label: "Desktop",
+                        value: devicesData.devices.desktop,
+                        color: "bg-primary",
+                      },
+                      {
+                        label: "Mobile",
+                        value: devicesData.devices.mobile,
+                        color: "bg-accent",
+                      },
+                      {
+                        label: "Tablet",
+                        value: devicesData.devices.tablet,
+                        color: "bg-chart-3",
+                      },
+                    ].map((item) => (
+                      <div key={item.label}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-muted-foreground">
+                            {item.label}
+                          </span>
+                          <span className="font-medium tabular-nums">
+                            {total > 0
+                              ? Math.round((item.value / total) * 100)
+                              : 0}
+                            %
+                          </span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${item.color}`}
+                            style={{
+                              width: `${total > 0 ? (item.value / total) * 100 : 0}%`,
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${item.color}`}
-                          style={{ width: `${total > 0 ? item.value / total * 100 : 0}%` }}
-                        />
-                      </div>
-                    </div>
-                  ));
-                })() : (
-                  <p className="text-sm text-muted-foreground text-center py-4">No device data yet</p>
+                    ));
+                  })()
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No device data yet
+                  </p>
                 )}
               </div>
             </CardContent>
           </Card>
+        </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <Target className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Top Goals</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Goal</TableHead>
-                    <TableHead className="text-right">Count</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingGoals ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : goalsData?.goals?.length ? (
-                    goalsData.goals.map((goal) => (
-                      <TableRow key={goal.name}>
-                        <TableCell className="font-medium">{goal.name}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{goal.completions}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
-                        No goals set
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={goalsData?.goals || []}
+                labelKey="name"
+                valueKey="completions"
+                valueLabel="Count"
+              />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <Megaphone className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Top Sources</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Source</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingSources ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : sourcesData?.sources?.length ? (
-                    sourcesData.sources.map((source) => (
-                      <TableRow key={source.source}>
-                        <TableCell className="font-medium">{source.source}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{source.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
-                        No source data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={sourcesData?.sources || []}
+                labelKey="source"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Top Cities</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>City</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoadingLocations ? (
-                    Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                        <TableCell className="text-right"><div className="h-4 w-8 bg-muted animate-pulse rounded ml-auto" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : citiesData?.cities?.length ? (
-                    citiesData.cities.map((c) => (
-                      <TableRow key={c.city}>
-                        <TableCell className="font-medium">{c.city}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{c.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-4">
-                        No city data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={citiesData?.cities || []}
+                labelKey="city"
+                valueKey="views"
+                valueLabel="Views"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Outbound Links</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleTable
+                data={(outboundData?.outboundLinks || []).map((o) => ({
+                  url: new URL(o.url).hostname,
+                  clicks: o.clicks,
+                }))}
+                labelKey="url"
+                valueKey="clicks"
+                valueLabel="Clicks"
+              />
             </CardContent>
           </Card>
         </div>
+
+        {perfData && (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Gauge className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">
+                Performance (Core Web Vitals)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {[
+                  {
+                    label: "LCP",
+                    data: perfData.lcp,
+                    unit: "ms",
+                    good: 2500,
+                    poor: 4000,
+                  },
+                  {
+                    label: "FID/INP",
+                    data: perfData.fid,
+                    unit: "ms",
+                    good: 100,
+                    poor: 300,
+                  },
+                  {
+                    label: "CLS",
+                    data: perfData.cls,
+                    unit: "",
+                    good: 0.1,
+                    poor: 0.25,
+                  },
+                  {
+                    label: "TTFB",
+                    data: perfData.ttfb,
+                    unit: "ms",
+                    good: 800,
+                    poor: 1800,
+                  },
+                  {
+                    label: "FCP",
+                    data: perfData.fcp,
+                    unit: "ms",
+                    good: 1800,
+                    poor: 3000,
+                  },
+                ].map((m) => {
+                  const val = m.data?.p75 || 0;
+                  const status =
+                    val <= m.good
+                      ? "good"
+                      : val <= m.poor
+                        ? "needs-improvement"
+                        : "poor";
+                  const color =
+                    status === "good"
+                      ? "text-green-600"
+                      : status === "needs-improvement"
+                        ? "text-yellow-600"
+                        : "text-red-600";
+                  return (
+                    <div key={m.label} className="text-center">
+                      <p className="text-xs text-muted-foreground mb-1">
+                        {m.label}
+                      </p>
+                      <p className={`text-2xl font-bold ${color}`}>
+                        {m.label === "CLS" ? val.toFixed(3) : Math.round(val)}
+                        {m.unit}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        p75 · {m.data?.count || 0} samples
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card>
@@ -666,63 +1032,26 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Top Campaigns</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Campaign</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {campaignsData?.campaigns?.length ? (
-                    campaignsData.campaigns.map((c) => (
-                      <TableRow key={c.campaign}>
-                        <TableCell className="font-medium">{c.campaign}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{c.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                        No campaign data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={campaignsData?.campaigns || []}
+                labelKey="campaign"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <Megaphone className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-base">Top Mediums</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Medium</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {campaignsData?.mediums?.length ? (
-                    campaignsData.mediums.map((m) => (
-                      <TableRow key={m.medium}>
-                        <TableCell className="font-medium">{m.medium}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{m.views.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                        No medium data yet
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <SimpleTable
+                data={campaignsData?.mediums || []}
+                labelKey="medium"
+                valueKey="views"
+                valueLabel="Views"
+              />
             </CardContent>
           </Card>
         </div>
