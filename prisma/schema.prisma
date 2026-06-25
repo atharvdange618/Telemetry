@@ -33,6 +33,7 @@ model Account {
 model Tenant {
   id        String   @id @default(cuid())
   name      String
+  apiKey    String?  @unique
   domains   String[]
   createdAt DateTime @default(now())
 

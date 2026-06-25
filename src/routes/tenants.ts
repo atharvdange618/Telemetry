@@ -4,6 +4,16 @@ import { authHook } from "../hooks/auth";
 import { prisma } from "../lib/prisma";
 import { tenantBodySchema, tenantParamsSchema } from "../lib/schemas";
 import { invalidateOriginCache } from "../lib/cors-cache";
+import { randomBytes } from "crypto";
+
+function generateApiKey(): string {
+  const prefix = "tlv";
+  const version = "1";
+  const random = randomBytes(32)
+    .toString("base64url")
+    .replace(/[=]/g, "");
+  return `${prefix}_${version}_${random}`;
+}
 
 export async function tenantRoutes(app: FastifyInstance) {
   app.addHook("preHandler", authHook);
@@ -37,7 +47,9 @@ export async function tenantRoutes(app: FastifyInstance) {
       const { name, domains } = tenantBodySchema.parse(request.body);
 
       const tenant = await prisma.$transaction(async (tx) => {
-        const t = await tx.tenant.create({ data: { name, domains: domains ?? [] } });
+        const t = await tx.tenant.create({
+          data: { name, apiKey: generateApiKey(), domains: domains ?? [] },
+        });
         await tx.tenantUser.create({
           data: { tenantId: t.id, userId, role: "ADMIN" },
         });

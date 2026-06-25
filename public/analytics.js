@@ -8,6 +8,8 @@
     return;
   }
 
+  var apiKey = scriptEl.getAttribute("data-api-key") || "";
+
   var scriptOrigin = scriptEl.src
     ? new URL(scriptEl.src).origin
     : window.location.origin;
@@ -43,7 +45,16 @@
     if (/Windows NT (\d+\.\d+)/.test(str)) {
       os = "Windows";
       var v = parseFloat(RegExp.$1);
-      osVersion = v === 10.0 ? "10" : v === 6.3 ? "8.1" : v === 6.2 ? "8" : v === 6.1 ? "7" : String(v);
+      osVersion =
+        v === 10.0
+          ? "10"
+          : v === 6.3
+            ? "8.1"
+            : v === 6.2
+              ? "8"
+              : v === 6.1
+                ? "7"
+                : String(v);
     } else if (/Mac OS X (\d+[._]\d+)/.test(str)) {
       os = "macOS";
       osVersion = RegExp.$1.replace("_", ".");
@@ -73,11 +84,14 @@
   function getSessionId() {
     var sid = sessionStorage.getItem("_tid");
     if (!sid) {
-      sid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-        var r = (Math.random() * 16) | 0;
-        var v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
+      sid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+          var r = (Math.random() * 16) | 0;
+          var v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        },
+      );
       sessionStorage.setItem("_tid", sid);
     }
     return sid;
@@ -99,6 +113,7 @@
     var urlParams = new URLSearchParams(window.location.search);
     sendEvent({
       tenantId: tenantId,
+      apiKey: apiKey,
       type: "pageview",
       hostname: window.location.hostname,
       path: window.location.pathname,
@@ -126,6 +141,7 @@
     }
     var payload = {
       tenantId: tenantId,
+      apiKey: apiKey,
       type: "goal",
       goalName: goalName,
       sessionId: sessionId,
@@ -147,6 +163,7 @@
       if (url.hostname === window.location.hostname) return;
       sendEvent({
         tenantId: tenantId,
+        apiKey: apiKey,
         type: "outbound",
         url: href,
         domain: url.hostname,
@@ -164,7 +181,9 @@
 
   function trackScrollDepth() {
     var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    var docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var docHeight =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
     if (docHeight <= 0) return;
     var pct = Math.round((scrollTop / docHeight) * 100);
     if (pct > maxScroll) maxScroll = pct;
@@ -174,6 +193,7 @@
     if (maxScroll > 0) {
       sendEvent({
         tenantId: tenantId,
+        apiKey: apiKey,
         type: "scroll",
         path: window.location.pathname,
         scrollDepth: maxScroll,
@@ -197,7 +217,8 @@
         var n = nav[0];
         perfData.ttfb = Math.round(n.responseStart - n.requestStart);
         perfData.fcp = Math.round(
-          (perf.getEntriesByName("first-contentful-paint")[0] || {}).startTime || 0
+          (perf.getEntriesByName("first-contentful-paint")[0] || {})
+            .startTime || 0,
         );
       }
 
@@ -232,6 +253,7 @@
         if (Object.keys(perfData).length > 0) {
           sendEvent({
             tenantId: tenantId,
+            apiKey: apiKey,
             type: "performance",
             path: window.location.pathname,
             lcp: perfData.lcp || null,
@@ -265,7 +287,7 @@
         scrollThrottle = null;
       }, 200);
     },
-    { passive: true }
+    { passive: true },
   );
 
   document.addEventListener("click", trackOutboundClick, { capture: true });

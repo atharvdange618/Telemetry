@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const browserFields = {
+  apiKey: z.string().optional(),
   browser: z.string().optional(),
   browserVersion: z.string().optional(),
   os: z.string().optional(),
