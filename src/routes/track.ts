@@ -3,6 +3,49 @@ import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
 
+const BOT_PATTERNS = [
+  /bot/i, /crawler/i, /spider/i, /scrape/i, /curl/i, /wget/i,
+  /python-requests/i, /python-urllib/i, /go-http-client/i,
+  /java\//i, /php/i, /ruby/i, /perl/i, / headless/i,
+  /phantom/i, /selenium/i, /puppeteer/i, /playwright/i,
+  /ighthouse/i, /pagespeed/i, /webpagetest/i, /monitor/i,
+  /uptime/i, /healthcheck/i, /check/i, /test/i,
+  /feedfetcher/i, /mediapartners/i, /adsbot/i, /googlebot/i,
+  /bingbot/i, /yandexbot/i, /baiduspider/i, /duckduckbot/i,
+  /slurp/i, /ia_archiver/i, /semrushbot/i, /ahrefbot/i,
+  /mj12bot/i, /dotbot/i, /petalbot/i, /bytespider/i,
+  /gptbot/i, /chatgpt-user/i, /ccbot/i, /claudebot/i,
+  /amazonbot/i, /anthropic-ai/i, /cohere-ai/i,
+];
+
+function isBot(ua: string): boolean {
+  if (!ua || ua.length < 10) return true;
+  return BOT_PATTERNS.some((p) => p.test(ua));
+}
+
+const TRACK_RATE_LIMIT = 30;
+const TRACK_RATE_WINDOW = 60_000;
+const trackHits = new Map<string, number[]>();
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of trackHits) {
+    const fresh = timestamps.filter((t) => now - t < TRACK_RATE_WINDOW);
+    if (fresh.length === 0) trackHits.delete(ip);
+    else trackHits.set(ip, fresh);
+  }
+}, TRACK_RATE_WINDOW);
+
+function isTrackRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = trackHits.get(ip) || [];
+  const fresh = timestamps.filter((t) => now - t < TRACK_RATE_WINDOW);
+  if (fresh.length >= TRACK_RATE_LIMIT) return true;
+  fresh.push(now);
+  trackHits.set(ip, fresh);
+  return false;
+}
+
 async function getGeoLocation(ip: string): Promise<{ country: string | null; city: string | null }> {
   if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.")) {
     return { country: null, city: null };
@@ -17,6 +60,18 @@ async function getGeoLocation(ip: string): Promise<{ country: string | null; cit
 }
 
 export async function trackRoutes(app: FastifyInstance) {
+  app.addHook("preHandler", async (request, reply) => {
+    if (request.url === "/api/track" && request.method === "POST") {
+      if (isTrackRateLimited(request.ip)) {
+        return reply.code(429).send({ message: "Rate limit exceeded" });
+      }
+      const ua = request.headers["user-agent"] || "";
+      if (isBot(ua)) {
+        return reply.code(403).send({ message: "Forbidden" });
+      }
+    }
+  });
+
   app.post<{ Body: CreateEventInput }>(
     "/api/track",
     {
@@ -25,7 +80,7 @@ export async function trackRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { tenantId, ...eventData } = request.body;
+      const { tenantId, apiKey: providedApiKey, ...eventData } = request.body as CreateEventInput & { apiKey?: string };
 
       try {
         const tenant = await prisma.tenant.findUnique({
@@ -34,6 +89,10 @@ export async function trackRoutes(app: FastifyInstance) {
 
         if (!tenant) {
           return reply.code(404).send({ message: "Tenant not found" });
+        }
+
+        if (tenant.apiKey && tenant.apiKey !== providedApiKey) {
+          return reply.code(403).send({ message: "Invalid API key" });
         }
 
         const ip = request.ip;
