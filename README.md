@@ -80,7 +80,22 @@ window.telemetry?.pageview("/new-page");
 ```javascript
 // Track conversions
 window.telemetry?.goal("signup");
+
+// Track with custom properties
+window.telemetry?.goal("purchase", { plan: "pro", amount: 49 });
 ```
+
+### What's Automatically Tracked
+
+The script automatically captures:
+- **Browser & OS**: Name, version (Chrome 125, Windows 11, etc.)
+- **Language**: Browser language setting
+- **Session ID**: Groups events per visit (stored in sessionStorage)
+- **Scroll Depth**: Max scroll percentage on page leave
+- **Outbound Links**: Clicks on external links
+- **Core Web Vitals**: LCP, INP, CLS, TTFB, FCP (sent once per page load)
+- **UTM Parameters**: Source, medium, campaign, term, content
+- **Geolocation**: Country and city (server-side via IP)
 
 ## Production Deployment
 
@@ -106,7 +121,7 @@ pm2 start ecosystem.config.cjs
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/track` | POST | Track pageview or goal event |
+| `/api/track` | POST | Track pageview, goal, outbound, performance, or scroll event |
 | `/api/tenants` | GET/POST | List or create sites |
 | `/api/tenants/:id` | PUT/DELETE | Update or delete a site |
 | `/api/stats/summary` | GET | Page views, visitors, bounce rate |
@@ -121,6 +136,17 @@ pm2 start ecosystem.config.cjs
 | `/api/stats/locations` | GET | Top countries |
 | `/api/stats/goals` | GET | Goal completions |
 | `/api/stats/compare` | GET | Period vs previous period |
+| `/api/stats/browsers` | GET | Top browsers with percentages |
+| `/api/stats/os` | GET | Top operating systems with percentages |
+| `/api/stats/languages` | GET | Top languages with percentages |
+| `/api/stats/sessions` | GET | Session count and avg duration |
+| `/api/stats/scroll-depth` | GET | Average scroll depth and distribution |
+| `/api/stats/performance` | GET | Core Web Vitals (p50/p75/p90/p99) |
+| `/api/stats/outbound` | GET | Top outbound links by clicks |
+| `/api/stats/funnels` | POST | Funnel conversion analysis |
+| `/api/stats/cohorts` | GET | Weekly cohort retention matrix |
+| `/api/stats/insights` | GET | Automated insights and anomalies |
+| `/api/export/events` | GET | Export events as CSV or JSON |
 
 ## License
 

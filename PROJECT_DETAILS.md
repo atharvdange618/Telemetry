@@ -102,9 +102,12 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 
 - **File**: `src/routes/track.ts`
 - **Description**: The main endpoint for collecting analytics data from the `analytics.js` script.
-- **Request Body**: A JSON object that can be a `pageview` or a `goal` event.
-  - **`pageview`**: `{ type: "pageview", tenantId, hostname, path, ... }`
-  - **`goal`**: `{ type: "goal", tenantId, goalName }`
+- **Request Body**: A JSON object that can be a `pageview`, `goal`, `outbound`, `performance`, or `scroll` event.
+  - **`pageview`**: `{ type: "pageview", tenantId, hostname, path, browser, os, language, sessionId, ... }`
+  - **`goal`**: `{ type: "goal", tenantId, goalName, properties?, sessionId, ... }`
+  - **`outbound`**: `{ type: "outbound", tenantId, url, domain, path, sessionId }`
+  - **`performance`**: `{ type: "performance", tenantId, path, lcp, fid, cls, ttfb, fcp, sessionId }`
+  - **`scroll`**: `{ type: "scroll", tenantId, path, scrollDepth, sessionId }`
 - **Processing**:
   1. Validates the incoming event against `createEventSchema`.
   2. Verifies that the `tenantId` exists.
@@ -136,7 +139,7 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 
 - **File**: `src/routes/stats.ts`
 - **Authentication**: All routes are protected by the `authHook`.
-- **Query Parameters**: All routes require `tenantId` and accept a `period` (`24h`, `7d`, `30d`).
+- **Query Parameters**: All routes require `tenantId` and accept `period` (`24h`, `7d`, `30d`, `90d`), or `startDate`/`endDate` (ISO strings) for custom date ranges. Segment filtering params: `browser`, `os`, `country`, `language`, `device`, `referrer`, `utmSource`.
 
 - **`POST /api/track`**: The main endpoint for collecting analytics data from the `analytics.js` script.
 - **`GET /api/stats/summary`**: Returns the core metrics: `pageViews`, `uniqueVisitors`, and `bounceRate`.
@@ -151,6 +154,17 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 - **`GET /api/stats/campaigns`**: Returns top UTM mediums and campaigns.
 - **`GET /api/stats/cities`**: Returns the top 20 cities by page views.
 - **`GET /api/stats/compare`**: Compares current vs previous period with percentage change.
+- **`GET /api/stats/browsers`**: Returns top browsers with view counts and percentages.
+- **`GET /api/stats/os`**: Returns top operating systems with view counts and percentages.
+- **`GET /api/stats/languages`**: Returns top languages with view counts and percentages.
+- **`GET /api/stats/sessions`**: Returns total sessions and average session duration.
+- **`GET /api/stats/scroll-depth`**: Returns average scroll depth and distribution (25%/50%/75%/100%).
+- **`GET /api/stats/performance`**: Returns p50/p75/p90/p99 for LCP, INP, CLS, TTFB, FCP.
+- **`GET /api/stats/outbound`**: Returns top 20 outbound links by click count.
+- **`POST /api/stats/funnels`**: Accepts `{ tenantId, steps: ["/page1", "/page2", ...], period }` and returns conversion rates between steps.
+- **`GET /api/stats/cohorts`**: Returns weekly cohort retention matrix.
+- **`GET /api/stats/insights`**: Returns automated insights (trending pages, significant changes, top referrers).
+- **`GET /api/export/events`**: Exports events as CSV or JSON. Params: `tenantId`, `format` (csv/json), `startDate`, `endDate`, `limit`.
 
 ## 4. Database Schema
 
@@ -160,9 +174,28 @@ The schema is defined in `prisma/schema.prisma`.
 - **`Account`**: Links a `User` to an OAuth provider (e.g., GitHub).
 - **`Tenant`**: Represents a website being tracked.
 - **`TenantUser`**: A join table linking `User` and `Tenant`, defining roles (e.g., 'ADMIN', 'MEMBER').
-- **`Event`**: The central table for all analytics data. It stores pageviews, goals, location data, UTM parameters, and the anonymized `visitorId`.
+- **`Event`**: The central table for all analytics data. It stores pageviews, goals, outbound clicks, performance metrics, scroll depth, location data, browser/OS/language info, session tracking, UTM parameters, custom event properties, and the anonymized `visitorId`.
 
 ## 5. Changelog
+
+### 2026-06-25: `feat: enhanced tracking, performance metrics, funnel analysis, and data export`
+
+- **Enhanced Tracking Script**: `analytics.js` now captures browser/OS/version (client-side UA parsing), language, session ID (via sessionStorage), scroll depth (beforeunload beacon), outbound link clicks, and Core Web Vitals (LCP, INP, CLS, TTFB, FCP).
+- **Custom Event Properties**: `window.telemetry.goal("name", { key: "value" })` now accepts an optional properties object stored as JSON.
+- **New Event Types**: Added `outbound`, `performance`, and `scroll` event types alongside existing `pageview` and `goal`.
+- **Database Schema**: Added 12 new columns to Event model (browser, browserVersion, os, osVersion, language, sessionId, scrollDepth, outboundUrl, outboundDomain, lcp, fid, cls, ttfb, fcp, properties) and 5 new indexes.
+- **Custom Date Ranges**: All stats endpoints now accept `startDate`/`endDate` query params for arbitrary date ranges. Added `90d` period option.
+- **Segment Filtering**: All stats endpoints support filtering by `browser`, `os`, `country`, `language`, `device` (mobile/tablet/desktop), `referrer`, and `utmSource`.
+- **Browser/OS/Language Stats**: New endpoints `/api/stats/browsers`, `/api/stats/os`, `/api/stats/languages` with percentage breakdowns.
+- **Session Analytics**: New endpoint `/api/stats/sessions` returning total sessions, average duration (formatted).
+- **Scroll Depth Analytics**: New endpoint `/api/stats/scroll-depth` with average scroll depth and distribution (25%/50%/75%/100%).
+- **Core Web Vitals**: New endpoint `/api/stats/performance` returning p50/p75/p90/p99 for LCP, INP, CLS, TTFB, FCP.
+- **Outbound Link Tracking**: New endpoint `/api/stats/outbound` showing most-clicked external links.
+- **Funnel Analysis**: New `POST /api/stats/funnels` endpoint accepting page path steps, returning conversion rates between each step.
+- **Cohort/Retention Analysis**: New `GET /api/stats/cohorts` endpoint grouping visitors by first-visit week with weekly retention matrix.
+- **Automated Insights**: New `GET /api/stats/insights` endpoint detecting significant metric changes, trending pages, and top referrers.
+- **Data Export**: New `GET /api/export/events` endpoint supporting CSV and JSON formats with date range filtering.
+- **Dashboard UI**: Added custom date range picker, segment filter bar (browser/OS/country/language/device), automated insights cards, session metrics, scroll depth cards, browser/OS/language tables, outbound links table, Core Web Vitals panel with color-coded p75 values, and data export button.
 
 ### 2026-06-23: `feat: advanced analytics, dynamic CORS, and UI overhaul`
 
