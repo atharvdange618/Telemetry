@@ -150,3 +150,5 @@ telemetryapis
 
 # Project context (AI agent working files)
 .context/
+
+public/test.html
