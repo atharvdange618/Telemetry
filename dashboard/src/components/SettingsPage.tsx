@@ -28,9 +28,11 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchAPI = async (url: string, options?: RequestInit) => {
+  const headers: Record<string, string> = {};
+  if (options?.body) headers["Content-Type"] = "application/json";
   const res = await fetch(url, {
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options,
   });
   if (!res.ok) throw new Error("An error occurred");
