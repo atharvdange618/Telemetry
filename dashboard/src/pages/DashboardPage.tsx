@@ -3,6 +3,7 @@ import LocationMap from "@/components/LocationMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SEO } from "@/components/SEO";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -228,12 +229,19 @@ export default function DashboardPage() {
     </Card>
   );
 
+  const tenantName = selectedTenant?.name || "Dashboard";
+
   return (
     <div className="p-4 md:p-8 bg-background min-h-screen">
+      <SEO
+        title={`${tenantName} Overview`}
+        description="View real-time privacy-friendly website analytics, visitor statistics, device breakdown, goals, and referral data."
+        noindex={true}
+      />
       <header className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <BarChart3 className="h-5 w-5 text-primary" />
+            <img src="/logo.svg" alt="Telemetry Logo" className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">

@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SEO } from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -132,6 +133,11 @@ const SettingsPage = () => {
 
   return (
     <div className="p-4 md:p-8 bg-background min-h-screen">
+      <SEO
+        title="Settings"
+        description="Configure your tracked domains, view tracking snippet integration scripts, and manage site parameters."
+        noindex={true}
+      />
       <div className="mb-8">
         <Button asChild variant="outline">
           <Link to="/dashboard">← Back to Dashboard</Link>
