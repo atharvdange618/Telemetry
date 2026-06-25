@@ -117,11 +117,18 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Geist Sans", "Geist", system-ui, -apple-system, sans-serif;
+    font-family:
+      "Geist Sans",
+      "Geist",
+      system-ui,
+      -apple-system,
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  code, pre, .font-mono {
+  code,
+  pre,
+  .font-mono {
     font-family: "Geist Mono", "Geist", ui-monospace, monospace;
   }
 }
@@ -134,7 +141,12 @@
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, oklch(0.72 0.22 195), oklch(0.74 0.18 55), oklch(0.68 0.2 145));
+    background: linear-gradient(
+      135deg,
+      oklch(0.72 0.22 195),
+      oklch(0.74 0.18 55),
+      oklch(0.68 0.2 145)
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -156,24 +168,34 @@
     animation: slide-in-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .delay-100 { animation-delay: 100ms; }
-  .delay-200 { animation-delay: 200ms; }
-  .delay-300 { animation-delay: 300ms; }
-  .delay-400 { animation-delay: 400ms; }
-  .delay-500 { animation-delay: 500ms; }
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  .delay-500 {
+    animation-delay: 500ms;
+  }
 
   .glass {
-    background: oklch(1 0 0 / 4%);
+    background: color-mix(in srgb, var(--background) 30%, transparent);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid oklch(1 0 0 / 6%);
+    border: 1px solid var(--border);
   }
 
   .glass-strong {
-    background: oklch(1 0 0 / 8%);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid oklch(1 0 0 / 10%);
+    background: color-mix(in srgb, var(--background) 65%, transparent);
+    backdrop-filter: blur(40px) saturate(220%);
+    -webkit-backdrop-filter: blur(40px) saturate(220%);
+    border: 1px solid var(--border);
   }
 
   .noise {
@@ -188,23 +210,45 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-in-left {
-  from { opacity: 0; transform: translateX(-32px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(32px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
