@@ -1,6 +1,6 @@
 import { ComparisonSection } from "@/components/ComparisonRow";
-import { DashboardPreviewSection } from "@/components/DashboardPreviewSection";
 import { FAQSection } from "@/components/FAQSection";
+import { FeaturesBento } from "@/components/FeaturesBento";
 import { FinalCtaSection } from "@/components/FinalCtaSection";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
@@ -39,7 +39,8 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-background dark:bg-gray-950">
+    <main className="min-h-screen">
+      <div className="noise" />
       <SEO
         title="Privacy-First Open-Source Web Analytics"
         description="Telemetry is a cookieless, privacy-focused open-source analytics platform. Get clear, aggregated visitor insights without cookie banners, tracking scripts, or personal data collection."
@@ -49,8 +50,8 @@ export default function Home() {
       />
       <Navigation />
       <HeroSection />
+      <FeaturesBento />
       <HowItWorksSection />
-      <DashboardPreviewSection />
       <ComparisonSection />
       <PrivacyManifestoSection />
       <FAQSection />

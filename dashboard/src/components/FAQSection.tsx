@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FAQItemProps {
   question: string;
@@ -10,27 +11,34 @@ interface FAQItemProps {
 
 function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="border-b border-border/50 last:border-b-0">
       <button
-        className="w-full px-6 py-4 text-left bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+        className="w-full py-5 text-left flex items-center justify-between gap-4 group"
         onClick={onToggle}
       >
-        <span className="font-medium text-gray-900 dark:text-gray-100 pr-4">
+        <span className={cn(
+          "text-base font-medium transition-colors",
+          isOpen ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+        )}>
           {question}
         </span>
-        {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
-        )}
+        <ChevronDown
+          className={cn(
+            "w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200",
+            isOpen && "rotate-180"
+          )}
+        />
       </button>
-      {isOpen && (
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            {answer}
-          </p>
-        </div>
-      )}
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-300",
+          isOpen ? "max-h-48 pb-5" : "max-h-0"
+        )}
+      >
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {answer}
+        </p>
+      </div>
     </div>
   );
 }
@@ -88,18 +96,16 @@ export function FAQSection() {
   ];
 
   return (
-    <section className="py-20 bg-stone-50 dark:bg-gray-950">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-            Everything you need to know about privacy-first analytics
-          </p>
-        </div>
+    <section id="faq" className="py-24 px-6 lg:px-8 border-t border-border/50">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-heading text-3xl md:text-4xl text-foreground mb-4 text-balance text-center">
+          Frequently Asked Questions
+        </h2>
+        <p className="text-muted-foreground text-lg mb-12 text-center">
+          Everything you need to know about privacy-first analytics
+        </p>
 
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="rounded-2xl border border-border bg-card px-6">
           {faqs.map((faq, index) => (
             <FAQItem
               key={index}
@@ -111,17 +117,15 @@ export function FAQSection() {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Still have questions?
-          </p>
+        <p className="text-center text-sm text-muted-foreground mt-8">
+          Still have questions?{" "}
           <a
             href="mailto:atharvdange.dev@gmail.com"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium underline"
+            className="text-primary hover:text-primary/80 transition-colors"
           >
-            Contact our team
+            Contact us
           </a>
-        </div>
+        </p>
       </div>
     </section>
   );

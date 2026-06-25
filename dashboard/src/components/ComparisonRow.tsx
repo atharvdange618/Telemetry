@@ -1,154 +1,57 @@
 import { Check, X } from "lucide-react";
 
-interface ComparisonRowProps {
-  feature: string;
-  telemetry: boolean | string;
-  googleAnalytics: boolean | string;
-  description?: string;
-}
-
-function ComparisonRow({
-  feature,
-  telemetry,
-  googleAnalytics,
-  description,
-}: ComparisonRowProps) {
-  const renderValue = (value: boolean | string) => {
-    if (typeof value === "boolean") {
-      return value ? (
-        <Check className="w-5 h-5 text-green-600 mx-auto" />
-      ) : (
-        <X className="w-5 h-5 text-red-500 mx-auto" />
-      );
-    }
-    return <span className="text-sm text-center">{value}</span>;
-  };
-
-  return (
-    <tr className="border-b border-gray-100 dark:border-gray-800">
-      <td className="py-4 px-6 text-left">
-        <div>
-          <div className="font-medium text-gray-900 dark:text-gray-100">
-            {feature}
-          </div>
-          {description && (
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {description}
-            </div>
-          )}
-        </div>
-      </td>
-      <td className="py-4 px-6 text-center">{renderValue(telemetry)}</td>
-      <td className="py-4 px-6 text-center">{renderValue(googleAnalytics)}</td>
-    </tr>
-  );
-}
+const features = [
+  { name: "Cookie-free", telemetry: true, analytics: false },
+  { name: "Data Ownership", telemetry: true, analytics: false },
+  { name: "GDPR by Default", telemetry: true, analytics: false },
+  { name: "Open Source", telemetry: true, analytics: false },
+  { name: "Self-Hosted Option", telemetry: true, analytics: false },
+  { name: "Real-Time Data", telemetry: true, analytics: true },
+  { name: "Lightweight Script", telemetry: true, analytics: false },
+  { name: "No Data Retention Limit", telemetry: true, analytics: false },
+];
 
 export function ComparisonSection() {
-  const comparisons: ComparisonRowProps[] = [
-    {
-      feature: "Cookie-Free Tracking",
-      telemetry: true,
-      googleAnalytics: false,
-      description: "No cookies or persistent identifiers",
-    },
-    {
-      feature: "Data Ownership",
-      telemetry: "100% Yours",
-      googleAnalytics: "Google's",
-      description: "Who controls your analytics data",
-    },
-    {
-      feature: "GDPR Compliant",
-      telemetry: true,
-      googleAnalytics: "Requires consent",
-      description: "Built-in privacy compliance",
-    },
-    {
-      feature: "Open Source",
-      telemetry: true,
-      googleAnalytics: false,
-      description: "Transparent, auditable code",
-    },
-    {
-      feature: "Self-Hosted Option",
-      telemetry: true,
-      googleAnalytics: false,
-      description: "Keep data on your infrastructure",
-    },
-    {
-      feature: "Real-time Analytics",
-      telemetry: true,
-      googleAnalytics: true,
-      description: "Live visitor tracking",
-    },
-    {
-      feature: "Page Load Impact",
-      telemetry: "< 1KB",
-      googleAnalytics: "~45KB",
-      description: "Script size and performance impact",
-    },
-    {
-      feature: "Data Retention Control",
-      telemetry: "Your choice",
-      googleAnalytics: "Google's terms",
-      description: "How long data is stored",
-    },
-  ];
-
   return (
-    <section className="py-20 bg-stone-50 dark:bg-gray-950">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Why Choose Telemetry?
-          </h2>
-          <p className="text-lg text-gray-900 dark:text-gray-300 max-w-2xl mx-auto">
-            See how we compare to traditional analytics solutions
-          </p>
-        </div>
+    <section className="py-24 px-6 lg:px-8 border-t border-border/50">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-heading text-3xl md:text-4xl text-foreground mb-4 text-balance text-center">
+          Telemetry vs. Google Analytics
+        </h2>
+        <p className="text-muted-foreground text-lg mb-12 text-center max-w-xl mx-auto">
+          See how privacy-first analytics compares.
+        </p>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-100 dark:bg-gray-800">
-                <tr>
-                  <th className="py-4 px-6 text-left font-semibold text-gray-900 dark:text-gray-100">
-                    Feature
-                  </th>
-                  <th className="py-4 px-6 text-center font-semibold text-gray-900 dark:text-gray-100">
-                    Telemetry
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Privacy-First
-                    </div>
-                  </th>
-                  <th className="py-4 px-6 text-center font-semibold text-gray-900 dark:text-gray-100">
-                    Google Analytics
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Traditional
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisons.map((comparison, index) => (
-                  <ComparisonRow key={index} {...comparison} />
-                ))}
-              </tbody>
-            </table>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="grid grid-cols-3 text-sm font-medium text-muted-foreground border-b border-border">
+            <div className="px-6 py-4">Feature</div>
+            <div className="px-6 py-4 text-center text-primary">Telemetry</div>
+            <div className="px-6 py-4 text-center">Google Analytics</div>
           </div>
-
-          <div className="text-center mt-8">
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Ready to make the switch to privacy-first analytics?
-            </p>
-            <a
-              href={`${import.meta.env.VITE_API_URL}/login/github`}
-              className="inline-flex items-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium transition-colors"
+          {features.map((f, i) => (
+            <div
+              key={f.name}
+              className={`grid grid-cols-3 text-sm ${
+                i < features.length - 1 ? "border-b border-border/50" : ""
+              }`}
             >
-              Get Started - it's free
-            </a>
-          </div>
+              <div className="px-6 py-3.5 text-foreground">{f.name}</div>
+              <div className="px-6 py-3.5 flex justify-center">
+                {f.telemetry ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <X className="w-4 h-4 text-red-500/60" />
+                )}
+              </div>
+              <div className="px-6 py-3.5 flex justify-center">
+                {f.analytics ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <X className="w-4 h-4 text-red-500/60" />
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
