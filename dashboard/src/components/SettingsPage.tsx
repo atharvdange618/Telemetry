@@ -45,6 +45,8 @@ const SettingsPage = () => {
   const [newSiteName, setNewSiteName] = useState("");
   const [newSiteDomains, setNewSiteDomains] = useState("");
   const [editingTenantId, setEditingTenantId] = useState<string | null>(null);
+  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
   const [newDomain, setNewDomain] = useState("");
 
   const { data: tenantsData, isLoading } = useQuery({
@@ -75,6 +77,22 @@ const SettingsPage = () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
       setEditingTenantId(null);
       setNewDomain("");
+    },
+  });
+
+  const renameTenant = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      fetchAPI(`${API_URL}/api/tenants/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name,
+          domains: tenantsData?.tenants?.find((t: Tenant) => t.id === id)?.domains ?? [],
+        }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenants"] });
+      setEditingNameId(null);
+      setEditingName("");
     },
   });
 
@@ -151,7 +169,59 @@ const SettingsPage = () => {
           {tenantsData?.tenants?.map((tenant: Tenant) => (
             <Card key={tenant.id}>
               <CardHeader>
-                <CardTitle>{tenant.name}</CardTitle>
+                {editingNameId === tenant.id ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (editingName.trim()) {
+                            renameTenant.mutate({ id: tenant.id, name: editingName.trim() });
+                          }
+                        }
+                        if (e.key === "Escape") {
+                          setEditingNameId(null);
+                          setEditingName("");
+                        }
+                      }}
+                      autoFocus
+                      className="text-lg font-bold"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (editingName.trim()) {
+                          renameTenant.mutate({ id: tenant.id, name: editingName.trim() });
+                        }
+                      }}
+                      disabled={renameTenant.isPending || !editingName.trim()}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setEditingNameId(null);
+                        setEditingName("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                ) : (
+                  <CardTitle
+                    className="cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => {
+                      setEditingNameId(tenant.id);
+                      setEditingName(tenant.name);
+                    }}
+                  >
+                    {tenant.name}
+                  </CardTitle>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <h3 className="font-semibold">Embed Script</h3>

@@ -8,9 +8,6 @@ import {
 import fastifyStatic from "@fastify/static";
 import cors from "@fastify/cors";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import { trackRoutes } from "./routes/track";
 import { authRoutes } from "./routes/auth";
@@ -46,7 +43,7 @@ app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
 app.register(fastifyStatic, {
-  root: path.join(__dirname, "..", "public"),
+  root: path.join(process.cwd(), "public"),
   prefix: "/",
 });
 
