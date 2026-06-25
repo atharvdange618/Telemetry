@@ -33,37 +33,94 @@ export async function trackRoutes(app: FastifyInstance) {
         });
 
         if (!tenant) {
-          return reply.code(404).send({
-            message: "Tenant not found",
-          });
+          return reply.code(404).send({ message: "Tenant not found" });
         }
 
         const ip = request.ip;
         const { country, city } = await getGeoLocation(ip);
-
-        app.log.debug(
-          { tenantId, ip, country, city },
-          "Tracking event"
-        );
 
         const userAgent = request.headers["user-agent"] || "";
         const salt = process.env.VISITOR_SALT!;
         const hashSource = `${ip}-${userAgent}-${tenant.id}-${salt}`;
         const visitorId = createHash("sha256").update(hashSource).digest("hex");
 
-        await prisma.event.create({
-          data: {
-            tenantId: tenant.id,
-            visitorId,
-            city,
-            country,
-            ...eventData,
-          },
-        });
+        const shared = {
+          tenantId: tenant.id,
+          visitorId,
+          city,
+          country,
+          sessionId: eventData.sessionId || null,
+          browser: eventData.browser || null,
+          browserVersion: eventData.browserVersion || null,
+          os: eventData.os || null,
+          osVersion: eventData.osVersion || null,
+          language: eventData.language || null,
+        };
 
-        return reply.code(201).send({
-          message: "Event Received",
-        });
+        const type = eventData.type;
+
+        if (type === "pageview") {
+          await prisma.event.create({
+            data: {
+              ...shared,
+              type: "pageview",
+              hostname: eventData.hostname,
+              path: eventData.path,
+              referrer: eventData.referrer || null,
+              screenWidth: eventData.screenWidth || null,
+              screenHeight: eventData.screenHeight || null,
+              utmSource: eventData.utmSource || null,
+              utmMedium: eventData.utmMedium || null,
+              utmCampaign: eventData.utmCampaign || null,
+              utmTerm: eventData.utmTerm || null,
+              utmContent: eventData.utmContent || null,
+              scrollDepth: eventData.scrollDepth || null,
+            },
+          });
+        } else if (type === "goal") {
+          await prisma.event.create({
+            data: {
+              ...shared,
+              type: "goal",
+              goalName: eventData.goalName,
+              properties: eventData.properties as any || undefined,
+            },
+          });
+        } else if (type === "outbound") {
+          await prisma.event.create({
+            data: {
+              ...shared,
+              type: "outbound",
+              outboundUrl: eventData.url,
+              outboundDomain: eventData.domain,
+              path: eventData.path || null,
+            },
+          });
+        } else if (type === "performance") {
+          await prisma.event.create({
+            data: {
+              ...shared,
+              type: "performance",
+              path: eventData.path || null,
+              lcp: eventData.lcp ?? null,
+              fid: eventData.fid ?? null,
+              cls: eventData.cls ?? null,
+              ttfb: eventData.ttfb ?? null,
+              fcp: eventData.fcp ?? null,
+            },
+          });
+        } else if (type === "scroll") {
+          await prisma.event.create({
+            data: {
+              ...shared,
+              type: "scroll",
+              path: eventData.path || null,
+              scrollDepth: eventData.scrollDepth,
+            },
+          });
+        }
+
+        return reply.code(201).send({ message: "Event Received" });
       } catch (error) {
         app.log.error(error, "Failed to process event");
         return reply.code(500).send({ message: "Internal server error" });
