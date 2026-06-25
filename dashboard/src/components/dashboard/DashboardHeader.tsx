@@ -18,14 +18,6 @@ import {
 } from "lucide-react";
 import type { TenantsResponse } from "@/lib/types/dashboard.types";
 
-type Segments = {
-  browser?: string;
-  os?: string;
-  country?: string;
-  language?: string;
-  device?: "mobile" | "tablet" | "desktop";
-};
-
 interface DashboardHeaderProps {
   user: { name?: string | null; email?: string | null; image?: string | null } | null;
   tenantsData: TenantsResponse | undefined;
