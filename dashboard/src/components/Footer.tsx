@@ -1,4 +1,3 @@
-import { BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -7,8 +6,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-primary/20 p-2 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-primary" />
+            <div className="bg-primary/20 p-2 rounded-lg flex items-center justify-center">
+              <img src="/logo.svg" alt="Telemetry Logo" className="h-6 w-6" />
             </div>
             <Link to="/" className="text-xl font-bold">
               Telemetry

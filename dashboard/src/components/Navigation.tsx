@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { BarChart3, Github, Menu, X } from "lucide-react";
+import { Github, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { Button } from "./ui/button";
@@ -29,8 +29,8 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <BarChart3 className="h-6 w-6 text-gray-900 dark:text-gray-100" />
+            <div className="p-2 rounded-lg bg-primary/10 flex items-center justify-center">
+              <img src="/logo.svg" alt="Telemetry Logo" className="h-6 w-6" />
             </div>
             <Link
               to="/"
