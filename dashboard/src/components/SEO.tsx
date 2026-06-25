@@ -16,19 +16,17 @@ export const SEO: React.FC<SEOProps> = ({
   description,
   keywords,
   ogType = "website",
-  ogImage = "/logo.svg",
+  ogImage = "/og-image.png",
   canonicalPath,
   schema,
   noindex = false,
 }) => {
   useEffect(() => {
-    // 1. Update Document Title
     const formattedTitle = title.includes("Telemetry")
       ? title
       : `${title} | Telemetry`;
     document.title = formattedTitle;
 
-    // Helper to get or create a meta tag
     const setMetaTag = (
       attrName: string,
       attrValue: string,
@@ -43,10 +41,8 @@ export const SEO: React.FC<SEOProps> = ({
       element.setAttribute("content", content);
     };
 
-    // 2. Update Standard Meta Tags
     setMetaTag("name", "description", description);
 
-    // Manage indexation indexing rules
     if (noindex) {
       setMetaTag("name", "robots", "noindex, nofollow");
     } else {
@@ -62,7 +58,6 @@ export const SEO: React.FC<SEOProps> = ({
       }
     }
 
-    // 3. Update Open Graph (OG) Meta Tags
     setMetaTag("property", "og:title", title);
     setMetaTag("property", "og:description", description);
     setMetaTag("property", "og:type", ogType);
@@ -77,13 +72,11 @@ export const SEO: React.FC<SEOProps> = ({
       : window.location.href;
     setMetaTag("property", "og:url", currentUrl);
 
-    // 4. Update Twitter Card Meta Tags
     setMetaTag("name", "twitter:card", "summary_large_image");
     setMetaTag("name", "twitter:title", title);
     setMetaTag("name", "twitter:description", description);
     setMetaTag("name", "twitter:image", absoluteOgImage);
 
-    // 5. Update Canonical URL Link
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = document.createElement("link");
@@ -92,7 +85,6 @@ export const SEO: React.FC<SEOProps> = ({
     }
     canonicalLink.setAttribute("href", currentUrl);
 
-    // 6. Update Dynamic JSON-LD Structured Data Schema
     const existingSchema = document.getElementById("seo-schema");
     if (existingSchema) {
       existingSchema.remove();
@@ -106,7 +98,6 @@ export const SEO: React.FC<SEOProps> = ({
       document.head.appendChild(script);
     }
 
-    // Clean up dynamic schema script on unmount
     return () => {
       const cleanupSchema = document.getElementById("seo-schema");
       if (cleanupSchema) {
