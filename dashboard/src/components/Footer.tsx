@@ -31,7 +31,7 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="text-center md:text-right text-sm text-muted-foreground/60">
+          <div className="text-center md:text-right text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Telemetry. Built with care for a better web.
           </div>
         </div>

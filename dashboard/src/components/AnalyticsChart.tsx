@@ -18,7 +18,7 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <TrendingUp className="h-4 w-4 text-muted-foreground/60" />
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent className="pl-2">
@@ -29,15 +29,19 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
                 <stop
                   offset="5%"
                   stopColor="var(--primary)"
-                  stopOpacity={0.3}
+                  stopOpacity={0.25}
                 />
-                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                <stop
+                  offset="95%"
+                  stopColor="var(--primary)"
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
               stroke="var(--muted-foreground)"
-              fontSize={12}
+              fontSize={11}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) =>
@@ -49,7 +53,7 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
             />
             <YAxis
               stroke="var(--muted-foreground)"
-              fontSize={12}
+              fontSize={11}
               tickLine={false}
               axisLine={false}
               width={40}
@@ -59,7 +63,8 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
                 backgroundColor: "var(--card)",
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
-                fontSize: "13px",
+                fontSize: "12px",
+                fontFamily: "Geist Mono, monospace",
               }}
               labelFormatter={(value) =>
                 new Date(value).toLocaleDateString(undefined, {
@@ -76,7 +81,7 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
               strokeWidth={2}
               fill="url(#viewsGradient)"
               activeDot={{
-                r: 5,
+                r: 4,
                 strokeWidth: 2,
                 fill: "var(--primary)",
                 stroke: "var(--card)",
