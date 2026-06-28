@@ -3,14 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Trash2, Filter } from "lucide-react";
-import type { FunnelStep, FunnelResponse } from "@/lib/types/dashboard.types";
+import { Plus, Trash2, Filter, AlertTriangle } from "lucide-react";
+import type { FunnelResponse } from "@/lib/types/dashboard.types";
 import { InfoTooltip } from "./InfoTooltip";
+import { FunnelChart, type FunnelStage } from "@/components/charts/funnel-chart";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchAPI = async <T,>(url: string, options?: RequestInit): Promise<T> => {
-  const res = await fetch(url, { ...options, credentials: "include" });
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string>),
+  };
+  const res = await fetch(url, { ...options, credentials: "include", headers });
   if (!res.ok) throw new Error("Network response was not ok");
   return res.json();
 };
@@ -45,11 +50,18 @@ export function FunnelSection({ tenantId }: FunnelSectionProps) {
 
   const handleAnalyze = () => {
     const validSteps = steps.filter((s) => s.trim());
-    if (validSteps.length < 2) return;
+    if (validSteps.length < 2 || !tenantId) return;
     funnelMutation.mutate({ tenantId, steps: validSteps, period: "30d" });
   };
 
-  const maxVisitors = result?.funnel?.[0]?.visitors || 1;
+  const funnelData: FunnelStage[] =
+    result?.funnel?.map((s, i) => ({
+      label: s.step,
+      value: s.visitors,
+      color: i === 0 ? "var(--chart-line-primary)" : undefined,
+    })) || [];
+
+  const hasNoData = result && result.funnel && result.funnel.every((s) => s.visitors === 0);
 
   return (
     <Card>
@@ -94,46 +106,36 @@ export function FunnelSection({ tenantId }: FunnelSectionProps) {
           </Button>
           <Button
             onClick={handleAnalyze}
-            disabled={funnelMutation.isPending || steps.filter((s) => s.trim()).length < 2}
+            disabled={funnelMutation.isPending || steps.filter((s) => s.trim()).length < 2 || !tenantId}
           >
             {funnelMutation.isPending ? "Analyzing..." : "Analyze Funnel"}
           </Button>
         </div>
 
-        {result?.funnel && result.funnel.length > 0 && (
-          <div className="mt-4 space-y-3">
-            {result.funnel.map((step, i) => {
-              const width = Math.max((step.visitors / maxVisitors) * 100, 8);
-              return (
-                <div key={i} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-mono truncate mr-2">{step.step}</span>
-                    <span className="text-muted-foreground whitespace-nowrap">
-                      {step.visitors.toLocaleString()} visitors
-                    </span>
-                  </div>
-                  <div className="relative h-8 bg-muted rounded-lg overflow-hidden">
-                    <div
-                      className="absolute inset-y-0 left-0 bg-primary/80 rounded-lg transition-all duration-500"
-                      style={{ width: `${width}%` }}
-                    />
-                    <div className="absolute inset-0 flex items-center px-3">
-                      <span className="text-xs font-medium text-foreground">
-                        {i === 0 ? "100%" : `${step.conversionFromPrevious}%`}
-                        {i > 0 && (
-                          <span className="text-muted-foreground ml-1">
-                            (from prev)
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            <p className="text-xs text-muted-foreground">
-              Overall conversion: {result.funnel[result.funnel.length - 1]?.conversionFromFirst}% from first step
-            </p>
+        {hasNoData && (
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 text-sm flex gap-3 items-start mt-4">
+            <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">No visitor data found for these steps</p>
+              <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                Make sure the page paths match exactly what is being tracked (including any subdirectories or file extensions).
+                For example, use <code className="font-mono text-foreground px-1 py-0.5 bg-muted rounded border border-muted">/test-pages/home.html</code> instead of <code className="font-mono text-foreground px-1 py-0.5 bg-muted rounded border border-muted">/home.html</code> if the tracked paths are prefixed.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {funnelData.length > 0 && !hasNoData && (
+          <div className="mt-4">
+            <FunnelChart
+              data={funnelData}
+              orientation="horizontal"
+              showPercentage
+              showValues
+              showLabels
+              gap={6}
+              style={{ height: 320 }}
+            />
           </div>
         )}
       </CardContent>

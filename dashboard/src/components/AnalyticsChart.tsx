@@ -1,14 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip as RechartsTooltip,
-} from "recharts";
 import { TrendingUp } from "lucide-react";
 import { InfoTooltip } from "@/components/dashboard/InfoTooltip";
+import { AreaChart } from "@/components/charts/area-chart";
+import { Area } from "@/components/charts/area";
+import { Grid } from "@/components/charts/grid";
+import { XAxis } from "@/components/charts/x-axis";
+import { ChartTooltip } from "@/components/charts/tooltip";
+import type { TooltipRow } from "@/components/charts/tooltip";
 
 type AnalyticsChartProps = {
   data: Array<{ date: string | number | Date; views: number }>;
@@ -17,6 +15,11 @@ type AnalyticsChartProps = {
 };
 
 export function AnalyticsChart({ data, title, tooltip }: AnalyticsChartProps) {
+  const chartData = data.map((d) => ({
+    ...d,
+    date: d.date instanceof Date ? d.date : new Date(d.date),
+  }));
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
@@ -25,73 +28,29 @@ export function AnalyticsChart({ data, title, tooltip }: AnalyticsChartProps) {
         {tooltip && <InfoTooltip content={tooltip} />}
       </CardHeader>
       <CardContent className="pl-2">
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={data}>
-            <defs>
-              <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--primary)"
-                  stopOpacity={0.25}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--primary)"
-                  stopOpacity={0}
-                />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="date"
-              stroke="var(--muted-foreground)"
-              fontSize={11}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) =>
-                new Date(value).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                })
-              }
-            />
-            <YAxis
-              stroke="var(--muted-foreground)"
-              fontSize={11}
-              tickLine={false}
-              axisLine={false}
-              width={40}
-            />
-            <RechartsTooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontFamily: "Geist Mono, monospace",
-              }}
-              labelFormatter={(value) =>
-                new Date(value).toLocaleDateString(undefined, {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })
-              }
-            />
-            <Area
-              type="monotone"
-              dataKey="views"
-              stroke="var(--primary)"
-              strokeWidth={2}
-              fill="url(#viewsGradient)"
-              activeDot={{
-                r: 4,
-                strokeWidth: 2,
-                fill: "var(--primary)",
-                stroke: "var(--card)",
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <AreaChart data={chartData} xDataKey="date" style={{ height: 280 }}>
+          <Grid horizontal numTicksRows={5} />
+          <XAxis numTicks={6} />
+          <Area
+            dataKey="views"
+            fill="var(--chart-line-primary)"
+            fillOpacity={0.15}
+            stroke="var(--chart-line-primary)"
+            strokeWidth={2}
+          />
+          <ChartTooltip
+            rows={(point) => {
+              const value = point.views;
+              return [
+                {
+                  color: "var(--chart-line-primary)",
+                  label: "Views",
+                  value: typeof value === "number" ? value : 0,
+                } satisfies TooltipRow,
+              ];
+            }}
+          />
+        </AreaChart>
       </CardContent>
     </Card>
   );
