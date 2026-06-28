@@ -99,7 +99,8 @@ model Event {
 
   // Performance Fields (Core Web Vitals)
   lcp  Float? // Largest Contentful Paint (ms)
-  fid  Float? // First Input Delay (ms)
+  inp  Float? // Interaction to Next Paint (ms)
+  fid  Float? // First Input Delay (ms) - legacy, kept for backwards compatibility
   cls  Float? // Cumulative Layout Shift
   ttfb Float? // Time to First Byte (ms)
   fcp  Float? // First Contentful Paint (ms)

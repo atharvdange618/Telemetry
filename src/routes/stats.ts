@@ -906,7 +906,7 @@ export async function statsRoutes(app: FastifyInstance) {
           type: "performance",
           ...segments,
         },
-        select: { lcp: true, fid: true, cls: true, ttfb: true, fcp: true },
+        select: { lcp: true, inp: true, fid: true, cls: true, ttfb: true, fcp: true },
       });
 
       const calcPercentile = (values: number[], p: number) => {
@@ -916,10 +916,11 @@ export async function statsRoutes(app: FastifyInstance) {
         return sorted[Math.max(0, idx)];
       };
 
-      const extract = (field: "lcp" | "fid" | "cls" | "ttfb" | "fcp") =>
+      const extract = (field: "lcp" | "inp" | "fid" | "cls" | "ttfb" | "fcp") =>
         perfEvents.map((e) => e[field]).filter((v): v is number => v !== null);
 
       const lcp = extract("lcp"),
+        inp = extract("inp"),
         fid = extract("fid"),
         cls = extract("cls"),
         ttfb = extract("ttfb"),
@@ -935,6 +936,7 @@ export async function statsRoutes(app: FastifyInstance) {
 
       return {
         lcp: calcMetric(lcp),
+        inp: calcMetric(inp),
         fid: calcMetric(fid),
         cls: {
           ...calcMetric(cls),

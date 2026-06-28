@@ -149,6 +149,7 @@ export async function trackRoutes(app: FastifyInstance) {
               type: "performance",
               path: eventData.path || null,
               lcp: eventData.lcp ?? null,
+              inp: eventData.inp ?? null,
               fid: eventData.fid ?? null,
               cls: eventData.cls ?? null,
               ttfb: eventData.ttfb ?? null,

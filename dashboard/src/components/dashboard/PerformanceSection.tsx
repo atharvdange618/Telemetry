@@ -5,8 +5,8 @@ import { InfoTooltip } from "./InfoTooltip";
 
 const metricTooltips: Record<string, string> = {
   LCP: "Largest Contentful Paint - how long it takes for the biggest thing on your page to appear. Under 2.5 seconds is good.",
-  "FID/INP":
-    "Interaction to Next Paint - how quickly your page responds when someone clicks or taps. Under 100ms feels instant.",
+  INP:
+    "Interaction to Next Paint - how quickly your page responds when someone clicks or taps. Under 200ms feels instant.",
   CLS: "Cumulative Layout Shift - how much the page jiggles around while loading. Lower is better, under 0.1 is good.",
   TTFB: "Time to First Byte - how fast your server sends the first bit of data. Under 800ms means your server is fast.",
   FCP: "First Contentful Paint - when the first text or image appears on screen. Under 1.8 seconds is good.",
@@ -21,7 +21,7 @@ export function PerformanceSection({
 
   const metrics = [
     { label: "LCP", data: data.lcp, unit: "ms", good: 2500, poor: 4000 },
-    { label: "FID/INP", data: data.fid, unit: "ms", good: 100, poor: 300 },
+    { label: "INP", data: data.inp || data.fid, unit: "ms", good: 200, poor: 500 },
     { label: "CLS", data: data.cls, unit: "", good: 0.1, poor: 0.25 },
     { label: "TTFB", data: data.ttfb, unit: "ms", good: 800, poor: 1800 },
     { label: "FCP", data: data.fcp, unit: "ms", good: 1800, poor: 3000 },

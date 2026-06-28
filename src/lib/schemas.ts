@@ -50,6 +50,7 @@ export const createEventSchema = z.discriminatedUnion("type", [
     tenantId: z.string().cuid(),
     path: z.string().optional(),
     lcp: z.number().nullable().optional(),
+    inp: z.number().nullable().optional(),
     fid: z.number().nullable().optional(),
     cls: z.number().nullable().optional(),
     ttfb: z.number().nullable().optional(),

@@ -208,7 +208,6 @@
 
   function collectPerformanceMetrics() {
     if (perfSent) return;
-    perfSent = true;
 
     try {
       var perf = window.performance;
@@ -216,55 +215,57 @@
       if (nav && nav[0]) {
         var n = nav[0];
         perfData.ttfb = Math.round(n.responseStart - n.requestStart);
-        perfData.fcp = Math.round(
-          (perf.getEntriesByName("first-contentful-paint")[0] || {})
-            .startTime || 0,
-        );
+      }
+      var fcpEntry = perf.getEntriesByName("first-contentful-paint")[0];
+      if (fcpEntry) {
+        perfData.fcp = Math.round(fcpEntry.startTime);
       }
 
-      // LCP
-      new PerformanceObserver(function (list) {
-        var entries = list.getEntries();
-        var last = entries[entries.length - 1];
-        if (last) perfData.lcp = Math.round(last.startTime);
-      }).observe({ type: "largest-contentful-paint", buffered: true });
+      var script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/npm/web-vitals@3/dist/web-vitals.umd.js";
+      script.onload = function () {
+        var webVitals = window.webVitals;
+        if (!webVitals) return;
 
-      // CLS
-      new PerformanceObserver(function (list) {
-        var cls = 0;
-        list.getEntries().forEach(function (entry) {
-          if (!entry.hadRecentInput) cls += entry.value;
+        var collectMetric = function (metric) {
+          perfData[metric.name.toLowerCase()] =
+            metric.name === "CLS"
+              ? parseFloat(metric.value.toFixed(4))
+              : Math.round(metric.value);
+        };
+
+        webVitals.onLCP(collectMetric);
+        webVitals.onCLS(collectMetric);
+        webVitals.onINP(collectMetric);
+
+        var sendMetrics = function () {
+          if (perfSent) return;
+          perfSent = true;
+
+          if (Object.keys(perfData).length > 0) {
+            sendEvent({
+              tenantId: tenantId,
+              apiKey: apiKey,
+              type: "performance",
+              path: window.location.pathname,
+              lcp: perfData.lcp || null,
+              cls: perfData.cls || null,
+              inp: perfData.inp || null,
+              ttfb: perfData.ttfb || null,
+              fcp: perfData.fcp || null,
+              sessionId: sessionId,
+            });
+          }
+        };
+
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "hidden") sendMetrics();
         });
-        perfData.cls = parseFloat(cls.toFixed(4));
-      }).observe({ type: "layout-shift", buffered: true });
-
-      // INP (replaces FID)
-      new PerformanceObserver(function (list) {
-        var maxInteraction = 0;
-        list.getEntries().forEach(function (entry) {
-          var dur = entry.duration;
-          if (dur > maxInteraction) maxInteraction = dur;
-        });
-        if (maxInteraction > 0) perfData.fid = Math.round(maxInteraction);
-      }).observe({ type: "event", buffered: true });
-
-      // Send after a short delay to collect more data
-      setTimeout(function () {
-        if (Object.keys(perfData).length > 0) {
-          sendEvent({
-            tenantId: tenantId,
-            apiKey: apiKey,
-            type: "performance",
-            path: window.location.pathname,
-            lcp: perfData.lcp || null,
-            fid: perfData.fid || null,
-            cls: perfData.cls || null,
-            ttfb: perfData.ttfb || null,
-            fcp: perfData.fcp || null,
-            sessionId: sessionId,
-          });
-        }
-      }, 3000);
+        window.addEventListener("beforeunload", sendMetrics);
+        window.addEventListener("pagehide", sendMetrics);
+      };
+      document.head.appendChild(script);
     } catch (_) {
       // Performance API not supported, skip
     }

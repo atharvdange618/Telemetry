@@ -126,6 +126,7 @@ export interface PerformanceMetric {
 
 export interface PerformanceResponse {
   lcp: PerformanceMetric;
+  inp: PerformanceMetric;
   fid: PerformanceMetric;
   cls: PerformanceMetric & {
     p50: number;
