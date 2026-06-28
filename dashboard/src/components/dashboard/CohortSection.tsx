@@ -10,6 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 import type { CohortsResponse, CohortData } from "@/lib/types/dashboard.types";
+import { InfoTooltip } from "./InfoTooltip";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,10 +26,14 @@ interface CohortSectionProps {
 }
 
 function getRetentionColor(percentage: number): string {
-  if (percentage >= 80) return "bg-green-500/20 text-green-700 dark:text-green-400";
-  if (percentage >= 60) return "bg-green-500/15 text-green-600 dark:text-green-400";
-  if (percentage >= 40) return "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400";
-  if (percentage >= 20) return "bg-orange-500/15 text-orange-600 dark:text-orange-400";
+  if (percentage >= 80)
+    return "bg-green-500/20 text-green-700 dark:text-green-400";
+  if (percentage >= 60)
+    return "bg-green-500/15 text-green-600 dark:text-green-400";
+  if (percentage >= 40)
+    return "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400";
+  if (percentage >= 20)
+    return "bg-orange-500/15 text-orange-600 dark:text-orange-400";
   if (percentage > 0) return "bg-red-500/10 text-red-600 dark:text-red-400";
   return "text-muted-foreground";
 }
@@ -47,6 +52,7 @@ export function CohortSection({ queryParams, enabled }: CohortSectionProps) {
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             Cohort Retention
+            <InfoTooltip content="Shows how many visitors come back week after week. Each row is a group of people who first visited in that week. The percentages show what portion returned in following weeks - higher means people keep coming back." />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -65,6 +71,7 @@ export function CohortSection({ queryParams, enabled }: CohortSectionProps) {
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             Cohort Retention
+            <InfoTooltip content="Shows how many visitors come back week after week. Each row is a group of people who first visited in that week. The percentages show what portion returned in following weeks - higher means people keep coming back." />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -84,6 +91,7 @@ export function CohortSection({ queryParams, enabled }: CohortSectionProps) {
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
           Cohort Retention
+          <InfoTooltip content="Shows how many visitors come back week after week. Each row is a group of people who first visited in that week. The percentages show what portion returned in following weeks - higher means people keep coming back." />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -114,7 +122,8 @@ export function CohortSection({ queryParams, enabled }: CohortSectionProps) {
                     {weeks.map((week, i) => {
                       const val = row[week];
                       const count = typeof val === "number" ? val : 0;
-                      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                      const pct =
+                        total > 0 ? Math.round((count / total) * 100) : 0;
                       return (
                         <TableCell
                           key={i}
@@ -131,7 +140,8 @@ export function CohortSection({ queryParams, enabled }: CohortSectionProps) {
           </Table>
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          Shows weekly retention for the last 8 cohorts. Each cell shows the percentage of users who returned that week.
+          Shows weekly retention for the last 8 cohorts. Each cell shows the
+          percentage of users who returned that week.
         </p>
       </CardContent>
     </Card>

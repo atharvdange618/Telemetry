@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus, Trash2, Filter } from "lucide-react";
 import type { FunnelStep, FunnelResponse } from "@/lib/types/dashboard.types";
+import { InfoTooltip } from "./InfoTooltip";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,6 +57,7 @@ export function FunnelSection({ tenantId }: FunnelSectionProps) {
         <CardTitle className="flex items-center gap-2">
           <Filter className="h-5 w-5" />
           Funnel Analysis
+          <InfoTooltip content="Track how many visitors complete each step of a journey (e.g. Homepage → Pricing → Signup → Checkout). Enter the page paths in order, and see where people drop off." />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
