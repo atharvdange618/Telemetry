@@ -18,7 +18,6 @@ function generateApiKey(): string {
 export async function tenantRoutes(app: FastifyInstance) {
   app.addHook("preHandler", authHook);
 
-  // GET /api/tenants
   app.get("/api/tenants", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -40,7 +39,6 @@ export async function tenantRoutes(app: FastifyInstance) {
     }
   });
 
-  // POST /api/tenants - Create a new tenant
   app.post("/api/tenants", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -67,7 +65,6 @@ export async function tenantRoutes(app: FastifyInstance) {
     }
   });
 
-  // PUT /api/tenants/:id - Rename a tenant
   app.put("/api/tenants/:id", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -98,7 +95,6 @@ export async function tenantRoutes(app: FastifyInstance) {
     }
   });
 
-  // DELETE /api/tenants/:id - Delete a tenant
   app.delete("/api/tenants/:id", async (request, reply) => {
     try {
       const userId = request.userId!;

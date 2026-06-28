@@ -26,12 +26,10 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   app.get("/login/github/callback", async (request, reply) => {
-    // get the access token
     try {
       const { token } =
         await app.githubOAuth.getAccessTokenFromAuthorizationCodeFlow(request);
 
-      // get user info from github
       const githubUserResponse = await fetch(`${process.env.GITHUB_URL}/user`, {
         headers: {
           Authorization: `Bearer ${token.access_token}`,
@@ -47,7 +45,6 @@ export async function authRoutes(app: FastifyInstance) {
         avatar_url,
       } = githubUserSchema.parse(githubUserData);
 
-      // get user's primary email
       const githubEmailsResponse = await fetch(
         `${process.env.GITHUB_URL}/user/emails`,
         {

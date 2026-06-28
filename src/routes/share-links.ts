@@ -44,11 +44,9 @@ function segmentFilters(config: Record<string, string | undefined>) {
 }
 
 export async function shareLinksRoutes(app: FastifyInstance) {
-  // --- Authenticated routes (CRUD) ---
 
   app.addHook("preHandler", authHook);
 
-  // POST /api/share-links — Create a share link
   app.post("/api/share-links", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -84,7 +82,6 @@ export async function shareLinksRoutes(app: FastifyInstance) {
     }
   });
 
-  // GET /api/share-links — List share links for a tenant
   app.get("/api/share-links", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -113,7 +110,6 @@ export async function shareLinksRoutes(app: FastifyInstance) {
     }
   });
 
-  // DELETE /api/share-links/:id — Delete a share link
   app.delete("/api/share-links/:id", async (request, reply) => {
     try {
       const userId = request.userId!;
@@ -141,9 +137,6 @@ export async function shareLinksRoutes(app: FastifyInstance) {
     }
   });
 
-  // --- Public routes (no auth) ---
-
-  // GET /api/shared/:token — Get share link config
   app.get("/api/shared/:token", async (request, reply) => {
     try {
       const { token } = request.params as { token: string };
@@ -173,7 +166,6 @@ export async function shareLinksRoutes(app: FastifyInstance) {
     }
   });
 
-  // GET /api/shared/:token/stats/:type — Proxy stats for shared view
   app.get("/api/shared/:token/stats/:type", async (request, reply) => {
     try {
       const { token, type } = request.params as { token: string; type: string };
@@ -537,11 +529,11 @@ export async function shareLinksRoutes(app: FastifyInstance) {
           const change =
             prevVisitors > 0
               ? parseFloat(
-                  (
-                    ((currVisitors - prevVisitors) / prevVisitors) *
-                    100
-                  ).toFixed(1),
-                )
+                (
+                  ((currVisitors - prevVisitors) / prevVisitors) *
+                  100
+                ).toFixed(1),
+              )
               : 0;
 
           return {
@@ -691,8 +683,8 @@ export async function shareLinksRoutes(app: FastifyInstance) {
           const avg =
             total > 0
               ? Math.round(
-                  events.reduce((s, e) => s + (e.scrollDepth || 0), 0) / total,
-                )
+                events.reduce((s, e) => s + (e.scrollDepth || 0), 0) / total,
+              )
               : 0;
 
           const distribution = { at25: 0, at50: 0, at75: 0, at100: 0 };

@@ -5,21 +5,24 @@ import {
   ResponsiveContainer,
   XAxis,
   YAxis,
-  Tooltip,
+  Tooltip as RechartsTooltip,
 } from "recharts";
 import { TrendingUp } from "lucide-react";
+import { InfoTooltip } from "@/components/dashboard/InfoTooltip";
 
 type AnalyticsChartProps = {
   data: Array<{ date: string | number | Date; views: number }>;
   title: string;
+  tooltip?: string;
 };
 
-export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
+export function AnalyticsChart({ data, title, tooltip }: AnalyticsChartProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <TrendingUp className="h-4 w-4 text-muted-foreground/60" />
         <CardTitle className="text-base">{title}</CardTitle>
+        {tooltip && <InfoTooltip content={tooltip} />}
       </CardHeader>
       <CardContent className="pl-2">
         <ResponsiveContainer width="100%" height={300}>
@@ -58,7 +61,7 @@ export function AnalyticsChart({ data, title }: AnalyticsChartProps) {
               axisLine={false}
               width={40}
             />
-            <Tooltip
+            <RechartsTooltip
               contentStyle={{
                 backgroundColor: "var(--card)",
                 border: "1px solid var(--border)",

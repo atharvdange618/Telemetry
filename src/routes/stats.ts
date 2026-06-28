@@ -12,7 +12,6 @@ import {
   exportQuerySchema,
 } from "../lib/schemas";
 
-// Helper: resolve date range from query params
 function resolveDateRange(query: {
   period?: string;
   startDate?: string;
@@ -33,7 +32,6 @@ function resolveDateRange(query: {
   };
 }
 
-// Helper: build segment WHERE clause
 function segmentFilters(query: Record<string, any>) {
   const where: Record<string, any> = {};
   if (query.browser) where.browser = query.browser;
@@ -51,7 +49,6 @@ function segmentFilters(query: Record<string, any>) {
   return where;
 }
 
-// Helper: check tenant access
 async function checkAccess(userId: string, tenantId: string) {
   const access = await prisma.tenantUser.findUnique({
     where: { userId_tenantId: { userId, tenantId } },
@@ -59,7 +56,6 @@ async function checkAccess(userId: string, tenantId: string) {
   return !!access;
 }
 
-// Helper: extract tenantId + period + segments from query
 function parseQuery(request: any) {
   const parsed = statsQuerySchema.parse(request.query);
   const { startDate, endDate } = resolveDateRange(parsed);
@@ -433,7 +429,6 @@ export async function statsRoutes(app: FastifyInstance) {
       const avgPagesPerSession =
         totalVisitors > 0 ? totalPages / totalVisitors : 0;
 
-      // New vs returning: check if visitor had events in the period before
       const durationMs = endDate.getTime() - startDate.getTime();
       const prevStart = new Date(startDate.getTime() - durationMs);
 
@@ -1027,7 +1022,6 @@ export async function statsRoutes(app: FastifyInstance) {
         funnelSteps.push({ step: steps[i], visitors: visitors.length });
       }
 
-      // Build funnel with conversion rates
       const result = funnelSteps.map((s, i) => ({
         step: s.step,
         visitors: s.visitors,
@@ -1036,14 +1030,14 @@ export async function statsRoutes(app: FastifyInstance) {
             ? 100
             : funnelSteps[i - 1].visitors > 0
               ? parseFloat(
-                  ((s.visitors / funnelSteps[i - 1].visitors) * 100).toFixed(1),
-                )
+                ((s.visitors / funnelSteps[i - 1].visitors) * 100).toFixed(1),
+              )
               : 0,
         conversionFromFirst:
           funnelSteps[0].visitors > 0
             ? parseFloat(
-                ((s.visitors / funnelSteps[0].visitors) * 100).toFixed(1),
-              )
+              ((s.visitors / funnelSteps[0].visitors) * 100).toFixed(1),
+            )
             : 0,
       }));
 

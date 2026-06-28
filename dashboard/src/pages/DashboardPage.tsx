@@ -42,6 +42,7 @@ import { PerformanceSection } from "@/components/dashboard/PerformanceSection";
 import { CampaignsSection } from "@/components/dashboard/CampaignsSection";
 import { FunnelSection } from "@/components/dashboard/FunnelSection";
 import { CohortSection } from "@/components/dashboard/CohortSection";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
@@ -66,9 +67,15 @@ export default function DashboardPage() {
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(
     searchParams.get("tenant"),
   );
-  const [period, setPeriod] = useState<string>(searchParams.get("period") || "24h");
-  const [startDate, setStartDate] = useState<string>(searchParams.get("startDate") || "");
-  const [endDate, setEndDate] = useState<string>(searchParams.get("endDate") || "");
+  const [period, setPeriod] = useState<string>(
+    searchParams.get("period") || "24h",
+  );
+  const [startDate, setStartDate] = useState<string>(
+    searchParams.get("startDate") || "",
+  );
+  const [endDate, setEndDate] = useState<string>(
+    searchParams.get("endDate") || "",
+  );
   const [segments, setSegments] = useState<Segments>({
     browser: searchParams.get("browser") || undefined,
     os: searchParams.get("os") || undefined,
@@ -81,7 +88,6 @@ export default function DashboardPage() {
     !!(searchParams.get("startDate") && searchParams.get("endDate")),
   );
 
-  // Sync state to URL params
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedTenantId) params.set("tenant", selectedTenantId);
@@ -141,11 +147,13 @@ export default function DashboardPage() {
   ];
   const enabled = !!selectedTenantId;
 
-  const { data: summary, isLoading: isLoadingSummary } = useQuery<StatsSummary>({
-    queryKey: [...queryKey, "summary"],
-    queryFn: () => fetchAPI(`${endpoint}/summary?${queryParams}`),
-    enabled,
-  });
+  const { data: summary, isLoading: isLoadingSummary } = useQuery<StatsSummary>(
+    {
+      queryKey: [...queryKey, "summary"],
+      queryFn: () => fetchAPI(`${endpoint}/summary?${queryParams}`),
+      enabled,
+    },
+  );
 
   const { data: pages } = useQuery<PagesResponse>({
     queryKey: [...queryKey, "pages"],
@@ -293,135 +301,158 @@ export default function DashboardPage() {
   const hasActiveFilters = Object.values(segments).some(Boolean);
 
   return (
-    <div className="p-4 md:p-8 min-h-screen relative">
-      <div className="noise" />
-      <SEO
-        title={`${tenantName} Overview`}
-        description="View real-time privacy-friendly website analytics."
-        noindex={true}
-      />
-
-      <DashboardHeader
-        user={user}
-        tenantsData={tenantsData}
-        isLoadingTenants={isLoadingTenants}
-        selectedTenantId={selectedTenantId}
-        selectedTenant={selectedTenant}
-        period={period}
-        customRange={customRange}
-        showFilters={showFilters}
-        hasActiveFilters={hasActiveFilters}
-        searchParams={searchParams}
-        onSelectTenant={setSelectedTenantId}
-        onSetPeriod={(p) => { setPeriod(p); setCustomRange(false); }}
-        onToggleCustomRange={() => setCustomRange(!customRange)}
-        onToggleFilters={() => setShowFilters(!showFilters)}
-        onExport={handleExport}
-        onNavigate={(path) => navigate(path)}
-        onLogout={handleLogout}
-      />
-
-      <FiltersBar
-        show={showFilters}
-        customRange={customRange}
-        startDate={startDate}
-        endDate={endDate}
-        segments={segments}
-        browsersData={browsersData}
-        osData={osData}
-        locationsData={locationsData}
-        languagesData={languagesData}
-        hasActiveFilters={hasActiveFilters}
-        onSetStartDate={setStartDate}
-        onSetEndDate={setEndDate}
-        onSetSegment={setSegment}
-        onClearSegments={clearSegments}
-      />
-
-      <main className="space-y-6">
-        <InsightCards data={insightsData} />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Page Views"
-            value={summary?.pageViews ?? 0}
-            icon={Eye}
-            change={compareData?.pageViews?.change}
-            isLoading={isLoadingSummary}
-          />
-          <StatCard
-            title="Unique Visitors"
-            value={summary?.uniqueVisitors ?? 0}
-            icon={Users}
-            change={compareData?.uniqueVisitors?.change}
-            isLoading={isLoadingSummary}
-          />
-          <StatCard
-            title="Pages / Session"
-            value={engagementData?.avgPagesPerSession ?? "\u2014"}
-            icon={TrendingUp}
-            isLoading={!engagementData}
-          />
-          <StatCard
-            title="Bounce Rate"
-            value={summary?.bounceRate != null ? `${summary.bounceRate}%` : "\u2014"}
-            icon={BarChart3}
-            isLoading={isLoadingSummary}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Sessions"
-            value={sessionsData?.totalSessions ?? "\u2014"}
-            icon={Timer}
-            isLoading={!sessionsData}
-          />
-          <StatCard
-            title="Avg Session"
-            value={sessionsData?.avgDurationFormatted ?? "\u2014"}
-            icon={Timer}
-            isLoading={!sessionsData}
-          />
-          <StatCard
-            title="Avg Scroll"
-            value={
-              scrollData?.avgScrollDepth ? `${scrollData.avgScrollDepth}%` : "\u2014"
-            }
-            icon={Scroll}
-            isLoading={!scrollData}
-          />
-          <StatCard
-            title="Scroll (100%)"
-            value={scrollData?.distribution?.at100 ?? "\u2014"}
-            icon={Scroll}
-            isLoading={!scrollData}
-          />
-        </div>
-
-        {viewsOverTime?.views && (
-          <AnalyticsChart data={viewsOverTime.views} title="Views Over Time" />
-        )}
-
-        <LocationSection data={locationsData} />
-        <PagesReferrersSection pages={pages} referrers={referrers} />
-        <TechSection
-          browsers={browsersData}
-          os={osData}
-          languages={languagesData}
-          devices={devicesData}
+    <TooltipProvider>
+      <div className="p-4 md:p-8 min-h-screen relative">
+        <div className="noise" />
+        <SEO
+          title={`${tenantName} Overview`}
+          description="View real-time privacy-friendly website analytics."
+          noindex={true}
         />
-        <GoalsSection
-          goals={goalsData}
-          sources={sourcesData}
-          cities={citiesData}
-          outbound={outboundData}
+
+        <DashboardHeader
+          user={user}
+          tenantsData={tenantsData}
+          isLoadingTenants={isLoadingTenants}
+          selectedTenantId={selectedTenantId}
+          selectedTenant={selectedTenant}
+          period={period}
+          customRange={customRange}
+          showFilters={showFilters}
+          hasActiveFilters={hasActiveFilters}
+          searchParams={searchParams}
+          onSelectTenant={setSelectedTenantId}
+          onSetPeriod={(p) => {
+            setPeriod(p);
+            setCustomRange(false);
+          }}
+          onToggleCustomRange={() => setCustomRange(!customRange)}
+          onToggleFilters={() => setShowFilters(!showFilters)}
+          onExport={handleExport}
+          onNavigate={(path) => navigate(path)}
+          onLogout={handleLogout}
         />
-        <PerformanceSection data={perfData} />
-        <CampaignsSection data={campaignsData} />
-        <FunnelSection tenantId={selectedTenantId || ""} />
-        <CohortSection queryParams={queryParams} enabled={enabled} />
-      </main>
-    </div>
+
+        <FiltersBar
+          show={showFilters}
+          customRange={customRange}
+          startDate={startDate}
+          endDate={endDate}
+          segments={segments}
+          browsersData={browsersData}
+          osData={osData}
+          locationsData={locationsData}
+          languagesData={languagesData}
+          hasActiveFilters={hasActiveFilters}
+          onSetStartDate={setStartDate}
+          onSetEndDate={setEndDate}
+          onSetSegment={setSegment}
+          onClearSegments={clearSegments}
+        />
+
+        <main className="space-y-6">
+          <InsightCards data={insightsData} />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Page Views"
+              value={summary?.pageViews ?? 0}
+              icon={Eye}
+              change={compareData?.pageViews?.change}
+              isLoading={isLoadingSummary}
+              tooltip="Total number of pages viewed. If one person views the same page 3 times, that counts as 3 page views."
+            />
+            <StatCard
+              title="Unique Visitors"
+              value={summary?.uniqueVisitors ?? 0}
+              icon={Users}
+              change={compareData?.uniqueVisitors?.change}
+              isLoading={isLoadingSummary}
+              tooltip="Number of individual people who visited your site. Each person is counted only once, no matter how many pages they viewed."
+            />
+            <StatCard
+              title="Pages / Session"
+              value={engagementData?.avgPagesPerSession ?? "\u2014"}
+              icon={TrendingUp}
+              isLoading={!engagementData}
+              tooltip="Average number of pages a person looks at during a single visit. Higher usually means your content is engaging."
+            />
+            <StatCard
+              title="Bounce Rate"
+              value={
+                summary?.bounceRate != null
+                  ? `${summary.bounceRate}%`
+                  : "\u2014"
+              }
+              icon={BarChart3}
+              isLoading={isLoadingSummary}
+              tooltip="Percentage of visitors who left after viewing only one page, without clicking anything else. Lower is generally better."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Sessions"
+              value={sessionsData?.totalSessions ?? "\u2014"}
+              icon={Timer}
+              isLoading={!sessionsData}
+              tooltip="A session is a single visit to your site. If someone leaves and comes back later, that counts as a new session."
+            />
+            <StatCard
+              title="Avg Session"
+              value={sessionsData?.avgDurationFormatted ?? "\u2014"}
+              icon={Timer}
+              isLoading={!sessionsData}
+              tooltip="How long, on average, people spend on your site per visit. Longer usually means they find your content useful."
+            />
+            <StatCard
+              title="Avg Scroll"
+              value={
+                scrollData?.avgScrollDepth
+                  ? `${scrollData.avgScrollDepth}%`
+                  : "\u2014"
+              }
+              icon={Scroll}
+              isLoading={!scrollData}
+              tooltip="How far down the page people typically scroll. 100% means they reached the bottom. Higher means they read more of your content."
+            />
+            <StatCard
+              title="Scroll (100%)"
+              value={scrollData?.distribution?.at100 ?? "\u2014"}
+              icon={Scroll}
+              isLoading={!scrollData}
+              tooltip="Number of people who scrolled all the way to the bottom of the page. Shows how much of your content is being fully consumed."
+            />
+          </div>
+
+          {viewsOverTime?.views && (
+            <AnalyticsChart
+              data={viewsOverTime.views}
+              title="Views Over Time"
+              tooltip="Shows how many page views your site received over the selected time period. The line goes up when traffic increases and down when it decreases."
+            />
+          )}
+
+          <LocationSection data={locationsData} />
+          <PagesReferrersSection pages={pages} referrers={referrers} />
+          <TechSection
+            browsers={browsersData}
+            os={osData}
+            languages={languagesData}
+            devices={devicesData}
+          />
+          <GoalsSection
+            goals={goalsData}
+            sources={sourcesData}
+            cities={citiesData}
+            outbound={outboundData}
+          />
+          <PerformanceSection data={perfData} />
+          <CampaignsSection data={campaignsData} />
+          <FunnelSection tenantId={selectedTenantId || ""} />
+          <CohortSection queryParams={queryParams} enabled={enabled} />
+        </main>
+      </div>
+    </TooltipProvider>
   );
 }
