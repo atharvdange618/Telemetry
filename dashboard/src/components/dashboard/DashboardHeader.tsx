@@ -17,6 +17,8 @@ import {
   Filter,
 } from "lucide-react";
 import type { TenantsResponse } from "@/lib/types/dashboard.types";
+import { ShareButton } from "./ShareButton";
+import { ShareLinksDialog } from "./ShareLinksDialog";
 
 interface DashboardHeaderProps {
   user: { name?: string | null; email?: string | null; image?: string | null } | null;
@@ -28,6 +30,7 @@ interface DashboardHeaderProps {
   customRange: boolean;
   showFilters: boolean;
   hasActiveFilters: boolean;
+  searchParams: URLSearchParams;
   onSelectTenant: (id: string) => void;
   onSetPeriod: (p: string) => void;
   onToggleCustomRange: () => void;
@@ -46,6 +49,7 @@ export function DashboardHeader({
   customRange,
   showFilters,
   hasActiveFilters,
+  searchParams,
   onSelectTenant,
   onSetPeriod,
   onToggleCustomRange,
@@ -140,6 +144,16 @@ export function DashboardHeader({
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             )}
           </Button>
+
+          {selectedTenant && (
+            <>
+              <ShareButton
+                tenantId={selectedTenant.id}
+                searchParams={searchParams}
+              />
+              <ShareLinksDialog tenantId={selectedTenant.id} />
+            </>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

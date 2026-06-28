@@ -27,7 +27,7 @@ import type {
 import { useQuery } from "@tanstack/react-query";
 import { Eye, Users, TrendingUp, BarChart3, Timer, Scroll } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -59,13 +59,40 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const APP_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
-  const [period, setPeriod] = useState<string>("24h");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [segments, setSegments] = useState<Segments>({});
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedTenantId, setSelectedTenantId] = useState<string | null>(
+    searchParams.get("tenant"),
+  );
+  const [period, setPeriod] = useState<string>(searchParams.get("period") || "24h");
+  const [startDate, setStartDate] = useState<string>(searchParams.get("startDate") || "");
+  const [endDate, setEndDate] = useState<string>(searchParams.get("endDate") || "");
+  const [segments, setSegments] = useState<Segments>({
+    browser: searchParams.get("browser") || undefined,
+    os: searchParams.get("os") || undefined,
+    country: searchParams.get("country") || undefined,
+    language: searchParams.get("language") || undefined,
+    device: (searchParams.get("device") as Segments["device"]) || undefined,
+  });
   const [showFilters, setShowFilters] = useState(false);
-  const [customRange, setCustomRange] = useState(false);
+  const [customRange, setCustomRange] = useState(
+    !!(searchParams.get("startDate") && searchParams.get("endDate")),
+  );
+
+  // Sync state to URL params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedTenantId) params.set("tenant", selectedTenantId);
+    if (period && !customRange) params.set("period", period);
+    if (customRange && startDate) params.set("startDate", startDate);
+    if (customRange && endDate) params.set("endDate", endDate);
+    if (segments.browser) params.set("browser", segments.browser);
+    if (segments.os) params.set("os", segments.os);
+    if (segments.country) params.set("country", segments.country);
+    if (segments.language) params.set("language", segments.language);
+    if (segments.device) params.set("device", segments.device);
+    setSearchParams(params, { replace: true });
+  }, [selectedTenantId, period, startDate, endDate, customRange, segments]);
 
   const { data: tenantsData, isLoading: isLoadingTenants } =
     useQuery<TenantsResponse>({
@@ -282,6 +309,7 @@ export default function DashboardPage() {
         customRange={customRange}
         showFilters={showFilters}
         hasActiveFilters={hasActiveFilters}
+        searchParams={searchParams}
         onSelectTenant={setSelectedTenantId}
         onSetPeriod={(p) => { setPeriod(p); setCustomRange(false); }}
         onToggleCustomRange={() => setCustomRange(!customRange)}

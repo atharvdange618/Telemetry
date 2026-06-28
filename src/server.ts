@@ -14,6 +14,7 @@ import { authRoutes } from "./routes/auth";
 import fastifyCookie from "@fastify/cookie";
 import { statsRoutes } from "./routes/stats";
 import { tenantRoutes } from "./routes/tenants";
+import { shareLinksRoutes } from "./routes/share-links";
 import { refreshOrigins, isOriginAllowed } from "./lib/cors-cache";
 
 dotenv.config();
@@ -50,6 +51,7 @@ app.register(fastifyStatic, {
 app.register(authRoutes);
 app.register(tenantRoutes);
 app.register(statsRoutes);
+app.register(shareLinksRoutes);
 
 app.withTypeProvider<ZodTypeProvider>().register(trackRoutes);
 

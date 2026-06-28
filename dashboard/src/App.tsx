@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 import { useEffect } from "react";
 import DashboardPage from "./pages/DashboardPage";
+import SharedDashboardPage from "./pages/SharedDashboardPage";
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
 import Home from "./pages/Home";
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/shared/:token",
+    element: <SharedDashboardPage />,
   },
   {
     element: <ProtectedRoute />,

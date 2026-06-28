@@ -119,3 +119,26 @@ export const exportQuerySchema = z.object({
   endDate: z.string().datetime().optional(),
   limit: z.coerce.number().int().min(1).max(100000).default(10000),
 });
+
+export const shareLinkBodySchema = z.object({
+  tenantId: z.string().cuid(),
+  label: z.string().max(100).optional(),
+  config: z.object({
+    period: z.enum(["24h", "7d", "30d", "90d"]).optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    segments: z
+      .object({
+        browser: z.string().optional(),
+        os: z.string().optional(),
+        country: z.string().optional(),
+        language: z.string().optional(),
+        device: z.enum(["mobile", "tablet", "desktop"]).optional(),
+      })
+      .optional(),
+  }),
+});
+
+export const shareLinkParamsSchema = z.object({
+  id: z.string().cuid(),
+});

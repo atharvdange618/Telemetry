@@ -172,3 +172,31 @@ export interface Insight {
 export interface InsightsResponse {
   insights: Insight[];
 }
+
+export interface ShareLinkConfig {
+  period?: string;
+  startDate?: string;
+  endDate?: string;
+  segments?: Record<string, string>;
+}
+
+export interface ShareLink {
+  id: string;
+  token: string;
+  tenantId: string;
+  label: string | null;
+  config: ShareLinkConfig;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface ShareLinksResponse {
+  shareLinks: ShareLink[];
+}
+
+export interface SharedViewResponse {
+  id: string;
+  label: string;
+  config: ShareLinkConfig;
+  createdAt: string;
+}
