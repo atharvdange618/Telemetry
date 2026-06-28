@@ -3,10 +3,7 @@ import { ZodError } from "zod";
 import { randomBytes } from "crypto";
 import { authHook } from "../hooks/auth";
 import { prisma } from "../lib/prisma";
-import {
-  shareLinkBodySchema,
-  shareLinkParamsSchema,
-} from "../lib/schemas";
+import { shareLinkBodySchema, shareLinkParamsSchema } from "../lib/schemas";
 
 function generateToken(): string {
   return randomBytes(32).toString("base64url");
@@ -19,7 +16,10 @@ function resolveDateRange(query: {
 }) {
   const now = new Date();
   if (query.startDate && query.endDate) {
-    return { startDate: new Date(query.startDate), endDate: new Date(query.endDate) };
+    return {
+      startDate: new Date(query.startDate),
+      endDate: new Date(query.endDate),
+    };
   }
   const periodMap: Record<string, number> = {
     "24h": 1,
@@ -44,97 +44,98 @@ function segmentFilters(config: Record<string, string | undefined>) {
 }
 
 export async function shareLinksRoutes(app: FastifyInstance) {
+  app.register(async (privateApp) => {
+    privateApp.addHook("preHandler", authHook);
 
-  app.addHook("preHandler", authHook);
+    privateApp.post("/api/share-links", async (request, reply) => {
+      try {
+        const userId = request.userId!;
+        const body = shareLinkBodySchema.parse(request.body);
 
-  app.post("/api/share-links", async (request, reply) => {
-    try {
-      const userId = request.userId!;
-      const body = shareLinkBodySchema.parse(request.body);
+        const access = await prisma.tenantUser.findUnique({
+          where: { userId_tenantId: { userId, tenantId: body.tenantId } },
+        });
+        if (!access) {
+          return reply.code(403).send({ message: "Forbidden" });
+        }
 
-      const access = await prisma.tenantUser.findUnique({
-        where: { userId_tenantId: { userId, tenantId: body.tenantId } },
-      });
-      if (!access) {
-        return reply.code(403).send({ message: "Forbidden" });
+        const token = generateToken();
+        const shareLink = await prisma.shareLink.create({
+          data: {
+            token,
+            tenantId: body.tenantId,
+            label: body.label || null,
+            config: body.config,
+            createdBy: userId,
+          },
+        });
+
+        return reply.code(201).send({ shareLink });
+      } catch (error) {
+        if (error instanceof ZodError) {
+          return reply
+            .code(400)
+            .send({ message: "Invalid request body", errors: error.issues });
+        }
+        privateApp.log.error(error, "Failed to create share link");
+        return reply.code(500).send({ message: "Internal server error" });
       }
+    });
 
-      const token = generateToken();
-      const shareLink = await prisma.shareLink.create({
-        data: {
-          token,
-          tenantId: body.tenantId,
-          label: body.label || null,
-          config: body.config,
-          createdBy: userId,
-        },
-      });
+    privateApp.get("/api/share-links", async (request, reply) => {
+      try {
+        const userId = request.userId!;
+        const { tenantId } = request.query as { tenantId?: string };
 
-      return reply.code(201).send({ shareLink });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return reply
-          .code(400)
-          .send({ message: "Invalid request body", errors: error.issues });
+        if (!tenantId) {
+          return reply.code(400).send({ message: "tenantId is required" });
+        }
+
+        const access = await prisma.tenantUser.findUnique({
+          where: { userId_tenantId: { userId, tenantId } },
+        });
+        if (!access) {
+          return reply.code(403).send({ message: "Forbidden" });
+        }
+
+        const shareLinks = await prisma.shareLink.findMany({
+          where: { tenantId },
+          orderBy: { createdAt: "desc" },
+        });
+
+        return { shareLinks };
+      } catch (error) {
+        privateApp.log.error(error, "Failed to list share links");
+        return reply.code(500).send({ message: "Internal server error" });
       }
-      app.log.error(error, "Failed to create share link");
-      return reply.code(500).send({ message: "Internal server error" });
-    }
-  });
+    });
 
-  app.get("/api/share-links", async (request, reply) => {
-    try {
-      const userId = request.userId!;
-      const { tenantId } = request.query as { tenantId?: string };
+    privateApp.delete("/api/share-links/:id", async (request, reply) => {
+      try {
+        const userId = request.userId!;
+        const { id } = shareLinkParamsSchema.parse(request.params);
 
-      if (!tenantId) {
-        return reply.code(400).send({ message: "tenantId is required" });
+        const shareLink = await prisma.shareLink.findUnique({ where: { id } });
+        if (!shareLink) {
+          return reply.code(404).send({ message: "Share link not found" });
+        }
+
+        if (shareLink.createdBy !== userId) {
+          return reply.code(403).send({ message: "Forbidden" });
+        }
+
+        await prisma.shareLink.delete({ where: { id } });
+        return reply.code(204).send();
+      } catch (error) {
+        if (error instanceof ZodError) {
+          return reply
+            .code(400)
+            .send({ message: "Invalid request params", errors: error.issues });
+        }
+        privateApp.log.error(error, "Failed to delete share link");
+        return reply.code(500).send({ message: "Internal server error" });
       }
-
-      const access = await prisma.tenantUser.findUnique({
-        where: { userId_tenantId: { userId, tenantId } },
-      });
-      if (!access) {
-        return reply.code(403).send({ message: "Forbidden" });
-      }
-
-      const shareLinks = await prisma.shareLink.findMany({
-        where: { tenantId },
-        orderBy: { createdAt: "desc" },
-      });
-
-      return { shareLinks };
-    } catch (error) {
-      app.log.error(error, "Failed to list share links");
-      return reply.code(500).send({ message: "Internal server error" });
-    }
-  });
-
-  app.delete("/api/share-links/:id", async (request, reply) => {
-    try {
-      const userId = request.userId!;
-      const { id } = shareLinkParamsSchema.parse(request.params);
-
-      const shareLink = await prisma.shareLink.findUnique({ where: { id } });
-      if (!shareLink) {
-        return reply.code(404).send({ message: "Share link not found" });
-      }
-
-      if (shareLink.createdBy !== userId) {
-        return reply.code(403).send({ message: "Forbidden" });
-      }
-
-      await prisma.shareLink.delete({ where: { id } });
-      return reply.code(204).send();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return reply
-          .code(400)
-          .send({ message: "Invalid request params", errors: error.issues });
-      }
-      app.log.error(error, "Failed to delete share link");
-      return reply.code(500).send({ message: "Internal server error" });
-    }
+    });
   });
 
   app.get("/api/shared/:token", async (request, reply) => {
@@ -189,10 +190,7 @@ export async function shareLinksRoutes(app: FastifyInstance) {
       const { startDate, endDate } = resolveDateRange(params);
       const segments = segmentFilters(params as Record<string, string>);
 
-      const statsHandlers: Record<
-        string,
-        () => Promise<any>
-      > = {
+      const statsHandlers: Record<string, () => Promise<any>> = {
         summary: async () => {
           const [pageViews, uniqueVisitors, bounceEvents] = await Promise.all([
             prisma.event.count({
@@ -231,7 +229,9 @@ export async function shareLinksRoutes(app: FastifyInstance) {
           ).length;
           const bounceRate =
             uniqueVisitors > 0
-              ? parseFloat(((singlePageVisitors / uniqueVisitors) * 100).toFixed(1))
+              ? parseFloat(
+                  ((singlePageVisitors / uniqueVisitors) * 100).toFixed(1),
+                )
               : 0;
 
           return { pageViews, uniqueVisitors, bounceRate };
@@ -251,7 +251,9 @@ export async function shareLinksRoutes(app: FastifyInstance) {
             orderBy: { _count: { path: "desc" } },
             take: 10,
           });
-          return { pages: pages.map((p) => ({ path: p.path!, views: p._count })) };
+          return {
+            pages: pages.map((p) => ({ path: p.path!, views: p._count })),
+          };
         },
 
         referrers: async () => {
@@ -268,7 +270,12 @@ export async function shareLinksRoutes(app: FastifyInstance) {
             orderBy: { _count: { referrer: "desc" } },
             take: 10,
           });
-          return { referrers: refs.map((r) => ({ referrer: r.referrer!, views: r._count })) };
+          return {
+            referrers: refs.map((r) => ({
+              referrer: r.referrer === "" ? "Direct" : r.referrer!,
+              views: r._count,
+            })),
+          };
         },
 
         "views-over-time": async () => {
@@ -529,11 +536,11 @@ export async function shareLinksRoutes(app: FastifyInstance) {
           const change =
             prevVisitors > 0
               ? parseFloat(
-                (
-                  ((currVisitors - prevVisitors) / prevVisitors) *
-                  100
-                ).toFixed(1),
-              )
+                  (
+                    ((currVisitors - prevVisitors) / prevVisitors) *
+                    100
+                  ).toFixed(1),
+                )
               : 0;
 
           return {
@@ -683,8 +690,8 @@ export async function shareLinksRoutes(app: FastifyInstance) {
           const avg =
             total > 0
               ? Math.round(
-                events.reduce((s, e) => s + (e.scrollDepth || 0), 0) / total,
-              )
+                  events.reduce((s, e) => s + (e.scrollDepth || 0), 0) / total,
+                )
               : 0;
 
           const distribution = { at25: 0, at50: 0, at75: 0, at100: 0 };
@@ -696,7 +703,11 @@ export async function shareLinksRoutes(app: FastifyInstance) {
             if (d >= 100) distribution.at100++;
           }
 
-          return { avgScrollDepth: avg, totalScrollEvents: total, distribution };
+          return {
+            avgScrollDepth: avg,
+            totalScrollEvents: total,
+            distribution,
+          };
         },
 
         performance: async () => {
@@ -715,7 +726,9 @@ export async function shareLinksRoutes(app: FastifyInstance) {
               select: { [m]: true },
             });
 
-            const nums = values.map((v: any) => v[m] as number).sort((a, b) => a - b);
+            const nums = values
+              .map((v: any) => v[m] as number)
+              .sort((a, b) => a - b);
             const count = nums.length;
             const percentile = (p: number) =>
               count > 0 ? nums[Math.floor((p / 100) * (count - 1))] : 0;

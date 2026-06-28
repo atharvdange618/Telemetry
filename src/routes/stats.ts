@@ -906,7 +906,14 @@ export async function statsRoutes(app: FastifyInstance) {
           type: "performance",
           ...segments,
         },
-        select: { lcp: true, inp: true, fid: true, cls: true, ttfb: true, fcp: true },
+        select: {
+          lcp: true,
+          inp: true,
+          fid: true,
+          cls: true,
+          ttfb: true,
+          fcp: true,
+        },
       });
 
       const calcPercentile = (values: number[], p: number) => {
@@ -1032,14 +1039,14 @@ export async function statsRoutes(app: FastifyInstance) {
             ? 100
             : funnelSteps[i - 1].visitors > 0
               ? parseFloat(
-                ((s.visitors / funnelSteps[i - 1].visitors) * 100).toFixed(1),
-              )
+                  ((s.visitors / funnelSteps[i - 1].visitors) * 100).toFixed(1),
+                )
               : 0,
         conversionFromFirst:
           funnelSteps[0].visitors > 0
             ? parseFloat(
-              ((s.visitors / funnelSteps[0].visitors) * 100).toFixed(1),
-            )
+                ((s.visitors / funnelSteps[0].visitors) * 100).toFixed(1),
+              )
             : 0,
       }));
 
@@ -1081,11 +1088,18 @@ export async function statsRoutes(app: FastifyInstance) {
         }
       }
 
-      const cohorts = new Map<string, { visitors: Set<string>; weekStart: Date }>();
+      const cohorts = new Map<
+        string,
+        { visitors: Set<string>; weekStart: Date }
+      >();
       for (const [visitorId, firstVisit] of visitorFirstVisit) {
-        const weekKey = dayjs(firstVisit).isoWeekYear() + "-W" + String(dayjs(firstVisit).isoWeek()).padStart(2, "0");
+        const weekKey =
+          dayjs(firstVisit).isoWeekYear() +
+          "-W" +
+          String(dayjs(firstVisit).isoWeek()).padStart(2, "0");
         const weekStart = dayjs(firstVisit).startOf("isoWeek").toDate();
-        if (!cohorts.has(weekKey)) cohorts.set(weekKey, { visitors: new Set(), weekStart });
+        if (!cohorts.has(weekKey))
+          cohorts.set(weekKey, { visitors: new Set(), weekStart });
         cohorts.get(weekKey)!.visitors.add(visitorId);
       }
 
@@ -1094,7 +1108,10 @@ export async function statsRoutes(app: FastifyInstance) {
         a[0].localeCompare(b[0]),
       );
 
-      for (const [cohortWeek, { visitors: visitorIds, weekStart }] of sortedCohorts.slice(-8)) {
+      for (const [
+        cohortWeek,
+        { visitors: visitorIds, weekStart },
+      ] of sortedCohorts.slice(-8)) {
         const cohortData: Record<string, number> = { cohort: visitorIds.size };
 
         for (let w = 0; w <= 7; w++) {
@@ -1282,7 +1299,7 @@ export async function statsRoutes(app: FastifyInstance) {
       if (topRef.length > 0 && topRef[0]._count.referrer > 10) {
         insights.push({
           type: "referrer",
-          title: `Top referrer: ${topRef[0].referrer}`,
+          title: `Top referrer: ${topRef[0].referrer === "" ? "Direct" : topRef[0].referrer}`,
           detail: `${topRef[0]._count.referrer} visits from this source`,
           value: topRef[0]._count.referrer,
         });

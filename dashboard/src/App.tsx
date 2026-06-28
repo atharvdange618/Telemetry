@@ -18,6 +18,8 @@ import SettingsPage from "./components/SettingsPage";
 import Home from "./pages/Home";
 import { useDarkMode } from "./hooks/useDarkMode";
 
+import { TooltipProvider } from "./components/ui/tooltip";
+
 const queryClient = new QueryClient();
 
 function DarkModeInit() {
@@ -90,8 +92,10 @@ const router = createBrowserRouter([
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <DarkModeInit />
-      <RouterProvider router={router} />
+      <TooltipProvider>
+        <DarkModeInit />
+        <RouterProvider router={router} />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
