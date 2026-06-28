@@ -68,7 +68,7 @@ export interface BarChartProps {
   animationEasing?: string;
   /** Motion enter transition (spring or cubic-bezier tween). */
   enterTransition?: Transition;
-  /** Signature of motion URL state — triggers enter replay when it changes. */
+  /** Signature of motion URL state - triggers enter replay when it changes. */
   revealSignature?: string;
   /** Aspect ratio as "width / height". Default: "2 / 1" */
   aspectRatio?: string;
@@ -84,7 +84,7 @@ export interface BarChartProps {
   stacked?: boolean;
   /** Gap between stacked bar segments in pixels. Default: 0 */
   stackGap?: number;
-  /** Child components (Bar, Grid, ChartTooltip, etc.). Optional — omit for a
+  /** Child components (Bar, Grid, ChartTooltip, etc.). Optional - omit for a
    * pure `status="loading"` skeleton. */
   children?: ReactNode;
   /** Reports reveal lifecycle for OG screenshots and loading orchestration. */
@@ -107,7 +107,7 @@ function extractBarConfigs(children: ReactNode): LineConfig[] {
       __isBarDepthLayer?: boolean;
     };
     // Bar-depth surface layers (BarDepthBack/Front, BarPulse) carry a
-    // `dataKey` to pair with a Bar but are not series themselves — skip them
+    // `dataKey` to pair with a Bar but are not series themselves - skip them
     // so they don't inflate the series count and shrink the real bars.
     if (childType.__isBarDepthLayer) {
       return;
@@ -211,7 +211,7 @@ const ChartCore = memo(function ChartCore({
       }
       return String(value ?? "");
     },
-    [xDataKey]
+    [xDataKey],
   );
 
   // For compatibility with ChartContext, provide a Date-based xAccessor
@@ -223,7 +223,7 @@ const ChartCore = memo(function ChartCore({
       }
       return new Date();
     },
-    [xDataKey]
+    [xDataKey],
   );
 
   // Category scale (band) - for the categorical axis
@@ -345,7 +345,7 @@ const ChartCore = memo(function ChartCore({
   // Pre-compute labels for ticker animation
   const dateLabels = useMemo(
     () => data.map((d) => categoryAccessor(d)),
-    [data, categoryAccessor]
+    [data, categoryAccessor],
   );
 
   // Create a fake time scale for compatibility with ChartContext
@@ -362,7 +362,7 @@ const ChartCore = memo(function ChartCore({
     return scale;
   }, [categoryScale, innerWidth, data.length]);
 
-  // Animation timing — replay when motion settings change
+  // Animation timing - replay when motion settings change
   // biome-ignore lint/correctness/useExhaustiveDependencies: revealSignature
   useEffect(() => {
     setRevealEpoch((n) => n + 1);
@@ -515,7 +515,7 @@ const ChartCore = memo(function ChartCore({
       scheduleTooltip,
       yScales,
       primaryYScale,
-    ]
+    ],
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -542,7 +542,7 @@ const ChartCore = memo(function ChartCore({
       postOverlayChildren.push(resolvedChild);
     } else if (isClipExcludedComponent(resolvedChild)) {
       clipExcludedChildren.push(
-        isChartClipPassthrough(child.type) ? resolvedChild : child
+        isChartClipPassthrough(child.type) ? resolvedChild : child,
       );
     } else if (isUnderlayComponent(resolvedChild)) {
       underlayChildren.push(resolvedChild);
@@ -553,7 +553,7 @@ const ChartCore = memo(function ChartCore({
 
   const referenceAreas = useMemo(
     () => extractReferenceAreaConfigs(children),
-    [children]
+    [children],
   );
 
   const contextValue = {

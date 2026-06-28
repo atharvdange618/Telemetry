@@ -5,7 +5,7 @@ export interface FadeSides {
   left: boolean;
   /** Whether the right edge should fade out. */
   right: boolean;
-  /** True if either side fades — use to gate gradient/mask defs. */
+  /** True if either side fades - use to gate gradient/mask defs. */
   any: boolean;
 }
 

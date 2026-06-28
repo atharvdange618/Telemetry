@@ -18,7 +18,7 @@ export type PieCenterShellProps = Omit<PieCenterProps, "children"> & {
   centerValue: number;
   /** Square reference size for pie context (matches `PieChart` `size`) */
   contextSize: number;
-  /** Inner radius in px — must be > 0 so `PieCenter` renders */
+  /** Inner radius in px - must be > 0 so `PieCenter` renders */
   innerRadiusPx: number;
   /**
    * When true (default), the first paint uses `0` then updates to `centerValue`
@@ -43,7 +43,7 @@ export function PieCenterShell({
   const introStartedRef = useRef(false);
 
   const [flowTotal, setFlowTotal] = useState(() =>
-    animateEntrance ? 0 : centerValue
+    animateEntrance ? 0 : centerValue,
   );
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function PieCenterShell({
 
   const data: PieData[] = useMemo(
     () => [{ label: "_pieCenterShell", value: Math.max(flowTotal, 0) }],
-    [flowTotal]
+    [flowTotal],
   );
 
   const totalValue = flowTotal;
@@ -123,7 +123,7 @@ export function PieCenterShell({
       }
       return getColor(index);
     },
-    [data, getColor]
+    [data, getColor],
   );
 
   const center = contextSize / 2;
@@ -162,7 +162,7 @@ export function PieCenterShell({
       totalValue,
       getColor,
       getFill,
-    ]
+    ],
   );
 
   return (

@@ -81,7 +81,7 @@ export function decimateTimeSeries<T extends Record<string, unknown>>(
   return sampled;
 }
 
-/** ~1.5 points per pixel — enough for crisp curves without over-drawing. */
+/** ~1.5 points per pixel - enough for crisp curves without over-drawing. */
 export function maxRenderPointsForWidth(innerWidth: number): number {
   return Math.max(64, Math.ceil(innerWidth * 1.5));
 }

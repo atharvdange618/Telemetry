@@ -14,7 +14,7 @@ interface SeriesHoverDimProps {
   durationSec?: number;
   /** Series index for multi-series legend hover dimming. */
   seriesIndex?: number;
-  /** Stable chart visuals — area fill, stroke line, dashed tail, etc. */
+  /** Stable chart visuals - area fill, stroke line, dashed tail, etc. */
   children: ReactNode;
 }
 

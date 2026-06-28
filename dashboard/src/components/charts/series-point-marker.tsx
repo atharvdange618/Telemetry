@@ -129,7 +129,7 @@ export interface SeriesPointMarkerProps extends SeriesPointMarkerStyle {
   enterDuration: number;
 }
 
-/** Motion enter marker — used only while the chart reveal is running. */
+/** Motion enter marker - used only while the chart reveal is running. */
 export function SeriesPointMarker({
   dataKey,
   index,
@@ -195,7 +195,7 @@ export function getSeriesMarkerVisualExtent(
     | "ringGap"
     | "outlineWidth"
     | "showActiveHighlight"
-  >
+  >,
 ): number {
   const radius = style.radius ?? 5;
   const strokeWidth = style.strokeWidth ?? 2;

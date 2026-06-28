@@ -60,7 +60,7 @@ export interface AreaProps {
   /**
    * Fade the area fill (and stroke) toward transparent at the chart edges.
    * - `true` fades both edges, `false` disables the fade entirely.
-   * - `"left"` / `"right"` fades only that side — useful when the opposite
+   * - `"left"` / `"right"` fades only that side - useful when the opposite
    *   edge butts up against another element you don't want to fade into.
    * Default: false
    */
@@ -99,7 +99,7 @@ function useAreaLoadingPulseState(
   chartPhase: ChartPhase,
   loading: boolean | undefined,
   loadingPulseMode: LineLoadingPulseMode | undefined,
-  notifyLoadingPulseComplete?: () => void
+  notifyLoadingPulseComplete?: () => void,
 ) {
   const phasePulseMode = resolveLineLoadingPulseMode(chartPhase);
   const pulseMode =
@@ -185,7 +185,7 @@ export function Area({
     chartPhase,
     loading,
     loadingPulseMode,
-    notifyLoadingPulseComplete
+    notifyLoadingPulseComplete,
   );
 
   const seriesIndex = useMemo(() => {
@@ -223,12 +223,12 @@ export function Area({
       const value = d[dataKey];
       return typeof value === "number" ? (yScale(value) ?? 0) : 0;
     },
-    [dataKey, yScale]
+    [dataKey, yScale],
   );
 
   const hasDashTail = resolveDashTailBounds(dashFromIndex, data.length);
   // The stroke gradient is only emitted when at least one edge fades, so fall
-  // back to the resolved solid color otherwise — avoids an invalid url(#...).
+  // back to the resolved solid color otherwise - avoids an invalid url(#...).
   const fadeSides = resolveFadeSides(fadeEdges);
   const useViewportEdgeFade = fadeSides.any && !isPatternFill;
   let strokePaint = resolvedStroke;
@@ -325,7 +325,7 @@ export function Area({
         )}
       </SeriesHoverDim>
 
-      {/* Highlight segment on hover — isolated hover subscriber. */}
+      {/* Highlight segment on hover - isolated hover subscriber. */}
       <SeriesHighlightLayer
         enabled={highlightEnabled}
         height={innerHeight}

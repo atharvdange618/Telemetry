@@ -24,7 +24,7 @@ export type BarAnimationType = "grow" | "fade";
 // ── Bar-depth perspective trim ───────────────────────────────────────────
 // Uses the SHARED geometry (`bar-depth-geometry.ts`) so a
 // `<Bar perspective>` front face lines up exactly with
-// `<BarDepthBack>`'s lid — the formula lives in one place for both.
+// `<BarDepthBack>`'s lid - the formula lives in one place for both.
 
 /** perspectiveRise for a positive bar whose visual top sits at `topY`.
  * Returns 0 for a dead-center bar or a dense chart (degenerate depth). */
@@ -35,7 +35,7 @@ function barDepthPerspectiveRise(
   innerWidth: number,
   datum: Record<string, unknown>,
   topY: number,
-  baselineY: number
+  baselineY: number,
 ): number {
   const centerX = innerWidth / 2;
   if (centerX <= 0) {
@@ -252,7 +252,7 @@ const BarInner = memo(function BarInner({
 
   // Calculate corner radius based on lineCap. Perspective bars force a flat
   // top (radius 0) so the 3D lid from `<BarDepthBack>` meets the bar with no
-  // gap — rounded corners would leave a wedge, so `perspective` overrides it.
+  // gap - rounded corners would leave a wedge, so `perspective` overrides it.
   const cornerRadius = useMemo(() => {
     if (perspective) {
       return 0;
@@ -337,7 +337,7 @@ const BarInner = memo(function BarInner({
             : bandPos +
               seriesIndex * (barWidth + (seriesCount > 1 ? groupGap : 0));
 
-          // Minimum visible height — floor short/zero non-stacked bars so a
+          // Minimum visible height - floor short/zero non-stacked bars so a
           // zero-value data point still reads as a tiny bar instead of
           // vanishing. Grows up from the baseline. Floored bars skip the
           // perspective trim (sub-pixel on a 3px bar; keeps the front aligned
@@ -355,7 +355,7 @@ const BarInner = memo(function BarInner({
             isFloored = true;
           }
 
-          // Perspective trim — shrink the topmost positive bar's front-face
+          // Perspective trim - shrink the topmost positive bar's front-face
           // top down by its perspective rise so it meets `<BarDepthBack>`'s
           // lid back edge. Stacked: only the last (topmost) series; grouped or
           // single: every positive bar. Clamped to `barHeight - 1` so very
@@ -374,7 +374,7 @@ const BarInner = memo(function BarInner({
               innerWidth,
               d,
               y,
-              baselineY
+              baselineY,
             );
             const trim = Math.min(rise, Math.max(0, barHeight - 1));
             y += trim;

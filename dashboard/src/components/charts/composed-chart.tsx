@@ -19,7 +19,7 @@ import { SeriesBar, type SeriesBarProps } from "./series-bar";
 import { TimeSeriesChartInner } from "./time-series-chart-shell";
 
 export interface ComposedChartProps {
-  /** Data array — each row typically has a date and multiple numeric series */
+  /** Data array - each row typically has a date and multiple numeric series */
   data: Record<string, unknown>[];
   /** Key for the x-axis (time). Default: "date" */
   xDataKey?: string;
@@ -27,7 +27,7 @@ export interface ComposedChartProps {
   animationDuration?: number;
   animationEasing?: string;
   enterTransition?: Transition;
-  /** Signature of motion URL state — triggers reveal replay when it changes. */
+  /** Signature of motion URL state - triggers reveal replay when it changes. */
   revealSignature?: string;
   aspectRatio?: string;
   className?: string;
@@ -60,14 +60,14 @@ function upsertLineConfig(lines: LineConfig[], config: LineConfig): void {
     lines.push(config);
     return;
   }
-  // Area+Line pairs share a dataKey — keep the later config (Line over Area).
+  // Area+Line pairs share a dataKey - keep the later config (Line over Area).
   lines[index] = config;
 }
 
 function tryAppendSeriesBar(
   child: ReactElement,
   lines: LineConfig[],
-  barDataKeys: string[]
+  barDataKeys: string[],
 ): boolean {
   const name = getChildComponentName(child);
   if (!(child.type === SeriesBar || name === "SeriesBar")) {
@@ -146,7 +146,7 @@ function extractComposedSeries(children: ReactNode): {
 function computeComposedYScaleDomainMax(
   data: Record<string, unknown>[],
   lines: LineConfig[],
-  barDataKeys: string[]
+  barDataKeys: string[],
 ): number | undefined {
   const barSet = new Set(barDataKeys);
   let max = 0;
@@ -214,7 +214,7 @@ function ChartInner({
 }: ChartInnerProps) {
   const { lines, barDataKeys } = useMemo(
     () => extractComposedSeries(children),
-    [children]
+    [children],
   );
 
   const composedStackOffsets = useMemo(() => {
@@ -246,7 +246,7 @@ function ChartInner({
       stacked && barDataKeys.length > 0
         ? computeComposedYScaleDomainMax(data, lines, barDataKeys)
         : undefined,
-    [data, lines, barDataKeys, stacked]
+    [data, lines, barDataKeys, stacked],
   );
 
   return (

@@ -4,7 +4,7 @@ import { motion, useSpring } from "motion/react";
 import { memo, useMemo, useRef } from "react";
 
 const TICKER_ITEM_HEIGHT = 24;
-/** Full scroll stacks are skipped above this count — single label + instant updates. */
+/** Full scroll stacks are skipped above this count - single label + instant updates. */
 const COMPACT_TICKER_THRESHOLD = 60;
 
 export interface DateTickerProps {

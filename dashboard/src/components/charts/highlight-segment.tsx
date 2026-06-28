@@ -10,13 +10,13 @@ import { type RefObject, useId } from "react";
 // drawn (see `highlight-segment-bounds.ts` for the band-extent caveat).
 
 export interface HighlightSegmentProps {
-  /** Ref to the rendered base stroke `<path>` — its `d` is re-used verbatim. */
+  /** Ref to the rendered base stroke `<path>` - its `d` is re-used verbatim. */
   pathRef: RefObject<SVGPathElement | null>;
   /** Whether to render (caller gates on showHighlight + active + loaded). */
   visible: boolean;
   stroke: string;
   strokeWidth: number;
-  /** Plot height — the clip band spans it fully. */
+  /** Plot height - the clip band spans it fully. */
   height: number;
   /** Spring-eased left edge of the clip band (px). */
   x: MotionValue<number>;

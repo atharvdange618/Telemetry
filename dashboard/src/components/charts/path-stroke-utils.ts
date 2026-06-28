@@ -34,7 +34,7 @@ const EMPTY_METRICS: PathStrokeMetrics = { pathD: null, pathLength: 0 };
 /**
  * Caller passes the references that drive the rendered path (renderData,
  * innerWidth, etc.) as `deps`. A stringified summary like
- * `${renderData.length}:${innerWidth}` is *not* safe here — same-length
+ * `${renderData.length}:${innerWidth}` is *not* safe here - same-length
  * in-place mutations of `renderData` keep the summary identical, so the
  * effect would never re-fire and `pathD`/`pathLength` would stay frozen on
  * the previous geometry (the area fill repaints from `renderData` directly

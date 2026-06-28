@@ -93,7 +93,7 @@ export interface PieStableContextValue {
   getFill: (index: number) => string;
 
   /**
-   * Studio geometry scrub — skip Motion path morphing and use plain SVG paths.
+   * Studio geometry scrub - skip Motion path morphing and use plain SVG paths.
    * @default false
    */
   geometryScrubbing: boolean;
@@ -156,7 +156,7 @@ export function PieProvider({
       value.getFill,
       value.geometryScrubbing,
       value.scrubSlicePaths,
-    ]
+    ],
   );
 
   const hover = useMemo<PieHoverContextValue>(
@@ -164,7 +164,7 @@ export function PieProvider({
       hoveredIndex: value.hoveredIndex,
       setHoveredIndex: value.setHoveredIndex,
     }),
-    [value.hoveredIndex, value.setHoveredIndex]
+    [value.hoveredIndex, value.setHoveredIndex],
   );
 
   return (
@@ -181,7 +181,7 @@ export function usePieStable(): PieStableContextValue {
   if (!context) {
     throw new Error(
       "usePieStable must be used within a PieProvider. " +
-        "Make sure your component is wrapped in <PieChart>."
+        "Make sure your component is wrapped in <PieChart>.",
     );
   }
   return context;
@@ -192,7 +192,7 @@ export function usePieHover(): PieHoverContextValue {
   if (!context) {
     throw new Error(
       "usePieHover must be used within a PieProvider. " +
-        "Make sure your component is wrapped in <PieChart>."
+        "Make sure your component is wrapped in <PieChart>.",
     );
   }
   return context;

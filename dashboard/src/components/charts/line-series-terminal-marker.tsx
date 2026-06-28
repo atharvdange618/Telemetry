@@ -19,7 +19,7 @@ function isTerminalMarkerPhaseVisible(phase: string): boolean {
   return phase === "ready" || phase === "exitingReady";
 }
 
-/** Hollow ring at the last data point — shared anchor for projection lines. */
+/** Hollow ring at the last data point - shared anchor for projection lines. */
 export function LineSeriesTerminalMarker({
   dataKey,
   yAxisId,

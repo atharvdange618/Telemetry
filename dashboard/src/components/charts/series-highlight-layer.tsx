@@ -19,8 +19,8 @@ interface SeriesHighlightLayerProps {
  *
  * Owns the `useHighlightSegment` subscription (which reads both stable + hover
  * context) so the parent <Area> / <Line> can stay on the stable slice. This
- * component still re-renders on hover — that's the price of driving the
- * highlight band — but it's a tiny leaf so the cost is bounded to itself.
+ * component still re-renders on hover - that's the price of driving the
+ * highlight band - but it's a tiny leaf so the cost is bounded to itself.
  */
 export function SeriesHighlightLayer({
   enabled,

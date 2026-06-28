@@ -13,7 +13,7 @@ export interface DashTailStrokeProps {
   dashStartX: number;
   innerWidth: number;
   innerHeight: number;
-  /** Stroke paint — solid color or gradient url. */
+  /** Stroke paint - solid color or gradient url. */
   stroke: string;
   strokeWidth: number;
   dashArray: string;
@@ -51,7 +51,7 @@ export function DashTailStroke({
           />
         </clipPath>
       </defs>
-      {/* Solid head — same curved path, gradient/fade preserved */}
+      {/* Solid head - same curved path, gradient/fade preserved */}
       <path
         d={pathD}
         fill="none"
@@ -60,7 +60,7 @@ export function DashTailStroke({
         strokeLinecap="round"
         strokeWidth={strokeWidth}
       />
-      {/* Dashed tail — clipped to x ≥ dashStartX so dashes follow the curve */}
+      {/* Dashed tail - clipped to x ≥ dashStartX so dashes follow the curve */}
       <path
         clipPath={`url(#${clipPathId})`}
         d={pathD}

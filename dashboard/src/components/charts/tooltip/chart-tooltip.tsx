@@ -56,7 +56,7 @@ export interface ChartTooltipProps {
   springConfig?: SpringConfig;
   /**
    * When `true`, the floating panel uses the crosshair spring and stays in sync.
-   * Default `false` — panel follow uses `damping` (`20`).
+   * Default `false` - panel follow uses `damping` (`20`).
    */
   matchCrosshair?: boolean;
   /**

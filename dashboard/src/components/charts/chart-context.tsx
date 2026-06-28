@@ -89,7 +89,7 @@ export interface LineConfig {
 }
 
 /**
- * Hover/selection state — every field here changes on mouse movement.
+ * Hover/selection state - every field here changes on mouse movement.
  * Lives in its own context so cold consumers (Grid, YAxis, PatternArea, …)
  * can subscribe to the stable slice and skip re-rendering on every hover.
  */
@@ -125,7 +125,7 @@ export interface ChartContextValue extends ChartHoverContextValue {
 
   // Scales
   xScale: ScaleTime<number, number>;
-  /** Primary (left) y-scale — alias for `yScales[DEFAULT_Y_AXIS_ID]`. */
+  /** Primary (left) y-scale - alias for `yScales[DEFAULT_Y_AXIS_ID]`. */
   yScale: ScaleLinear<number, number>;
   /** Per-axis y-scales keyed by `yAxisId`. */
   yScales: Record<string, ScaleLinear<number, number>>;
@@ -146,7 +146,7 @@ export interface ChartContextValue extends ChartHoverContextValue {
   // Line configurations (extracted from children)
   lines: LineConfig[];
 
-  /** {@link ReferenceArea} bands — drives y-axis label colors in range. */
+  /** {@link ReferenceArea} bands - drives y-axis label colors in range. */
   referenceAreas: ReferenceAreaConfig[];
 
   // Loading / lifecycle (LineChart status transitions)
@@ -166,7 +166,7 @@ export interface ChartContextValue extends ChartHoverContextValue {
   animationDuration: number;
   /** CSS easing for clip-reveal / line draw (cartesian charts). */
   animationEasing?: string;
-  /** Motion enter transition (spring or tween) — drives clip reveal when spring. */
+  /** Motion enter transition (spring or tween) - drives clip reveal when spring. */
   enterTransition?: Transition;
   /** Increments when enter animation should replay. */
   revealEpoch?: number;
@@ -179,7 +179,7 @@ export interface ChartContextValue extends ChartHoverContextValue {
   // Pre-computed date labels for ticker animation
   dateLabels: string[];
 
-  /** Active brush zoom range — when set, axis ticks align to visible data rows. */
+  /** Active brush zoom range - when set, axis ticks align to visible data rows. */
   xDomain?: [Date, Date];
   /** Full dataset length when brush zoom is enabled (for zoom vs full-range detection). */
   xDomainSlotCount?: number;
@@ -216,7 +216,7 @@ export interface ChartContextValue extends ChartHoverContextValue {
 }
 
 /**
- * Stable slice of the chart context — everything that doesn't change on hover
+ * Stable slice of the chart context - everything that doesn't change on hover
  * (data, scales, dimensions, animation state, layout config). Consumers that
  * subscribe via `useChartStable()` skip re-renders on every mouse move.
  */
@@ -232,7 +232,7 @@ const ChartHoverContext = createContext<ChartHoverContextValue | null>(null);
  * Splits the merged `value` into a stable slice and a volatile hover slice,
  * publishing each to its own context. Each slice is memoized on its own
  * field identities, so changing `tooltipData` does not bust the stable
- * slice — consumers of `useChartStable()` skip re-renders on hover.
+ * slice - consumers of `useChartStable()` skip re-renders on hover.
  */
 export function ChartProvider({
   children,
@@ -331,7 +331,7 @@ export function ChartProvider({
       value.composedStacked,
       value.composedStackOffsets,
       value.composedStackGap,
-    ]
+    ],
   );
 
   const hover = useMemo<ChartHoverContextValue>(
@@ -354,7 +354,7 @@ export function ChartProvider({
       value.setHoveredBarIndex,
       value.hoveredCandleIndex,
       value.setHoveredCandleIndex,
-    ]
+    ],
   );
 
   return (
@@ -367,7 +367,7 @@ export function ChartProvider({
 }
 
 /**
- * Stable slice — data, scales, dimensions, animation state, layout config.
+ * Stable slice - data, scales, dimensions, animation state, layout config.
  * Subscribers skip re-renders on hover (the hover slice lives in a separate
  * context). Prefer this in cold consumers like axes, grid, pattern fills.
  */
@@ -376,7 +376,7 @@ export function useChartStable(): ChartStableContextValue {
   if (!context) {
     throw new Error(
       "useChartStable must be used within a ChartProvider. " +
-        "Make sure your component is wrapped in <LineChart>, <AreaChart>, <BarChart>, or <ComposedChart>."
+        "Make sure your component is wrapped in <LineChart>, <AreaChart>, <BarChart>, or <ComposedChart>.",
     );
   }
   return context;
@@ -384,7 +384,7 @@ export function useChartStable(): ChartStableContextValue {
 
 /** Y-scale for a series axis (`yAxisId` on Line / Area / YAxis). */
 export function useYScale(
-  yAxisId?: string | number
+  yAxisId?: string | number,
 ): ScaleLinear<number, number> {
   const { yScales, yScale } = useChartStable();
   const id =
@@ -393,7 +393,7 @@ export function useYScale(
 }
 
 /**
- * Hover slice — tooltipData, selection, hovered bar / candle indices.
+ * Hover slice - tooltipData, selection, hovered bar / candle indices.
  * Subscribers re-render on every mouse move. Use only when the component
  * actually reads hover state.
  */
@@ -402,7 +402,7 @@ export function useChartHover(): ChartHoverContextValue {
   if (!context) {
     throw new Error(
       "useChartHover must be used within a ChartProvider. " +
-        "Make sure your component is wrapped in <LineChart>, <AreaChart>, <BarChart>, or <ComposedChart>."
+        "Make sure your component is wrapped in <LineChart>, <AreaChart>, <BarChart>, or <ComposedChart>.",
     );
   }
   return context;
@@ -417,7 +417,7 @@ export function useChartHover(): ChartHoverContextValue {
 export function useChart(): ChartContextValue {
   const stable = useChartStable();
   const hover = useChartHover();
-  // Identity changes on every hover (hover is the volatile slice) — that's
+  // Identity changes on every hover (hover is the volatile slice) - that's
   // fine for consumers using this merged hook; they explicitly opted in to
   // re-rendering on hover.
   return { ...stable, ...hover };
