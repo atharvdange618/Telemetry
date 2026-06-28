@@ -3,24 +3,11 @@ import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
 
-const BOT_PATTERNS = [
-  /bot/i, /crawler/i, /spider/i, /scrape/i, /curl/i, /wget/i,
-  /python-requests/i, /python-urllib/i, /go-http-client/i,
-  /java\//i, /php/i, /ruby/i, /perl/i, / headless/i,
-  /phantom/i, /selenium/i, /puppeteer/i, /playwright/i,
-  /ighthouse/i, /pagespeed/i, /webpagetest/i, /monitor/i,
-  /uptime/i, /healthcheck/i, /check/i, /test/i,
-  /feedfetcher/i, /mediapartners/i, /adsbot/i, /googlebot/i,
-  /bingbot/i, /yandexbot/i, /baiduspider/i, /duckduckbot/i,
-  /slurp/i, /ia_archiver/i, /semrushbot/i, /ahrefbot/i,
-  /mj12bot/i, /dotbot/i, /petalbot/i, /bytespider/i,
-  /gptbot/i, /chatgpt-user/i, /ccbot/i, /claudebot/i,
-  /amazonbot/i, /anthropic-ai/i, /cohere-ai/i,
-];
+const BOT_PATTERN = /bot|crawler|spider|scrape|curl|wget|python-requests|python-urllib|go-http-client|java\/|php|ruby|perl| headless|phantom|selenium|puppeteer|playwright|ighthouse|pagespeed|webpagetest|monitor|uptime|healthcheck|check|test|feedfetcher|mediapartners|adsbot|googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|ia_archiver|semrushbot|ahrefbot|mj12bot|dotbot|petalbot|bytespider|gptbot|chatgpt-user|ccbot|claudebot|amazonbot|anthropic-ai|cohere-ai/i;
 
 function isBot(ua: string): boolean {
   if (!ua || ua.length < 10) return true;
-  return BOT_PATTERNS.some((p) => p.test(ua));
+  return BOT_PATTERN.test(ua);
 }
 
 const TRACK_RATE_LIMIT = 30;
