@@ -151,4 +151,5 @@ telemetryapis
 # Project context (AI agent working files)
 .context/
 
-public/test.html
+public/test.html.mimocode/
+design.md
