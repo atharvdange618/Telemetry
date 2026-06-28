@@ -1,4 +1,4 @@
-import { Shield, BarChart3, Globe, Code, Zap, Lock } from "lucide-react";
+import { Shield, BarChart3, Globe, Code, Zap, Lock, Bot } from "lucide-react";
 
 const features = [
   {
@@ -50,6 +50,14 @@ const features = [
     bg: "bg-chart-5/5",
     border: "border-chart-5/10",
     large: true,
+  },
+  {
+    icon: Bot,
+    title: "AI Agent Friendly",
+    description: "Machine-readable integration guide at /docs.md. AI agents can fetch this file to automatically generate correct telemetry implementations.",
+    color: "text-chart-1",
+    bg: "bg-chart-1/5",
+    border: "border-chart-1/10",
   },
 ];
 
