@@ -40,6 +40,8 @@ import { TechSection } from "@/components/dashboard/TechSection";
 import { GoalsSection } from "@/components/dashboard/GoalsSection";
 import { PerformanceSection } from "@/components/dashboard/PerformanceSection";
 import { CampaignsSection } from "@/components/dashboard/CampaignsSection";
+import { FunnelSection } from "@/components/dashboard/FunnelSection";
+import { CohortSection } from "@/components/dashboard/CohortSection";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
@@ -417,6 +419,8 @@ export default function DashboardPage() {
         />
         <PerformanceSection data={perfData} />
         <CampaignsSection data={campaignsData} />
+        <FunnelSection tenantId={selectedTenantId || ""} />
+        <CohortSection queryParams={queryParams} enabled={enabled} />
       </main>
     </div>
   );

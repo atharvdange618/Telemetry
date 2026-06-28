@@ -3,6 +3,9 @@ import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 import { authHook } from "../hooks/auth";
 import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
+
+dayjs.extend(isoWeek);
 import {
   statsQuerySchema,
   funnelBodySchema,
@@ -1082,11 +1085,12 @@ export async function statsRoutes(app: FastifyInstance) {
         }
       }
 
-      const cohorts = new Map<string, Set<string>>();
+      const cohorts = new Map<string, { visitors: Set<string>; weekStart: Date }>();
       for (const [visitorId, firstVisit] of visitorFirstVisit) {
-        const weekKey = dayjs(firstVisit).format("YYYY-[W]ww");
-        if (!cohorts.has(weekKey)) cohorts.set(weekKey, new Set());
-        cohorts.get(weekKey)!.add(visitorId);
+        const weekKey = dayjs(firstVisit).isoWeekYear() + "-W" + String(dayjs(firstVisit).isoWeek()).padStart(2, "0");
+        const weekStart = dayjs(firstVisit).startOf("isoWeek").toDate();
+        if (!cohorts.has(weekKey)) cohorts.set(weekKey, { visitors: new Set(), weekStart });
+        cohorts.get(weekKey)!.visitors.add(visitorId);
       }
 
       const cohortResult = [];
@@ -1094,21 +1098,19 @@ export async function statsRoutes(app: FastifyInstance) {
         a[0].localeCompare(b[0]),
       );
 
-      for (const [cohortWeek, visitorIds] of sortedCohorts.slice(-8)) {
+      for (const [cohortWeek, { visitors: visitorIds, weekStart }] of sortedCohorts.slice(-8)) {
         const cohortData: Record<string, number> = { cohort: visitorIds.size };
 
         for (let w = 0; w <= 7; w++) {
-          const weekStart = dayjs(cohortWeek, "YYYY-[W]ww")
-            .add(w, "week")
-            .toDate();
-          const weekEnd = dayjs(weekStart).add(1, "week").toDate();
+          const wStart = dayjs(weekStart).add(w, "week").toDate();
+          const wEnd = dayjs(wStart).add(1, "week").toDate();
 
-          if (weekEnd > endDate) break;
+          if (wEnd > endDate) break;
 
           const returningVisitors = await prisma.event.findMany({
             where: {
               tenantId,
-              createdAt: { gte: weekStart, lt: weekEnd },
+              createdAt: { gte: wStart, lt: wEnd },
               type: "pageview",
               visitorId: { in: [...visitorIds] },
               ...segments,
