@@ -1,11 +1,11 @@
-import { GradientText } from "./HeroSection";
+import { AccentText } from "./HeroSection";
 
 export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="py-24 px-6 lg:px-8 border-t border-border/50">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 text-balance">
-          <GradientText>One Line</GradientText> of Code
+          <AccentText>One Line</AccentText> of Code
         </h2>
         <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
           Get powerful analytics up and running in under 60 seconds. No complex

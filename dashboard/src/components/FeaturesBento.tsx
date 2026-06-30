@@ -17,6 +17,7 @@ const features = [
     color: "text-chart-2",
     bg: "bg-chart-2/5",
     border: "border-chart-2/10",
+    borderless: true,
   },
   {
     icon: Globe,
@@ -33,6 +34,7 @@ const features = [
     color: "text-chart-3",
     bg: "bg-chart-3/5",
     border: "border-chart-3/10",
+    borderless: true,
   },
   {
     icon: Zap,
@@ -50,6 +52,7 @@ const features = [
     bg: "bg-chart-5/5",
     border: "border-chart-5/10",
     large: true,
+    borderless: true,
   },
   {
     icon: Bot,
@@ -79,9 +82,11 @@ export function FeaturesBento() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className={`group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-border/20 hover:bg-card/80 ${
-                feature.large ? "lg:col-span-2" : ""
-              }`}
+              className={`group relative rounded-2xl p-6 transition-all duration-300 ${
+                feature.borderless
+                  ? "bg-secondary/50 hover:bg-secondary/70"
+                  : "border border-border bg-card hover:border-border/20 hover:bg-card/80"
+              } ${feature.large ? "lg:col-span-2" : ""}`}
             >
               <div className={`inline-flex p-2.5 rounded-xl ${feature.bg} ${feature.border} border mb-4`}>
                 <feature.icon className={`w-5 h-5 ${feature.color}`} />

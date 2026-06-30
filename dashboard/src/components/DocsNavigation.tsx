@@ -53,7 +53,7 @@ export function DocsNavigation() {
 
   return (
     <nav className="sticky top-8">
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-4">
+      <div className="bg-card rounded-lg border border-border p-4">
         {sections.map((section) => (
           <div key={section.title} className="mb-6 last:mb-0">
             <h3 className="font-semibold text-foreground mb-2">

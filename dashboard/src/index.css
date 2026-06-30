@@ -201,16 +201,8 @@
     letter-spacing: -0.03em;
   }
 
-  .text-gradient {
-    background: linear-gradient(
-      135deg,
-      oklch(0.72 0.22 195),
-      oklch(0.74 0.18 55),
-      oklch(0.68 0.2 145)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .text-accent {
+    color: var(--primary);
   }
 
   .animate-fade-in {

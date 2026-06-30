@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Github, ArrowRight } from "lucide-react";
+import { Github } from "lucide-react";
 
 export function FinalCtaSection() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -14,17 +14,32 @@ export function FinalCtaSection() {
           Free, open source, and privacy-first. Set up in under a minute.
         </p>
 
-        <Button
-          size="lg"
-          asChild
-          className="cursor-pointer rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-12 px-8 text-sm font-medium group"
-        >
-          <a href={`${API_URL}/login/github`}>
-            <Github className="h-4 w-4 mr-2" />
-            Get Started Free
-            <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
-          </a>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button
+            size="lg"
+            asChild
+            variant="outline"
+            className="cursor-pointer rounded-full h-12 px-6 text-sm font-medium border-border hover:bg-white/5 transition-all"
+          >
+            <a
+              href="https://github.com/atharvdange618/Telemetry"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Github className="h-4 w-4 mr-2" />
+              View Source
+            </a>
+          </Button>
+          <Button
+            size="lg"
+            asChild
+            className="cursor-pointer rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-12 px-6 text-sm font-medium"
+          >
+            <a href={`${API_URL}/login/github`}>
+              Sign in with GitHub
+            </a>
+          </Button>
+        </div>
       </div>
     </section>
   );

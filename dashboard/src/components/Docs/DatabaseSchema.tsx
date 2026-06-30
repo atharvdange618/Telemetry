@@ -4,7 +4,7 @@ const DatabaseSchema = () => {
   return (
     <section id="database" className="mb-16">
       <h2 className="text-3xl font-bold text-foreground mb-6">Database Schema</h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
           Telemetry uses a PostgreSQL database with a clean, normalized schema
           designed for performance and scalability. The schema is defined using

@@ -6,7 +6,7 @@ const Metrics = () => {
       <h2 className="text-3xl font-bold text-foreground mb-6">
         Key Metrics Explained
       </h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-8">
+      <div className="bg-card rounded-lg border border-border p-8">
         <p className="text-muted-foreground mb-8 text-lg">
           Telemetry focuses on a few essential metrics to give you a clear
           understanding of your website's performance without overwhelming you

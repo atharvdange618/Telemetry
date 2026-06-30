@@ -6,7 +6,7 @@ const TrackingScript = () => {
       <h2 className="text-3xl font-bold text-foreground mb-6">
         Tracking Script
       </h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
           Once you have Telemetry set up, add the tracking script to your
           website. It's a lightweight (~1KB), privacy-focused script that won't

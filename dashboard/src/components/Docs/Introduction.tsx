@@ -2,7 +2,7 @@ const Introduction = () => {
   return (
     <section id="introduction" className="mb-16">
       <h2 className="text-3xl font-bold text-foreground mb-6">Introduction</h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6 mb-6">
+      <div className="bg-card rounded-lg border border-border p-6 mb-6">
         <p className="text-lg text-muted-foreground mb-4">
           Telemetry is a privacy-focused, open-source analytics platform
           designed to provide meaningful insights without compromising user

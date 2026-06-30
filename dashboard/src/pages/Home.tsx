@@ -40,6 +40,12 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <a
+        href="#features"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm"
+      >
+        Skip to content
+      </a>
       <div className="noise" />
       <SEO
         title="Privacy-First Open-Source Web Analytics"

@@ -51,7 +51,7 @@ export function PrivacyManifestoSection() {
             {principles.map((p) => (
               <div
                 key={p.title}
-                className="rounded-2xl border border-border bg-card p-5 transition-all hover:border-border/20"
+                className="rounded-2xl bg-secondary/50 p-5 transition-all hover:bg-secondary/70"
               >
                 <p.icon className="w-5 h-5 text-primary mb-3" />
                 <h3 className="font-heading text-base text-foreground mb-1.5">

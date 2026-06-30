@@ -4,7 +4,7 @@ const Authentication = () => {
   return (
     <section id="authentication" className="mb-16">
       <h2 className="text-3xl font-bold text-foreground mb-6">Authentication</h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
           Telemetry uses GitHub OAuth2 for user authentication. All dashboard
           and statistics API endpoints require a valid session.

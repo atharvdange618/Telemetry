@@ -6,7 +6,7 @@ const TrackingEndpoints = () => {
       <h2 className="text-3xl font-bold text-foreground mb-6">
         Tracking Endpoint
       </h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-6">
+      <div className="bg-card rounded-lg border border-border p-6">
         <div className="flex items-center gap-3 mb-4">
           <span className="bg-green-500/15 text-green-600 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium">
             POST

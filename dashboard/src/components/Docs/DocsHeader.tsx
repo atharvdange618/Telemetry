@@ -2,7 +2,7 @@ import { FileText } from "lucide-react";
 
 export function DocsHeader() {
   return (
-    <div className="bg-card dark:bg-gray-900 border-b border-border">
+    <div className="bg-card border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-3 mb-4">
           <div className="bg-primary/10 p-2 rounded-lg">

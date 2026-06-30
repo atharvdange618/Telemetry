@@ -26,7 +26,7 @@ export function Navigation() {
           "fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           isScrolled
             ? "top-4 w-[calc(100%-2rem)] max-w-3xl glass-strong rounded-full px-4 py-2"
-            : "top-6 w-[calc(100%-3rem)] max-w-5xl px-6 py-3"
+            : "top-6 w-[calc(100%-3rem)] max-w-5xl px-6 py-3",
         )}
       >
         <div className="flex items-center justify-between">
@@ -45,19 +45,19 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-1">
             <a
               href="#features"
-              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/5"
+              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/5"
+              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
             >
               How it Works
             </a>
             <a
               href="#faq"
-              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/5"
+              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary"
             >
               FAQ
             </a>
@@ -82,11 +82,15 @@ export function Navigation() {
             </div>
 
             <button
-              className="md:hidden p-1.5 text-foreground hover:bg-white/5 rounded-lg transition-colors"
+              className="md:hidden p-1.5 text-foreground hover:bg-secondary rounded-lg transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>

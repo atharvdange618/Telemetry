@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border py-12 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-primary/10 flex items-center justify-center">
               <img src="/logo.svg" alt="Telemetry" className="h-5 w-5" />
@@ -14,7 +14,8 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="flex justify-center gap-6">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Product</span>
             <a
               href="https://github.com/atharvdange618/Telemetry"
               target="_blank"
@@ -31,8 +32,14 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="text-center md:text-right text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Telemetry. Built with care for a better web.
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Legal</span>
+            <span className="text-sm text-muted-foreground/50">Privacy Policy</span>
+            <span className="text-sm text-muted-foreground/50">Terms of Service</span>
+          </div>
+
+          <div className="text-sm text-muted-foreground md:text-right">
+            &copy; {new Date().getFullYear()} Telemetry
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ const PrivacyAndSecurity = () => {
       <h2 className="text-3xl font-bold text-foreground mb-6">
         Privacy & Security
       </h2>
-      <div className="bg-card dark:bg-gray-900 rounded-lg border border-border p-8">
+      <div className="bg-card rounded-lg border border-border p-8">
         <p className="text-muted-foreground mb-10 text-lg">
           Privacy and security are fundamental to Telemetry's design. Every
           decision prioritizes user privacy while maintaining analytical value.

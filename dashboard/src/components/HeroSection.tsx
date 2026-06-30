@@ -1,14 +1,14 @@
 import { Github, ArrowRight, Shield, BarChart3, Globe, Code } from "lucide-react";
 import { Button } from "./ui/button";
 
-export const GradientText = ({
+export const AccentText = ({
   children,
   className = "",
 }: {
   children: React.ReactNode;
   className?: string;
 }) => (
-  <span className={`text-gradient ${className}`}>{children}</span>
+  <span className={`text-accent ${className}`}>{children}</span>
 );
 
 export function HeroSection() {
@@ -17,9 +17,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-chart-2/6 rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-chart-3/4 rounded-full blur-[140px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/4 rounded-full blur-[160px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-20">
@@ -32,7 +30,7 @@ export function HeroSection() {
 
             <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl text-foreground mb-6 text-balance leading-[1.05]">
               Analytics with a{" "}
-              <GradientText>Soul</GradientText>
+              <AccentText>Soul</AccentText>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg mb-10 leading-relaxed">
@@ -56,7 +54,7 @@ export function HeroSection() {
                 size="lg"
                 asChild
                 variant="outline"
-                className="cursor-pointer rounded-full h-12 px-6 text-sm font-medium border-border hover:bg-white/5 transition-all"
+                className="cursor-pointer rounded-full h-12 px-6 text-sm font-medium border-border hover:bg-secondary transition-all"
               >
                 <a
                   href="https://github.com/atharvdange618/Telemetry"
@@ -72,7 +70,6 @@ export function HeroSection() {
 
           <div className="animate-slide-in-right hidden lg:block">
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-chart-2/10 to-chart-4/20 rounded-2xl blur-2xl opacity-50" />
               <div className="relative rounded-2xl border border-border bg-card p-1">
                 <div className="rounded-xl bg-background p-6">
                   <div className="flex items-center gap-2 mb-6">
