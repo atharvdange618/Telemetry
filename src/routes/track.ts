@@ -1,8 +1,17 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import { isOriginAllowed } from "../lib/cors-cache";
+
+// Hashing both sides to a fixed-length digest before comparing sidesteps
+// timingSafeEqual's requirement that both buffers be the same length,
+// so a mismatched key length can't be inferred from an early throw either.
+function safeCompare(a: string, b: string): boolean {
+  const bufA = createHash("sha256").update(a).digest();
+  const bufB = createHash("sha256").update(b).digest();
+  return timingSafeEqual(bufA, bufB);
+}
 
 const BOT_PATTERN = /bot|crawler|spider|scrape|curl|wget|python-requests|python-urllib|go-http-client|java\/|php|ruby|perl| headless|phantom|selenium|puppeteer|playwright|ighthouse|pagespeed|webpagetest|monitor|uptime|healthcheck|check|test|feedfetcher|mediapartners|adsbot|googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|ia_archiver|semrushbot|ahrefbot|mj12bot|dotbot|petalbot|bytespider|gptbot|chatgpt-user|ccbot|claudebot|amazonbot|anthropic-ai|cohere-ai/i;
 
@@ -113,7 +122,7 @@ export async function trackRoutes(app: FastifyInstance) {
           return reply.code(404).send({ message: "Tenant not found" });
         }
 
-        if (tenant.apiKey && tenant.apiKey !== providedApiKey) {
+        if (tenant.apiKey && !safeCompare(tenant.apiKey, providedApiKey || "")) {
           return reply.code(403).send({ message: "Invalid API key" });
         }
 
