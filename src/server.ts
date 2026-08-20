@@ -20,7 +20,11 @@ import { refreshOrigins } from "./lib/cors-cache";
 dotenv.config();
 
 const app = Fastify({
-  trustProxy: true,
+  // Exactly one reverse proxy (nginx) sits in front of this process on the
+  // same host. trustProxy: true would trust the entire client-supplied
+  // X-Forwarded-For chain, letting a client spoof request.ip and bypass the
+  // /api/track rate limiter. 1 hop trusts only what nginx itself appended.
+  trustProxy: 1,
   logger: {
     transport: {
       target: "pino-pretty",
