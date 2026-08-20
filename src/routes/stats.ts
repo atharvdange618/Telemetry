@@ -414,20 +414,29 @@ export async function statsRoutes(app: FastifyInstance) {
         ...segments,
       };
 
-      const viewsPerVisitor = await prisma.event.groupBy({
-        by: ["visitorId"],
+      const events = await prisma.event.findMany({
         where: whereClause,
-        _count: { id: true },
-        orderBy: { visitorId: "asc" },
+        select: { visitorId: true, sessionId: true },
       });
 
-      const totalVisitors = viewsPerVisitor.length;
-      const totalPages = viewsPerVisitor.reduce(
-        (sum, v) => sum + v._count.id,
+      // Sessions are grouped by visitorId + sessionId, not by visitorId
+      // alone, so a returning visitor's separate sessions in this window
+      // aren't folded into one inflated "session".
+      const sessionsByVisitor = new Map<string, Set<string>>();
+      for (const e of events) {
+        if (!sessionsByVisitor.has(e.visitorId)) {
+          sessionsByVisitor.set(e.visitorId, new Set());
+        }
+        if (e.sessionId) sessionsByVisitor.get(e.visitorId)!.add(e.sessionId);
+      }
+
+      const totalVisitors = sessionsByVisitor.size;
+      const totalSessions = [...sessionsByVisitor.values()].reduce(
+        (sum, s) => sum + Math.max(s.size, 1),
         0,
       );
       const avgPagesPerSession =
-        totalVisitors > 0 ? totalPages / totalVisitors : 0;
+        totalSessions > 0 ? events.length / totalSessions : 0;
 
       const durationMs = endDate.getTime() - startDate.getTime();
       const prevStart = new Date(startDate.getTime() - durationMs);
@@ -444,8 +453,8 @@ export async function statsRoutes(app: FastifyInstance) {
       });
       const prevVisitorSet = new Set(prevVisitorIds.map((v) => v.visitorId));
 
-      const returning = viewsPerVisitor.filter((v) =>
-        prevVisitorSet.has(v.visitorId),
+      const returning = [...sessionsByVisitor.keys()].filter((visitorId) =>
+        prevVisitorSet.has(visitorId),
       ).length;
       const newVisitors = totalVisitors - returning;
 
