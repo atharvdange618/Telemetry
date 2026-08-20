@@ -6,7 +6,7 @@ import { tenantBodySchema, tenantParamsSchema } from "../lib/schemas";
 import { invalidateOriginCache } from "../lib/cors-cache";
 import { randomBytes } from "crypto";
 
-function generateApiKey(): string {
+export function generateApiKey(): string {
   const prefix = "tlv";
   const version = "1";
   const random = randomBytes(32)

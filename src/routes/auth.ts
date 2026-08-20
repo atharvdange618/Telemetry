@@ -3,6 +3,7 @@ import fastifyOAuth2, { OAuth2Namespace } from "@fastify/oauth2";
 import { githubEmailSchema, githubUserSchema } from "../lib/schemas";
 import { z } from "zod";
 import { prisma } from "../lib/prisma";
+import { generateApiKey } from "./tenants";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -83,7 +84,11 @@ export async function authRoutes(app: FastifyInstance) {
           });
 
           const t = await tx.tenant.create({
-            data: { name: `${displayName}'s Site`, domains: [] },
+            data: {
+              name: `${displayName}'s Site`,
+              domains: [],
+              apiKey: generateApiKey(),
+            },
           });
 
           await tx.tenantUser.create({
