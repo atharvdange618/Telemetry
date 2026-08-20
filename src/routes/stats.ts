@@ -1016,19 +1016,46 @@ export async function statsRoutes(app: FastifyInstance) {
       const { startDate, endDate } = resolveDateRange(body);
       const steps = body.steps;
 
+      // A visitor only counts toward step i if they also completed step i-1
+      // at or before that visit, so conversion reflects the actual sequence
+      // instead of independent per-path visitor counts.
       const funnelSteps: { step: string; visitors: number }[] = [];
+      let allowedVisitors: Set<string> | null = null;
+      let stepTimeByVisitor = new Map<string, Date>();
+
       for (let i = 0; i < steps.length; i++) {
-        const visitors = await prisma.event.findMany({
-          where: {
-            tenantId: body.tenantId,
-            createdAt: { gte: startDate, lte: endDate },
-            type: "pageview",
-            path: steps[i],
-          },
-          select: { visitorId: true },
-          distinct: ["visitorId"],
+        const where: Record<string, any> = {
+          tenantId: body.tenantId,
+          createdAt: { gte: startDate, lte: endDate },
+          type: "pageview",
+          path: steps[i],
+        };
+        if (allowedVisitors) {
+          where.visitorId = { in: [...allowedVisitors] };
+        }
+
+        const events = await prisma.event.findMany({
+          where,
+          select: { visitorId: true, createdAt: true },
+          orderBy: { createdAt: "asc" },
         });
-        funnelSteps.push({ step: steps[i], visitors: visitors.length });
+
+        const firstQualifyingTouch = new Map<string, Date>();
+        for (const e of events) {
+          if (firstQualifyingTouch.has(e.visitorId)) continue;
+          if (i === 0) {
+            firstQualifyingTouch.set(e.visitorId, e.createdAt);
+          } else {
+            const prevTime = stepTimeByVisitor.get(e.visitorId);
+            if (prevTime && e.createdAt >= prevTime) {
+              firstQualifyingTouch.set(e.visitorId, e.createdAt);
+            }
+          }
+        }
+
+        allowedVisitors = new Set(firstQualifyingTouch.keys());
+        stepTimeByVisitor = firstQualifyingTouch;
+        funnelSteps.push({ step: steps[i], visitors: allowedVisitors.size });
       }
 
       const result = funnelSteps.map((s, i) => ({
