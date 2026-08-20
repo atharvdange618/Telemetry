@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash, timingSafeEqual } from "crypto";
 import { isOriginAllowed } from "../lib/cors-cache";
+import { getRotatingSalt } from "../lib/visitor-salt";
 
 // Hashing both sides to a fixed-length digest before comparing sidesteps
 // timingSafeEqual's requirement that both buffers be the same length,
@@ -130,7 +131,7 @@ export async function trackRoutes(app: FastifyInstance) {
         const { country, city } = await getGeoLocation(ip);
 
         const userAgent = request.headers["user-agent"] || "";
-        const salt = process.env.VISITOR_SALT!;
+        const salt = getRotatingSalt(process.env.VISITOR_SALT!);
         const hashSource = `${ip}-${userAgent}-${tenant.id}-${salt}`;
         const visitorId = createHash("sha256").update(hashSource).digest("hex");
 
