@@ -39,8 +39,9 @@ async function getGeoLocation(ip: string): Promise<{ country: string | null; cit
     return { country: null, city: null };
   }
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,city`);
+    const res = await fetch(`https://ipwho.is/${ip}`);
     const data = await res.json();
+    if (!data.success) return { country: null, city: null };
     return { country: data.country || null, city: data.city || null };
   } catch {
     return { country: null, city: null };
