@@ -15,7 +15,7 @@ import fastifyCookie from "@fastify/cookie";
 import { statsRoutes } from "./routes/stats";
 import { tenantRoutes } from "./routes/tenants";
 import { shareLinksRoutes } from "./routes/share-links";
-import { refreshOrigins, isOriginAllowed } from "./lib/cors-cache";
+import { refreshOrigins } from "./lib/cors-cache";
 
 dotenv.config();
 
@@ -32,10 +32,13 @@ app.register(fastifyCookie, {
   secret: process.env.COOKIE_SECRET,
 });
 
+// Default CORS policy: only the dashboard's own origin may send
+// credentialed requests. Tenant-registered domains have no business
+// reading a logged-in user's session. /api/track overrides this
+// per-route below, since it's called from arbitrary customer sites
+// and carries no cookies.
 app.register(cors, {
-  origin: (origin, cb) => {
-    cb(null, isOriginAllowed(origin));
-  },
+  origin: process.env.FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 });

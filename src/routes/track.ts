@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash } from "crypto";
+import { isOriginAllowed } from "../lib/cors-cache";
 
 const BOT_PATTERN = /bot|crawler|spider|scrape|curl|wget|python-requests|python-urllib|go-http-client|java\/|php|ruby|perl| headless|phantom|selenium|puppeteer|playwright|ighthouse|pagespeed|webpagetest|monitor|uptime|healthcheck|check|test|feedfetcher|mediapartners|adsbot|googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|ia_archiver|semrushbot|ahrefbot|mj12bot|dotbot|petalbot|bytespider|gptbot|chatgpt-user|ccbot|claudebot|amazonbot|anthropic-ai|cohere-ai/i;
 
@@ -46,6 +47,23 @@ async function getGeoLocation(ip: string): Promise<{ country: string | null; cit
   }
 }
 
+// Ingestion is called from arbitrary customer sites, so it needs its own
+// origin allowlist (registered tenant domains) instead of the app-wide
+// CORS default that's scoped to the dashboard's own origin. No cookies
+// are involved here, so credentials stay off.
+const trackCorsConfig = {
+  cors: {
+    origin: (
+      origin: string | undefined,
+      cb: (err: Error | null, allow: boolean) => void,
+    ) => {
+      cb(null, isOriginAllowed(origin));
+    },
+    methods: ["POST", "OPTIONS"],
+    credentials: false,
+  },
+};
+
 export async function trackRoutes(app: FastifyInstance) {
   app.addHook("preHandler", async (request, reply) => {
     if (request.url === "/api/track" && request.method === "POST") {
@@ -59,12 +77,28 @@ export async function trackRoutes(app: FastifyInstance) {
     }
   });
 
+  // The CORS plugin's own preflight route is a global wildcard ('OPTIONS *')
+  // registered with the app-wide defaults, so it never sees this route's
+  // override. Registering an explicit OPTIONS handler for this exact path
+  // takes priority over that wildcard and carries the override instead.
+  app.options(
+    "/api/track",
+    { config: trackCorsConfig },
+    async (request, reply) => {
+      if (!request.corsPreflightEnabled) {
+        return reply.callNotFound();
+      }
+      return reply.send();
+    },
+  );
+
   app.post<{ Body: CreateEventInput }>(
     "/api/track",
     {
       schema: {
         body: createEventSchema,
       },
+      config: trackCorsConfig,
     },
     async (request, reply) => {
       const { tenantId, apiKey: providedApiKey, ...eventData } = request.body as CreateEventInput & { apiKey?: string };
