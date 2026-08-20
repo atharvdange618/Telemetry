@@ -223,7 +223,10 @@
 
       var script = document.createElement("script");
       script.src =
-        "https://cdn.jsdelivr.net/npm/web-vitals@3/dist/web-vitals.umd.js";
+        "https://cdn.jsdelivr.net/npm/web-vitals@3.5.2/dist/web-vitals.iife.js";
+      script.integrity =
+        "sha384-r5PlXVuO7waMhUw/+aB9MAKn3NqdeJvARlgEc5EU0flYozU3RBtquI+n1NzKMX8u";
+      script.crossOrigin = "anonymous";
       script.onload = function () {
         var webVitals = window.webVitals;
         if (!webVitals) return;
