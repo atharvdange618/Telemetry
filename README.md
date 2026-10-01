@@ -5,7 +5,7 @@
 [![API Server](https://img.shields.io/badge/API-usetelemetry.hogyoku.cloud-green.svg)](https://usetelemetry.hogyoku.cloud)
 [![Privacy First](https://img.shields.io/badge/Privacy-Cookieless-success.svg)](#privacy--compliance)
 
-Telemetry is a professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, and weighing in at under 1KB, it offers complete visitor insights with just one line of code.
+Telemetry is a professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, with a tracking script around 3KB gzipped, it offers complete visitor insights with just one line of code.
 
 Eliminate intrusive cookie banners, keep your site lightning fast, and retain absolute ownership of your data.
 
@@ -17,20 +17,20 @@ Eliminate intrusive cookie banners, keep your site lightning fast, and retain ab
 
 - **Zero Cookies, Zero Banner Fatigue**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. You don't need a privacy banner to use Telemetry, improving your site's conversion rates.
 - **Privacy-First & Compliant**: Built from the ground up to respect user privacy. We anonymize and aggregate session details immediately on the server. Fully GDPR, CCPA, and PECR compliant.
-- **Ultralight Script (<1KB)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and transmits data efficiently using native browser beaconing.
+- **Small Script (~3KB gzipped)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and transmits data efficiently using native browser beaconing.
 - **Absolute Data Ownership**: Keep your data safe from advertising giants. Self-host it on your own server or run it securely on our managed cloud.
 
 ---
 
 ## Key Features
 
-### Real-Time Dashboard
+### Dashboard
 
-A clean, visual dashboard designed for immediate clarity. See page views, unique visitors, referral traffic, and live engagement metrics.
+A clean, visual dashboard designed for immediate clarity. See page views, unique visitors, referral traffic, and engagement metrics, computed from raw events each time you open it.
 
 ### Core Web Vitals Tracking
 
-Monitor real-time performance indicators (LCP, INP, CLS, TTFB, FCP) directly from your users' actual sessions. Find speed bottlenecks before they impact your search rankings.
+Monitor performance indicators (LCP, INP, CLS, TTFB, FCP) directly from your users' actual sessions. Find speed bottlenecks before they impact your search rankings.
 
 ### Funnels & Conversion Analytics
 

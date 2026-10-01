@@ -306,7 +306,7 @@ export default function DashboardPage() {
         <div className="noise" />
         <SEO
           title={`${tenantName} Overview`}
-          description="View real-time privacy-friendly website analytics."
+          description="View privacy-friendly website analytics."
           noindex={true}
         />
 

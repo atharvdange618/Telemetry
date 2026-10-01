@@ -34,8 +34,7 @@ export function PrivacyManifestoSection() {
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed mb-8">
               We believe the web deserves better. Analytics shouldn&rsquo;t mean surveillance.
-              Telemetry exists to prove that meaningful insights and visitor privacy aren&rsquo;t
-              mutually exclusive.
+              Telemetry exists to prove you can know which pages work without knowing who read them.
             </p>
             <blockquote className="border-l-2 border-primary/40 pl-5 text-muted-foreground italic">
               &ldquo;If you aren&rsquo;t paying for the product, you are the product. Telemetry

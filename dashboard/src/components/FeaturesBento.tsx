@@ -4,7 +4,7 @@ const features = [
   {
     icon: Shield,
     title: "Privacy by Design",
-    description: "No cookies, no fingerprinting, no personal data collection. Your visitors stay anonymous while you still get actionable insights.",
+    description: "No cookies, no fingerprinting, no personal data collection. Your visitors stay anonymous, and you still see top pages and referrers.",
     color: "text-primary",
     bg: "bg-primary/5",
     border: "border-primary/10",
@@ -12,8 +12,8 @@ const features = [
   },
   {
     icon: BarChart3,
-    title: "Real-Time Dashboard",
-    description: "See page views, visitors, and engagement metrics as they happen.",
+    title: "No Batch Delay",
+    description: "Every stat reads raw events when you open the dashboard. A visit from a minute ago is already counted.",
     color: "text-chart-2",
     bg: "bg-chart-2/5",
     border: "border-chart-2/10",
@@ -38,8 +38,8 @@ const features = [
   },
   {
     icon: Zap,
-    title: "Under 1KB",
-    description: "Lightweight script loads asynchronously. Zero impact on page speed or Core Web Vitals.",
+    title: "About 3KB Gzipped",
+    description: "One small script. Events go out through sendBeacon, so sending them never blocks the page.",
     color: "text-accent",
     bg: "bg-accent/5",
     border: "border-accent/10",
@@ -74,7 +74,7 @@ export function FeaturesBento() {
             Built for developers who care about privacy
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl">
-            Everything you need to understand your audience without compromising their trust.
+            Pages, referrers, goals, funnels, and Core Web Vitals, with no personal data stored.
           </p>
         </div>
 

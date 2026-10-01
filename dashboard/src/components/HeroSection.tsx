@@ -34,8 +34,8 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg mb-10 leading-relaxed">
-              Gain meaningful insights while respecting your visitors as people,
-              not just data points. Open source, self-hostable, no cookies.
+              See which pages people read and where they came from, without
+              storing who they are. Open source, self-hostable, no cookies.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -115,7 +115,7 @@ export function HeroSection() {
           {[
             { icon: Globe, text: "No cookies" },
             { icon: Shield, text: "GDPR compliant" },
-            { icon: BarChart3, text: "Real-time insights" },
+            { icon: BarChart3, text: "Web Vitals included" },
             { icon: Code, text: "Open source" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-2">

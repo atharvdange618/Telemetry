@@ -11,9 +11,8 @@ export function DocsHeader() {
           <h1 className="text-3xl font-bold text-foreground">Documentation</h1>
         </div>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Everything you need to get started with Telemetry, a privacy-first
-          analytics platform that respects your visitors and gives you
-          meaningful insights.
+          How to install Telemetry, read its dashboard, and query its API.
+          Telemetry counts visits without cookies or personal data.
         </p>
       </div>
     </div>

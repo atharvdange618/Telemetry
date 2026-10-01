@@ -172,8 +172,8 @@ const Architecture = () => {
               Performance Optimized
             </h5>
             <p className="text-muted-foreground text-sm">
-              The tracking script is sub-1KB, and the API and database queries
-              are designed for high throughput and low latency.
+              The tracking script is about 3KB gzipped and sends events with
+              sendBeacon. Event queries hit composite indexes on tenant and time.
             </p>
           </div>
         </div>

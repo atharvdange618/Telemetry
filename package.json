@@ -1,7 +1,7 @@
 {
   "name": "telemetry",
   "version": "1.0.0",
-  "description": "A professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, and weighing in at under 1KB.",
+  "description": "A professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, with a tracking script around 3KB gzipped.",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

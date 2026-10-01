@@ -9,8 +9,8 @@ const TrackingScript = () => {
       <div className="bg-card rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
           Once you have Telemetry set up, add the tracking script to your
-          website. It's a lightweight (~1KB), privacy-focused script that won't
-          slow down your site.
+          website. It's a small (about 3KB gzipped), privacy-focused script that sends
+          events with sendBeacon, so it won't block page loads.
         </p>
 
         <h3 className="text-xl font-semibold text-foreground mb-3">

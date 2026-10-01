@@ -22,8 +22,8 @@ const DashboardOverview = () => {
       <div className="bg-card rounded-lg border border-border p-8">
         <p className="text-muted-foreground mb-8 text-lg">
           The Telemetry dashboard provides a clean, intuitive interface for
-          viewing your website analytics. All data is presented in an
-          easy-to-understand format focused on actionable insights.
+          viewing your website analytics. Each section answers one
+          question, such as where visitors came from or how fast pages loaded.
         </p>
 
         <h3 className="text-xl font-semibold text-foreground mb-6">

@@ -5,8 +5,8 @@ const Introduction = () => {
       <div className="bg-card rounded-lg border border-border p-6 mb-6">
         <p className="text-lg text-muted-foreground mb-4">
           Telemetry is a privacy-focused, open-source analytics platform
-          designed to provide meaningful insights without compromising user
-          privacy. Built for creators, developers, and anyone who believes in a
+          that shows which pages people read and where they came from, without
+          storing who they are. Built for creators, developers, and anyone who believes in a
           more transparent and honest web.
         </p>
         <div className="grid md:grid-cols-2 gap-6 mt-6">
@@ -16,7 +16,7 @@ const Introduction = () => {
               <li>• Privacy-first, cookieless tracking</li>
               <li>• Self-hosted data ownership</li>
               <li>• Clean, intuitive dashboard</li>
-              <li>• Real-time analytics</li>
+              <li>• Stats read raw events, no batch delay</li>
             </ul>
           </div>
           <div>

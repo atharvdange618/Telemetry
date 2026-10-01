@@ -8,8 +8,8 @@ export function HowItWorksSection() {
           <AccentText>One Line</AccentText> of Code
         </h2>
         <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-          Get powerful analytics up and running in under 60 seconds. No complex
-          setup, no cookies, no tracking.
+          Add one script tag and events start arriving in under 60 seconds. No
+          build step, no cookies.
         </p>
 
         <div className="rounded-2xl border border-border bg-card overflow-hidden">

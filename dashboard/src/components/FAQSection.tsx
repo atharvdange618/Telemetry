@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "How do I install it?",
     answer:
-      "Add our lightweight tracking script to your website. The script is less than 1KB and won't slow down your site. We provide installation guides for popular platforms and frameworks.",
+      "Add one script tag to your site. It's about 3KB gzipped and sends events with sendBeacon, so it won't block page loads. We provide installation guides for popular platforms and frameworks.",
   },
   {
     question: "What about bot traffic?",
@@ -49,7 +49,7 @@ export function FAQSection() {
           Frequently Asked Questions
         </h2>
         <p className="text-muted-foreground text-lg mb-12 text-center">
-          Everything you need to know about privacy-first analytics
+          How it compares to Google Analytics, what it counts, and how to install it
         </p>
 
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
