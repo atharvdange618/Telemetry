@@ -46,7 +46,7 @@ The core of the data collection is a lightweight JavaScript snippet that website
      - Hostname, path, and referrer
      - Screen dimensions
      - UTM parameters from the URL
-  5. It uses `navigator.sendBeacon()` to send this data to the backend API (`/api/track`) reliably, without impacting the subsequent page's load time.
+  5. It uses `fetch` with `keepalive: true` and `credentials: "omit"` to send this data to the backend API (`/api/track`), so the request survives page unloads without sending cookies or delaying the next page.
   6. A global `window.telemetry.goal(goalName)` function is exposed, allowing website owners to track custom conversion events (e.g., newsletter sign-ups, button clicks).
 
 ### Authentication

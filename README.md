@@ -17,7 +17,7 @@ Eliminate intrusive cookie banners, keep your site lightning fast, and retain ab
 
 - **Zero Cookies, Zero Banner Fatigue**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. You don't need a privacy banner to use Telemetry, improving your site's conversion rates.
 - **Privacy-First & Compliant**: Built from the ground up to respect user privacy. We anonymize and aggregate session details immediately on the server. Fully GDPR, CCPA, and PECR compliant.
-- **Small Script (~3KB gzipped)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and transmits data efficiently using native browser beaconing.
+- **Small Script (~3KB gzipped)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and sends events as cookieless keepalive requests that survive page unloads.
 - **Absolute Data Ownership**: Keep your data safe from advertising giants. Self-host it on your own server or run it securely on our managed cloud.
 
 ---

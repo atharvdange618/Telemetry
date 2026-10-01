@@ -25,7 +25,7 @@ const features = [
   {
     icon: Zap,
     title: "About 3KB Gzipped",
-    description: "One small script. Events go out through sendBeacon, so sending them never blocks the page.",
+    description: "One small script. Events go out as keepalive requests with no cookies, so sending them never blocks the page.",
   },
   {
     icon: Lock,

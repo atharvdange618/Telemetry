@@ -173,7 +173,8 @@ const Architecture = () => {
             </h5>
             <p className="text-muted-foreground text-sm">
               The tracking script is about 3KB gzipped and sends events with
-              sendBeacon. Event queries hit composite indexes on tenant and time.
+              keepalive fetch requests. Event queries hit composite indexes on
+              tenant and time.
             </p>
           </div>
         </div>

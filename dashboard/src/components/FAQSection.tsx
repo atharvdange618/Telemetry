@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "How do I install it?",
     answer:
-      "Add one script tag to your site. It's about 3KB gzipped and sends events with sendBeacon, so it won't block page loads. We provide installation guides for popular platforms and frameworks.",
+      "Add one script tag to your site. It's about 3KB gzipped and sends events in the background without cookies, so it won't block page loads. We provide installation guides for popular platforms and frameworks.",
   },
   {
     question: "What about bot traffic?",

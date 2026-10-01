@@ -10,7 +10,7 @@ const TrackingScript = () => {
         <p className="text-muted-foreground mb-6">
           Once you have Telemetry set up, add the tracking script to your
           website. It's a small (about 3KB gzipped), privacy-focused script that sends
-          events with sendBeacon, so it won't block page loads.
+          events in the background without cookies, so it won't block page loads.
         </p>
 
         <h3 className="text-xl font-semibold text-foreground mb-3">
@@ -120,10 +120,9 @@ signupButton.addEventListener('click', () => {
               Performance-First
             </h5>
             <p className="text-muted-foreground text-sm">
-              The script is asynchronous and uses{" "}
-              <code>navigator.sendBeacon</code> to send data, which doesn't
-              block page rendering or unloading. This ensures no performance
-              impact on your site.
+              The script is asynchronous and sends data with{" "}
+              <code>fetch</code> and <code>keepalive</code>, which doesn't
+              block page rendering or unloading and never sends cookies.
             </p>
           </div>
           <div className="bg-muted border border-border rounded-lg p-4">

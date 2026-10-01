@@ -101,11 +101,18 @@
   var language = navigator.language || navigator.userLanguage || "";
 
   // --- Core Send ---
+  // fetch, not sendBeacon: a beacon always sends cookies, which makes its
+  // CORS preflight a credentialed one that /api/track refuses by design.
+  // credentials "omit" keeps the tracker cookieless, and keepalive lets the
+  // request finish after the page unloads, the way a beacon would.
   function sendEvent(payload) {
-    var blob = new Blob([JSON.stringify(payload)], {
-      type: "application/json",
-    });
-    navigator.sendBeacon(endpoint, blob);
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      credentials: "omit",
+      keepalive: true,
+    }).catch(function () {});
   }
 
   // --- Pageview ---
