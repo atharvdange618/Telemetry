@@ -10,9 +10,13 @@ import {
   Navigate,
   Outlet,
   RouterProvider,
+  useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
-import DashboardPage from "./pages/DashboardPage";
+import { AppLayout } from "./components/layout/AppLayout";
+import { StatsLayout } from "./components/layout/StatsLayout";
+import { DashboardIndexRedirect } from "./components/layout/DashboardIndexRedirect";
+import OverviewPage from "./pages/dashboard/OverviewPage";
 import SharedDashboardPage from "./pages/SharedDashboardPage";
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
@@ -63,6 +67,12 @@ const ProtectedRoute: React.FC = () => {
   return <Outlet />;
 };
 
+// /dashboard/:siteId on its own opens Overview, keeping range and filters.
+const ToOverview: React.FC = () => {
+  const { search } = useLocation();
+  return <Navigate to={{ pathname: "overview", search }} replace />;
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -75,13 +85,20 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      { path: "/dashboard", element: <DashboardIndexRedirect /> },
       {
-        path: "/dashboard",
-        element: <DashboardPage />,
-      },
-      {
-        path: "/settings",
-        element: <SettingsPage />,
+        element: <AppLayout />,
+        children: [
+          {
+            path: "/dashboard/:siteId",
+            element: <StatsLayout />,
+            children: [
+              { index: true, element: <ToOverview /> },
+              { path: "overview", element: <OverviewPage /> },
+            ],
+          },
+          { path: "/settings", element: <SettingsPage /> },
+        ],
       },
     ],
   },
