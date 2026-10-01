@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import { buildApp } from "./app";
+import { startIngestionAlerts } from "./lib/ingestion-alert";
 
 dotenv.config();
 
@@ -16,4 +17,5 @@ app.listen({ port, host: "0.0.0.0" }, (err) => {
     app.log.error(err);
     process.exit(1);
   }
+  startIngestionAlerts(app.log);
 });
