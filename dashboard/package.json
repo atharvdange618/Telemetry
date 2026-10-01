@@ -42,6 +42,7 @@
     "d3-shape": "^3.2.0",
     "lucide-react": "^0.536.0",
     "motion": "^12.42.0",
+    "radix-ui": "^1.6.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.62.0",
