@@ -3,7 +3,6 @@ import { ZodError } from "zod";
 import { authHook } from "../hooks/auth";
 import { prisma } from "../lib/prisma";
 import { tenantBodySchema, tenantParamsSchema } from "../lib/schemas";
-import { invalidateOriginCache } from "../lib/cors-cache";
 import { randomBytes } from "crypto";
 
 export function generateApiKey(): string {
@@ -54,7 +53,6 @@ export async function tenantRoutes(app: FastifyInstance) {
         return t;
       });
 
-      invalidateOriginCache();
       return reply.code(201).send({ tenant });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -84,7 +82,6 @@ export async function tenantRoutes(app: FastifyInstance) {
         data: { name, ...(domains !== undefined && { domains }) },
       });
 
-      invalidateOriginCache();
       return { tenant: updatedTenant };
     } catch (error) {
       if (error instanceof ZodError) {
@@ -110,7 +107,6 @@ export async function tenantRoutes(app: FastifyInstance) {
 
       await prisma.tenant.delete({ where: { id: tenantId } });
 
-      invalidateOriginCache();
       return reply.code(204).send();
     } catch (error) {
       if (error instanceof ZodError) {

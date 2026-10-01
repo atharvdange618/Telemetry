@@ -105,6 +105,7 @@
   // CORS preflight a credentialed one that /api/track refuses by design.
   // credentials "omit" keeps the tracker cookieless, and keepalive lets the
   // request finish after the page unloads, the way a beacon would.
+  var warned = false;
   function sendEvent(payload) {
     fetch(endpoint, {
       method: "POST",
@@ -112,7 +113,18 @@
       body: JSON.stringify(payload),
       credentials: "omit",
       keepalive: true,
-    }).catch(function () {});
+    })
+      .then(function (res) {
+        // Say once why events are rejected (wrong domain, bad API key)
+        // instead of failing silently on every event.
+        if (res.status === 403 && !warned) {
+          warned = true;
+          return res.json().then(function (body) {
+            console.warn("Telemetry: " + body.message);
+          });
+        }
+      })
+      .catch(function () {});
   }
 
   // --- Pageview ---

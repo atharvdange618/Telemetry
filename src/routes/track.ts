@@ -2,7 +2,6 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash, timingSafeEqual } from "crypto";
-import { isOriginAllowed } from "../lib/cors-cache";
 import { getRotatingSalt } from "../lib/visitor-salt";
 
 // Hashing both sides to a fixed-length digest before comparing sidesteps
@@ -58,18 +57,28 @@ async function getGeoLocation(ip: string): Promise<{ country: string | null; cit
   }
 }
 
-// Ingestion is called from arbitrary customer sites, so it needs its own
-// origin allowlist (registered tenant domains) instead of the app-wide
-// CORS default that's scoped to the dashboard's own origin. No cookies
-// are involved here, so credentials stay off.
+// Domains are stored as the user entered them, so compare origins: a stored
+// "https://site.com/" or full page URL still matches the browser's Origin.
+export function isOriginAllowedForTenant(
+  origin: string,
+  domains: string[],
+): boolean {
+  return domains.some((domain) => {
+    try {
+      return new URL(domain).origin === origin;
+    } catch {
+      return false;
+    }
+  });
+}
+
+// Any origin passes CORS here: the route reads no cookies and returns nothing
+// private, so letting a page read the response leaks nothing. Which domains
+// may send events for a tenant is checked per tenant in the handler, where
+// the reason can be reported back. Credentials stay off.
 const trackCorsConfig = {
   cors: {
-    origin: (
-      origin: string | undefined,
-      cb: (err: Error | null, allow: boolean) => void,
-    ) => {
-      cb(null, isOriginAllowed(origin));
-    },
+    origin: true,
     methods: ["POST", "OPTIONS"],
     credentials: false,
   },
@@ -125,6 +134,15 @@ export async function trackRoutes(app: FastifyInstance) {
 
         if (tenant.apiKey && !safeCompare(tenant.apiKey, providedApiKey || "")) {
           return reply.code(403).send({ message: "Invalid API key" });
+        }
+
+        // Browsers always send Origin on these cross-origin POSTs. Requests
+        // without one come from servers, which the API key authenticates.
+        const origin = request.headers.origin;
+        if (origin && !isOriginAllowedForTenant(origin, tenant.domains)) {
+          return reply.code(403).send({
+            message: `${origin} isn't an allowed domain for this site. Add it in Telemetry settings.`,
+          });
         }
 
         const ip = request.ip;
