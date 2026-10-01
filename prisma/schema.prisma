@@ -108,7 +108,7 @@ model Event {
   // Custom Event Properties
   properties Json? // arbitrary key-value pairs
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, createdAt])
   @@index([tenantId, visitorId])
