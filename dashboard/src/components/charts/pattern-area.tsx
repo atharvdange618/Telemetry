@@ -4,8 +4,8 @@ import { curveMonotoneX } from "@visx/curve";
 import { AreaClosed } from "@visx/shape";
 import { useChartStable } from "./chart-context";
 
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3's CurveFactory, taken from a visx curve so no extra @types package is needed.
+type CurveFactory = typeof curveMonotoneX;
 
 export interface PatternAreaProps {
   /** Key in data to use for y values */

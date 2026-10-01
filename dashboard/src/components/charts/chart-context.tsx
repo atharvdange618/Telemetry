@@ -2,10 +2,10 @@
 
 import type { scaleBand, scaleLinear, scaleTime } from "@visx/scale";
 
-type ScaleLinear<Output, _Input = number> = ReturnType<
+type ScaleLinear<Output> = ReturnType<
   typeof scaleLinear<Output>
 >;
-type ScaleTime<Output, _Input = Date | number> = ReturnType<
+type ScaleTime<Output> = ReturnType<
   typeof scaleTime<Output>
 >;
 type ScaleBand<Domain extends { toString(): string }> = ReturnType<
@@ -124,11 +124,11 @@ export interface ChartContextValue extends ChartHoverContextValue {
   renderData: Record<string, unknown>[];
 
   // Scales
-  xScale: ScaleTime<number, number>;
+  xScale: ScaleTime<number>;
   /** Primary (left) y-scale - alias for `yScales[DEFAULT_Y_AXIS_ID]`. */
-  yScale: ScaleLinear<number, number>;
+  yScale: ScaleLinear<number>;
   /** Per-axis y-scales keyed by `yAxisId`. */
-  yScales: Record<string, ScaleLinear<number, number>>;
+  yScales: Record<string, ScaleLinear<number>>;
 
   // Dimensions
   width: number;
@@ -385,7 +385,7 @@ export function useChartStable(): ChartStableContextValue {
 /** Y-scale for a series axis (`yAxisId` on Line / Area / YAxis). */
 export function useYScale(
   yAxisId?: string | number,
-): ScaleLinear<number, number> {
+): ScaleLinear<number> {
   const { yScales, yScale } = useChartStable();
   const id =
     yAxisId == null || yAxisId === "" ? DEFAULT_Y_AXIS_ID : String(yAxisId);

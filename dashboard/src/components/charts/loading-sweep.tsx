@@ -1,5 +1,6 @@
 "use client";
 
+import type { curveLinear } from "@visx/curve";
 import { scaleLinear } from "@visx/scale";
 import { AreaClosed, LinePath } from "@visx/shape";
 import { motion, useReducedMotion } from "motion/react";
@@ -27,9 +28,8 @@ import {
  * `<BarChart status="loading">`.
  */
 
-// CurveFactory type - simplified version compatible with visx
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3's CurveFactory, taken from a visx curve so no extra @types package is needed.
+type CurveFactory = typeof curveLinear;
 
 /** One shimmer sweep, in seconds. */
 const DEFAULT_SWEEP_DURATION_S = 2;

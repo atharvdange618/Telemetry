@@ -20,4 +20,11 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    // Vendored chart library and shadcn primitives export hooks and variant
+    // helpers next to their components by design. Splitting them would fork
+    // upstream for a dev-only cost: these files full-reload instead of HMR.
+    files: ['src/components/charts/**', 'src/components/ui/**'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ])

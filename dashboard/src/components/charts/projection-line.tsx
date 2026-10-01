@@ -10,8 +10,8 @@ import {
   type ProjectionPoint,
 } from "./projection-utils";
 
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3's CurveFactory, taken from a visx curve so no extra @types package is needed.
+type CurveFactory = typeof curveLinear;
 
 export type ProjectionStrokeStyle = "solid" | "gradient";
 

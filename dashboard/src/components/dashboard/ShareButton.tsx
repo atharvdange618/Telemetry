@@ -13,7 +13,7 @@ import { Share2, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { ShareLink } from "@/lib/types/dashboard.types";
+import type { ShareLink, ShareLinkConfig } from "@/lib/types/dashboard.types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,7 +41,7 @@ export function ShareButton({ tenantId, searchParams }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const createMutation = useMutation({
-    mutationFn: (data: { tenantId: string; label?: string; config: any }) =>
+    mutationFn: (data: { tenantId: string; label?: string; config: ShareLinkConfig }) =>
       fetchAPI(`${API_URL}/api/share-links`, {
         method: "POST",
         body: JSON.stringify(data),
@@ -79,7 +79,7 @@ export function ShareButton({ tenantId, searchParams }: ShareButtonProps) {
   };
 
   const handleCreate = () => {
-    const config: Record<string, any> = {};
+    const config: ShareLinkConfig = {};
     config.period = period;
 
     const segments: Record<string, string> = {};

@@ -3,9 +3,8 @@
 import { curveNatural } from "@visx/curve";
 import { LinePath } from "@visx/shape";
 
-// CurveFactory type - simplified version compatible with visx
-// biome-ignore lint/suspicious/noExplicitAny: d3 curve factory type
-type CurveFactory = any;
+// d3's CurveFactory, taken from a visx curve so no extra @types package is needed.
+type CurveFactory = typeof curveNatural;
 
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { chartCssVars, useChartStable, useYScale } from "./chart-context";
