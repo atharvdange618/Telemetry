@@ -43,10 +43,11 @@ export function calcPercentile(values: number[], p: number): number {
 }
 
 export function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${Math.round(seconds)}s`;
-  if (seconds < 3600)
-    return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
-  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+  // Round first, so 59.6s becomes "1m 0s" instead of "60s".
+  const total = Math.round(seconds);
+  if (total < 60) return `${total}s`;
+  if (total < 3600) return `${Math.floor(total / 60)}m ${total % 60}s`;
+  return `${Math.floor(total / 3600)}h ${Math.floor((total % 3600) / 60)}m`;
 }
 
 export async function getSummary({
@@ -243,6 +244,8 @@ export async function getLocations({
     where: {
       tenantId,
       createdAt: { gte: startDate, lte: endDate },
+      // Every event type stores location; count each visit once.
+      type: "pageview",
       country: { not: null },
       ...segments,
     },
@@ -270,6 +273,7 @@ export async function getCities({
     where: {
       tenantId,
       createdAt: { gte: startDate, lte: endDate },
+      type: "pageview",
       city: { not: null },
       ...segments,
     },
