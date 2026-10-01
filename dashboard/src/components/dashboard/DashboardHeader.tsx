@@ -16,6 +16,7 @@ import {
   Download,
   Filter,
 } from "lucide-react";
+import { useIsFetching } from "@tanstack/react-query";
 import type { TenantsResponse } from "@/lib/types/dashboard.types";
 import { ShareButton } from "./ShareButton";
 import { ShareLinksDialog } from "./ShareLinksDialog";
@@ -58,6 +59,9 @@ export function DashboardHeader({
   onNavigate,
   onLogout,
 }: DashboardHeaderProps) {
+  // Old data stays on screen while a new period or filter loads, so say so.
+  const isUpdating = useIsFetching({ queryKey: ["stats"] }) > 0;
+
   return (
     <header className="mb-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -71,7 +75,9 @@ export function DashboardHeader({
                 ? "Loading..."
                 : selectedTenant?.name || "Dashboard"}
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Analytics overview</p>
+            <p className="text-sm text-muted-foreground mt-0.5" aria-live="polite">
+              {isUpdating ? "Updating…" : "Analytics overview"}
+            </p>
           </div>
         </div>
 
@@ -113,7 +119,7 @@ export function DashboardHeader({
               <button
                 key={p}
                 onClick={() => onSetPeriod(p)}
-                className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 ${
+                className={`h-7 px-3 text-xs font-medium rounded-full transition-all duration-200 ${
                   period === p && !customRange
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -138,6 +144,8 @@ export function DashboardHeader({
             size="sm"
             onClick={onToggleFilters}
             className="gap-1 h-8"
+            aria-label="Filters"
+            title="Filters"
           >
             <Filter className="h-3.5 w-3.5" />
             {hasActiveFilters && (
@@ -150,6 +158,7 @@ export function DashboardHeader({
               <ShareButton
                 tenantId={selectedTenant.id}
                 searchParams={searchParams}
+                currentPeriod={period}
               />
               <ShareLinksDialog tenantId={selectedTenant.id} />
             </>
@@ -157,7 +166,13 @@ export function DashboardHeader({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                aria-label="Export data"
+                title="Export data"
+              >
                 <Download className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
@@ -175,12 +190,14 @@ export function DashboardHeader({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-primary/30 transition-all duration-200">
-                <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <button aria-label="Account menu" className="rounded-full">
+                <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent hover:ring-primary/30 transition-all duration-200">
+                  <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                  <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>

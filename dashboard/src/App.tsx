@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   QueryClient,
   QueryClientProvider,
   useQuery,
@@ -19,8 +20,13 @@ import Home from "./pages/Home";
 import { useDarkMode } from "./hooks/useDarkMode";
 
 import { TooltipProvider } from "./components/ui/tooltip";
+import { Toaster } from "./components/ui/sonner";
 
-const queryClient = new QueryClient();
+// Keep the last result on screen while a new period or filter loads, so
+// sections don't unmount and the page doesn't jump on every change.
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { placeholderData: keepPreviousData } },
+});
 
 function DarkModeInit() {
   useDarkMode();
@@ -94,6 +100,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <DarkModeInit />
+        <Toaster />
         <RouterProvider router={router} />
       </TooltipProvider>
     </QueryClientProvider>

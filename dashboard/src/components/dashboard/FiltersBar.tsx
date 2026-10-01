@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { toDateInputValue } from "@/lib/utils";
 import type {
   BrowsersResponse,
   OsResponse,
@@ -47,6 +48,8 @@ export function FiltersBar({
   onSetSegment,
   onClearSegments,
 }: FiltersBarProps) {
+  const today = toDateInputValue(new Date());
+
   return (
     <>
       {customRange && (
@@ -55,6 +58,7 @@ export function FiltersBar({
           <input
             type="date"
             value={startDate}
+            max={endDate || today}
             onChange={(e) => onSetStartDate(e.target.value)}
             className="px-3 py-1 text-sm rounded-lg border border-border bg-background"
           />
@@ -62,6 +66,8 @@ export function FiltersBar({
           <input
             type="date"
             value={endDate}
+            min={startDate}
+            max={today}
             onChange={(e) => onSetEndDate(e.target.value)}
             className="px-3 py-1 text-sm rounded-lg border border-border bg-background"
           />

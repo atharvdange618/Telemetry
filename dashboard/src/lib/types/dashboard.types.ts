@@ -5,6 +5,13 @@ export interface Tenant {
   domains: string[];
 }
 
+// The dashboard's date range: a preset period, or explicit ISO start/end.
+export interface DateRange {
+  period?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export interface TenantsResponse {
   tenants: Tenant[];
 }

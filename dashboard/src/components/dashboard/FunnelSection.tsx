@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus, Trash2, Filter, AlertTriangle } from "lucide-react";
-import type { FunnelResponse } from "@/lib/types/dashboard.types";
+import type { DateRange, FunnelResponse } from "@/lib/types/dashboard.types";
 import { InfoTooltip } from "./InfoTooltip";
 import { FunnelChart, type FunnelStage } from "@/components/charts/funnel-chart";
+import { normalizePath } from "@/lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,20 +23,25 @@ const fetchAPI = async <T,>(url: string, options?: RequestInit): Promise<T> => {
 
 interface FunnelSectionProps {
   tenantId: string;
+  range: DateRange;
 }
 
-export function FunnelSection({ tenantId }: FunnelSectionProps) {
+export function FunnelSection({ tenantId, range }: FunnelSectionProps) {
   const [steps, setSteps] = useState<string[]>(["/", "/pricing"]);
-  const [result, setResult] = useState<FunnelResponse | null>(null);
+  // Keying the query on the submitted steps plus the dashboard range means the
+  // funnel re-runs when the period changes, like every other stat on the page.
+  const [submittedSteps, setSubmittedSteps] = useState<string[] | null>(null);
 
-  const funnelMutation = useMutation({
-    mutationFn: (data: { tenantId: string; steps: string[]; period: string }) =>
+  const funnelQuery = useQuery({
+    queryKey: ["funnel", tenantId, range, submittedSteps],
+    queryFn: () =>
       fetchAPI<FunnelResponse>(`${API_URL}/api/stats/funnels`, {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({ tenantId, steps: submittedSteps, ...range }),
       }),
-    onSuccess: (data) => setResult(data),
+    enabled: !!tenantId && !!submittedSteps,
   });
+  const result = funnelQuery.data;
 
   const addStep = () => setSteps([...steps, ""]);
   const removeStep = (index: number) => {
@@ -49,9 +55,15 @@ export function FunnelSection({ tenantId }: FunnelSectionProps) {
   };
 
   const handleAnalyze = () => {
-    const validSteps = steps.filter((s) => s.trim());
+    const validSteps = steps.filter((s) => s.trim()).map(normalizePath);
     if (validSteps.length < 2 || !tenantId) return;
-    funnelMutation.mutate({ tenantId, steps: validSteps, period: "30d" });
+    // Show the normalized paths, so "pricing" visibly becomes "/pricing".
+    setSteps(validSteps);
+    if (JSON.stringify(validSteps) === JSON.stringify(submittedSteps)) {
+      funnelQuery.refetch();
+    } else {
+      setSubmittedSteps(validSteps);
+    }
   };
 
   const funnelData: FunnelStage[] =
@@ -106,11 +118,17 @@ export function FunnelSection({ tenantId }: FunnelSectionProps) {
           </Button>
           <Button
             onClick={handleAnalyze}
-            disabled={funnelMutation.isPending || steps.filter((s) => s.trim()).length < 2 || !tenantId}
+            disabled={funnelQuery.isFetching || steps.filter((s) => s.trim()).length < 2 || !tenantId}
           >
-            {funnelMutation.isPending ? "Analyzing..." : "Analyze Funnel"}
+            {funnelQuery.isFetching ? "Analyzing..." : "Analyze Funnel"}
           </Button>
         </div>
+
+        {funnelQuery.isError && (
+          <p className="text-sm text-destructive">
+            Couldn't run the funnel. Check your connection and try again.
+          </p>
+        )}
 
         {hasNoData && (
           <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 text-sm flex gap-3 items-start mt-4">

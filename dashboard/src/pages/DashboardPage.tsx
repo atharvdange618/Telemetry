@@ -6,6 +6,7 @@ import type {
   CampaignsResponse,
   CitiesResponse,
   CompareResponse,
+  DateRange,
   DevicesResponse,
   EngagementResponse,
   GoalsResponse,
@@ -25,7 +26,15 @@ import type {
   ViewsOverTimeResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Users, TrendingUp, BarChart3, Timer, Scroll } from "lucide-react";
+import {
+  AlertTriangle,
+  Eye,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Timer,
+  Scroll,
+} from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -43,6 +52,8 @@ import { CampaignsSection } from "@/components/dashboard/CampaignsSection";
 import { FunnelSection } from "@/components/dashboard/FunnelSection";
 import { CohortSection } from "@/components/dashboard/CohortSection";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { toDateInputValue } from "@/lib/utils";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
@@ -119,22 +130,34 @@ export default function DashboardPage() {
   );
 
   const endpoint = `${APP_URL}/api/stats`;
-  const queryParams = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set("tenantId", selectedTenantId || "");
-    if (customRange && startDate && endDate) {
-      params.set("startDate", new Date(startDate).toISOString());
-      params.set("endDate", new Date(endDate + "T23:59:59").toISOString());
-    } else {
-      params.set("period", period);
+  const range = useMemo<DateRange>(
+    () =>
+      customRange && startDate && endDate
+        ? {
+            startDate: new Date(startDate).toISOString(),
+            endDate: new Date(endDate + "T23:59:59").toISOString(),
+          }
+        : { period },
+    [period, startDate, endDate, customRange],
+  );
+  // Tenant and range without segments. The filter dropdowns read their options
+  // from this, so picking one browser doesn't hide every other browser.
+  const baseParams = useMemo(() => {
+    const params = new URLSearchParams({ tenantId: selectedTenantId || "" });
+    for (const [key, value] of Object.entries(range)) {
+      if (value) params.set(key, value);
     }
+    return params.toString();
+  }, [selectedTenantId, range]);
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams(baseParams);
     if (segments.browser) params.set("browser", segments.browser);
     if (segments.os) params.set("os", segments.os);
     if (segments.country) params.set("country", segments.country);
     if (segments.language) params.set("language", segments.language);
     if (segments.device) params.set("device", segments.device);
     return params.toString();
-  }, [selectedTenantId, period, startDate, endDate, customRange, segments]);
+  }, [baseParams, segments]);
 
   const queryKey = [
     "stats",
@@ -239,6 +262,43 @@ export default function DashboardPage() {
     enabled,
   });
 
+  // Filter dropdown options. These use the main query keys with empty
+  // segments, so with no filter active they share the cache: no extra requests.
+  const optionsKey = [
+    "stats",
+    selectedTenantId,
+    period,
+    startDate,
+    endDate,
+    customRange,
+    {},
+  ];
+  const optionsEnabled = enabled && showFilters;
+
+  const { data: browserOptions } = useQuery<BrowsersResponse>({
+    queryKey: [...optionsKey, "browsers"],
+    queryFn: () => fetchAPI(`${endpoint}/browsers?${baseParams}`),
+    enabled: optionsEnabled,
+  });
+
+  const { data: osOptions } = useQuery<OsResponse>({
+    queryKey: [...optionsKey, "os"],
+    queryFn: () => fetchAPI(`${endpoint}/os?${baseParams}`),
+    enabled: optionsEnabled,
+  });
+
+  const { data: locationOptions } = useQuery<LocationsResponse>({
+    queryKey: [...optionsKey, "locations"],
+    queryFn: () => fetchAPI(`${endpoint}/locations?${baseParams}`),
+    enabled: optionsEnabled,
+  });
+
+  const { data: languageOptions } = useQuery<LanguagesResponse>({
+    queryKey: [...optionsKey, "languages"],
+    queryFn: () => fetchAPI(`${endpoint}/languages?${baseParams}`),
+    enabled: optionsEnabled,
+  });
+
   const { data: sessionsData } = useQuery<SessionsResponse>({
     queryKey: [...queryKey, "sessions"],
     queryFn: () => fetchAPI(`${endpoint}/sessions?${queryParams}`),
@@ -275,19 +335,17 @@ export default function DashboardPage() {
         credentials: "include",
       });
       if (response.ok) navigate("/", { replace: true });
+      else toast.error("Couldn't log out. Try again.");
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);
       else toast.error("An unknown error occurred.");
     }
   };
 
-  const handleExport = async (format: "csv" | "json") => {
-    const params = new URLSearchParams();
-    params.set("tenantId", selectedTenantId || "");
+  const handleExport = (format: "csv" | "json") => {
+    // Same range and filters as the dashboard, so the file matches the screen.
+    const params = new URLSearchParams(queryParams);
     params.set("format", format);
-    if (startDate) params.set("startDate", new Date(startDate).toISOString());
-    if (endDate)
-      params.set("endDate", new Date(endDate + "T23:59:59").toISOString());
     window.open(`${APP_URL}/api/export/events?${params.toString()}`, "_blank");
   };
 
@@ -325,7 +383,19 @@ export default function DashboardPage() {
             setPeriod(p);
             setCustomRange(false);
           }}
-          onToggleCustomRange={() => setCustomRange(!customRange)}
+          onToggleCustomRange={() => {
+            // Start from the period on screen, so turning Custom on never shows
+            // a blank range while the data still reflects the old period.
+            if (!customRange && (!startDate || !endDate)) {
+              const days = period === "24h" ? 1 : parseInt(period);
+              const now = new Date();
+              const start = new Date(now);
+              start.setDate(now.getDate() - days);
+              setStartDate(toDateInputValue(start));
+              setEndDate(toDateInputValue(now));
+            }
+            setCustomRange(!customRange);
+          }}
           onToggleFilters={() => setShowFilters(!showFilters)}
           onExport={handleExport}
           onNavigate={(path) => navigate(path)}
@@ -338,10 +408,10 @@ export default function DashboardPage() {
           startDate={startDate}
           endDate={endDate}
           segments={segments}
-          browsersData={browsersData}
-          osData={osData}
-          locationsData={locationsData}
-          languagesData={languagesData}
+          browsersData={browserOptions}
+          osData={osOptions}
+          locationsData={locationOptions}
+          languagesData={languageOptions}
           hasActiveFilters={hasActiveFilters}
           onSetStartDate={setStartDate}
           onSetEndDate={setEndDate}
@@ -350,6 +420,30 @@ export default function DashboardPage() {
         />
 
         <main className="space-y-6">
+          {selectedTenant && selectedTenant.domains.length === 0 && (
+            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 text-sm flex flex-col sm:flex-row gap-3 sm:items-center">
+              <div className="flex gap-3 items-start flex-1">
+                <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">
+                    Finish setting up {selectedTenant.name}
+                  </p>
+                  <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                    The tracking script's events are blocked until you add
+                    your site's domain, so this dashboard will stay empty.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate("/settings")}
+              >
+                Add domain
+              </Button>
+            </div>
+          )}
+
           <InsightCards data={insightsData} />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -448,7 +542,12 @@ export default function DashboardPage() {
           />
           <PerformanceSection data={perfData} />
           <CampaignsSection data={campaignsData} />
-          <FunnelSection tenantId={selectedTenantId || ""} />
+          {/* Keyed by site so switching sites clears the previous funnel. */}
+          <FunnelSection
+            key={selectedTenantId}
+            tenantId={selectedTenantId || ""}
+            range={range}
+          />
           <CohortSection queryParams={queryParams} enabled={enabled} />
         </main>
       </div>

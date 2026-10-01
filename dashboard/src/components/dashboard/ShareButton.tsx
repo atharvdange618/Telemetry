@@ -31,12 +31,18 @@ const fetchAPI = async (url: string, options?: RequestInit) => {
 interface ShareButtonProps {
   tenantId: string;
   searchParams: URLSearchParams;
+  /** The dashboard's current period, used as the starting choice. */
+  currentPeriod: string;
 }
 
-export function ShareButton({ tenantId, searchParams }: ShareButtonProps) {
+export function ShareButton({
+  tenantId,
+  searchParams,
+  currentPeriod,
+}: ShareButtonProps) {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState("");
-  const [period, setPeriod] = useState<string>("24h");
+  const [period, setPeriod] = useState<string>(currentPeriod);
   const [createdLink, setCreatedLink] = useState<ShareLink | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -98,9 +104,9 @@ export function ShareButton({ tenantId, searchParams }: ShareButtonProps) {
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
+    if (nextOpen) setPeriod(currentPeriod);
     if (!nextOpen) {
       setLabel("");
-      setPeriod("24h");
       setCreatedLink(null);
       setCopied(false);
     }
@@ -110,7 +116,7 @@ export function ShareButton({ tenantId, searchParams }: ShareButtonProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1">
-          <Share2 className="h-3.5 w-3.5" />
+          <Share2 className="h-3.5 w-3.5" /> Share
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

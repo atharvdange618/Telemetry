@@ -15,7 +15,9 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Tenant } from "@/lib/types/dashboard.types";
 import { Badge } from "@/components/ui/badge";
-import { X, Copy, Check } from "lucide-react";
+import { X, Copy, Check, Pencil } from "lucide-react";
+import { toast } from "sonner";
+import { normalizeOrigin } from "@/lib/utils";
 import {
   Dialog,
   DialogClose,
@@ -71,6 +73,7 @@ const SettingsPage = () => {
       setNewSiteName("");
       setNewSiteDomains("");
     },
+    onError: () => toast.error("Couldn't create the site. Try again."),
   });
 
   const updateTenant = useMutation({
@@ -87,6 +90,7 @@ const SettingsPage = () => {
       setEditingTenantId(null);
       setNewDomain("");
     },
+    onError: () => toast.error("Couldn't update domains. Try again."),
   });
 
   const renameTenant = useMutation({
@@ -105,6 +109,7 @@ const SettingsPage = () => {
       setEditingNameId(null);
       setEditingName("");
     },
+    onError: () => toast.error("Couldn't rename the site. Try again."),
   });
 
   const deleteTenant = useMutation({
@@ -115,25 +120,44 @@ const SettingsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
     },
+    onError: () => toast.error("Couldn't delete the site. Try again."),
   });
 
   const handleCreateSite = (e: FormEvent) => {
     e.preventDefault();
     if (newSiteName.trim()) {
-      const domains = newSiteDomains
+      const inputs = newSiteDomains
         .split(",")
         .map((d) => d.trim())
         .filter(Boolean);
+      const origins = inputs.map(normalizeOrigin);
+      const invalid = inputs.filter((_, i) => origins[i] === null);
+      if (invalid.length > 0) {
+        toast.error(`Not a valid domain: ${invalid.join(", ")}`);
+        return;
+      }
+      const domains = [
+        ...new Set(origins.filter((o): o is string => o !== null)),
+      ];
       createTenant.mutate({ name: newSiteName.trim(), domains });
     }
   };
 
   const handleAddDomain = (tenant: Tenant) => {
-    const url = newDomain.trim();
-    if (!url) return;
-    const domains = [...tenant.domains, url];
-    updateTenant.mutate({ id: tenant.id, domains });
-    setNewDomain("");
+    const input = newDomain.trim();
+    if (!input) return;
+    const origin = normalizeOrigin(input);
+    if (!origin) {
+      toast.error(`Not a valid domain: ${input}`);
+      return;
+    }
+    if (tenant.domains.includes(origin)) {
+      toast(`${origin} is already added`);
+      setNewDomain("");
+      return;
+    }
+    // The input clears in onSuccess, so a failed save keeps what was typed.
+    updateTenant.mutate({ id: tenant.id, domains: [...tenant.domains, origin] });
   };
 
   const handleRemoveDomain = (tenant: Tenant, domain: string) => {
@@ -179,7 +203,7 @@ const SettingsPage = () => {
               onChange={(e) => setNewSiteName(e.target.value)}
             />
             <Input
-              placeholder="Allowed domains (comma-separated, e.g. https://example.com)"
+              placeholder="Allowed domains, comma-separated (e.g. example.com)"
               value={newSiteDomains}
               onChange={(e) => setNewSiteDomains(e.target.value)}
             />
@@ -246,15 +270,21 @@ const SettingsPage = () => {
                     </Button>
                   </div>
                 ) : (
-                  <CardTitle
-                    className="cursor-pointer hover:text-primary transition-colors"
-                    onClick={() => {
-                      setEditingNameId(tenant.id);
-                      setEditingName(tenant.name);
-                    }}
-                  >
-                    {tenant.name}
-                  </CardTitle>
+                  <div className="flex items-center gap-1">
+                    <CardTitle>{tenant.name}</CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Rename ${tenant.name}`}
+                      title="Rename"
+                      onClick={() => {
+                        setEditingNameId(tenant.id);
+                        setEditingName(tenant.name);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
@@ -286,7 +316,8 @@ const SettingsPage = () => {
                       {domain}
                       <button
                         onClick={() => handleRemoveDomain(tenant, domain)}
-                        className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
+                        aria-label={`Remove ${domain}`}
+                        className="-my-1 -mr-1.5 ml-0.5 rounded-full p-1.5 hover:bg-muted-foreground/20"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -295,7 +326,7 @@ const SettingsPage = () => {
                 </div>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="https://example.com"
+                    placeholder="example.com"
                     value={editingTenantId === tenant.id ? newDomain : ""}
                     onChange={(e) => {
                       setEditingTenantId(tenant.id);
@@ -321,7 +352,12 @@ const SettingsPage = () => {
                 <div className="flex justify-end">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="destructive">Delete Site</Button>
+                      <Button
+                        variant="outline"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        Delete Site
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
