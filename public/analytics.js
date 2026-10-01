@@ -208,8 +208,10 @@
     if (pct > maxScroll) maxScroll = pct;
   }
 
+  var scrollSent = false;
   function sendScrollDepth() {
-    if (maxScroll > 0) {
+    if (maxScroll > 0 && !scrollSent) {
+      scrollSent = true;
       sendEvent({
         tenantId: tenantId,
         apiKey: apiKey,
@@ -271,11 +273,13 @@
               apiKey: apiKey,
               type: "performance",
               path: window.location.pathname,
-              lcp: perfData.lcp || null,
-              cls: perfData.cls || null,
-              inp: perfData.inp || null,
-              ttfb: perfData.ttfb || null,
-              fcp: perfData.fcp || null,
+              // Missing metrics stay undefined and drop out of the JSON.
+              // `|| null` here turned a perfect CLS of 0 into null.
+              lcp: perfData.lcp,
+              cls: perfData.cls,
+              inp: perfData.inp,
+              ttfb: perfData.ttfb,
+              fcp: perfData.fcp,
               sessionId: sessionId,
             });
           }
@@ -314,7 +318,9 @@
   );
 
   document.addEventListener("click", trackOutboundClick, { capture: true });
-  window.addEventListener("beforeunload", sendScrollDepth);
+  // pagehide, not beforeunload: iOS Safari rarely fires beforeunload, and
+  // pagehide fires on every browser when the page goes away.
+  window.addEventListener("pagehide", sendScrollDepth);
 
   // --- Init ---
   trackPageview();
