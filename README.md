@@ -149,6 +149,18 @@ npm run dev
 
 Visit `http://localhost:5173` to access your self-hosted dashboard.
 
+### Or: Run Everything with Docker
+
+Skip steps 1 and 3. With a `.env` holding your GitHub OAuth and security secrets (step 2), run:
+
+```bash
+docker compose up
+```
+
+This starts Postgres, the API on `:3000`, and the dashboard on `:5173`, with migrations applied and hot reload on both. The compose file sets the database and app URLs itself, so `.env` only needs the secrets. Your GitHub OAuth app's callback URL must be `http://localhost:3000/login/github/callback`.
+
+Reset the database with `docker compose down -v`.
+
 ### Production Deployments
 
 For production hosting on a VPS or cloud provider, build the production bundle:

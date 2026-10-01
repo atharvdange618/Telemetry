@@ -1,0 +1,64 @@
+# Local development: Postgres + API + dashboard, all with hot reload.
+# Secrets (GitHub OAuth, COOKIE_SECRET, VISITOR_SALT) come from .env.
+# The URLs below override .env so the stack always points at itself.
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: telemetry
+      POSTGRES_PASSWORD: telemetry
+      POSTGRES_DB: telemetry
+    # Host port 5433 so it doesn't clash with a local Postgres on 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U telemetry"]
+      interval: 2s
+      retries: 15
+
+  api:
+    # Full image, not slim: Prisma's engine needs OpenSSL, which slim lacks.
+    image: node:24
+    working_dir: /app
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://telemetry:telemetry@db:5432/telemetry
+      BASE_URL: http://localhost:3000
+      FRONTEND_URL: http://localhost:5173
+      # Windows bind mounts don't forward file events into the container.
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "npm install --no-save && npx prisma migrate deploy && npx prisma generate && npm run dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      # Linux builds of node_modules and the Prisma client live in volumes,
+      # so they never overwrite the Windows copies on the host.
+      - api_node_modules:/app/node_modules
+      - api_generated:/app/generated
+    depends_on:
+      db:
+        condition: service_healthy
+
+  dashboard:
+    image: node:24
+    working_dir: /app
+    environment:
+      VITE_API_URL: http://localhost:3000
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "npm install --no-save && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./dashboard:/app
+      - dashboard_node_modules:/app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  api_node_modules:
+  api_generated:
+  dashboard_node_modules:
