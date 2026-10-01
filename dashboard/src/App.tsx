@@ -17,7 +17,8 @@ import SharedDashboardPage from "./pages/SharedDashboardPage";
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
 import Home from "./pages/Home";
-import { useDarkMode } from "./hooks/useDarkMode";
+// Applies the saved theme to <html> as soon as the app loads.
+import "./hooks/useDarkMode";
 
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
@@ -27,11 +28,6 @@ import { Toaster } from "./components/ui/sonner";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { placeholderData: keepPreviousData } },
 });
-
-function DarkModeInit() {
-  useDarkMode();
-  return null;
-}
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
@@ -99,7 +95,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <DarkModeInit />
         <Toaster />
         <RouterProvider router={router} />
       </TooltipProvider>
