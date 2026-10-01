@@ -1,10 +1,12 @@
 # Telemetry Integration Guide
 
-Privacy-first web analytics. No cookies, no third-party scripts. All data stays on your server.
+Cookieless web analytics. Events go to your Telemetry server and live in its Postgres database. Two outside services are involved, both described under [Privacy](#privacy).
 
 ## Quick Start
 
-Add the tracking script to your HTML `<head>`:
+### 1. Add the script
+
+Put this in your HTML `<head>`:
 
 ```html
 <script
@@ -17,111 +19,164 @@ Add the tracking script to your HTML `<head>`:
 
 Find your **Tenant ID** and **API Key** on the [Settings](/settings) page after signing in.
 
-### What Happens Automatically
+### 2. Add your domains
 
-Once the script loads, it automatically tracks:
+On the [Settings](/settings) page, add every origin the script runs on. Telemetry rejects events from any other origin with a `403`.
 
-| Feature             | Details                                     |
-| ------------------- | ------------------------------------------- |
-| **Page views**      | Sent on every page load                     |
-| **Browser & OS**    | Parsed from User-Agent                      |
-| **Screen size**     | Width and height                            |
-| **Language**        | `navigator.language`                        |
-| **Referrer**        | `document.referrer`                         |
-| **UTM parameters**  | All 5 standard UTM params from URL          |
-| **Scroll depth**    | 25%, 50%, 75%, 100% markers                 |
-| **Outbound clicks** | External link clicks                        |
-| **Web Vitals**      | LCP, CLS, INP, FID, TTFB, FCP (via web-vitals@3) |
-| **Session ID**      | Tab-scoped UUID (sessionStorage)            |
+- Add each variant you serve: `https://example.com` and `https://www.example.com` count as two origins.
+- For local testing, type the scheme and port: `http://localhost:3000`. A bare `localhost:3000` gets saved as `https://localhost:3000` and won't match.
 
-No configuration needed for any of these - they work out of the box.
+If events are rejected, the script logs the reason to the browser console once, for example `Telemetry: http://localhost:3000 isn't an allowed domain for this site.`
+
+### What the script tracks on its own
+
+| Data                | Details                                                          |
+| ------------------- | ---------------------------------------------------------------- |
+| **Page views**      | One per full page load. Single-page apps need [one more step](#single-page-apps) |
+| **Browser & OS**    | Parsed from the User-Agent in the browser                        |
+| **Screen size**     | Width and height                                                 |
+| **Language**        | `navigator.language`                                             |
+| **Referrer**        | `document.referrer`, stored as the full URL                      |
+| **UTM parameters**  | All 5 standard UTM params from the URL                           |
+| **Scroll depth**    | Furthest point reached on the page, as a percentage              |
+| **Outbound clicks** | Clicks on links to another hostname                              |
+| **Web Vitals**      | LCP, CLS, INP (web-vitals 3.5.2), plus TTFB and FCP              |
+| **Session ID**      | Tab-scoped random UUID in `sessionStorage`                       |
+
+## Single-Page Apps
+
+The script records a page view when it loads. It does not watch `history` changes, so in React, Next.js or Vue apps every client-side route change is invisible until you call `window.telemetry.pageview()` yourself.
+
+`pageview()` reads the current `location`, so call it after the route has changed. Skip the first render: the script already counted that page view on load.
+
+### Next.js (App Router)
+
+```tsx
+"use client";
+
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
+
+export function TelemetryPageviews() {
+  const pathname = usePathname();
+  const lastPath = useRef(pathname);
+
+  useEffect(() => {
+    // Comparing paths skips the first render and React Strict Mode's
+    // double effect run in development.
+    if (lastPath.current === pathname) return;
+    lastPath.current = pathname;
+    window.telemetry?.pageview();
+  }, [pathname]);
+
+  return null;
+}
+```
+
+Render `<TelemetryPageviews />` once in your root `layout.tsx`, and load the script there with `next/script`:
+
+```tsx
+import Script from "next/script";
+
+<Script
+  src="https://your-telemetry-domain.com/analytics.js"
+  data-tenant-id="YOUR_TENANT_ID"
+  data-api-key="YOUR_API_KEY"
+  strategy="afterInteractive"
+/>;
+```
+
+### React Router
+
+```tsx
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+
+export function TelemetryPageviews() {
+  const { pathname } = useLocation();
+  const lastPath = useRef(pathname);
+
+  useEffect(() => {
+    if (lastPath.current === pathname) return;
+    lastPath.current = pathname;
+    window.telemetry?.pageview();
+  }, [pathname]);
+
+  return null;
+}
+```
+
+Render it inside your router so `useLocation` works.
+
+### Limits in single-page apps
+
+Scroll depth and Web Vitals are measured once per full page load, not per route. Both get reported under the path the visitor was on when they left.
+
+## TypeScript
+
+The script adds `window.telemetry`. Declare it once, for example in `src/telemetry.d.ts`:
+
+```ts
+export {};
+
+declare global {
+  interface Window {
+    telemetry?: {
+      goal: (name: string, properties?: Record<string, unknown>) => void;
+      pageview: () => void;
+    };
+  }
+}
+```
+
+The `?` is deliberate. With `defer` or `afterInteractive`, the script runs after your code may already be running, and it keeps no queue of calls made before it loads. Always call it as `window.telemetry?.goal(...)`.
 
 ## Tracking Goals
 
-Goals track specific actions users take on your site (sign-ups, purchases, feature usage).
+Goals record actions visitors take on your site, such as sign-ups, purchases or feature use.
 
 ```javascript
 // Simple goal
-window.telemetry.goal("signup");
+window.telemetry?.goal("signup");
 
 // Goal with properties
-window.telemetry.goal("purchase", {
+window.telemetry?.goal("purchase", {
   plan: "pro",
   amount: 29,
   currency: "USD",
 });
-
-// Goal with custom properties
-window.telemetry.goal("feature_used", {
-  feature: "export",
-  format: "csv",
-});
 ```
 
-### Goal Naming Best Practices
+Properties must be a plain object. Telemetry stores them as JSON with the goal.
 
-- Use **snake_case** or **kebab-case** - pick one and stay consistent
+### Naming goals
+
+- Use **snake_case** or **kebab-case**, and stay consistent
 - Be specific: `signup_completed` rather than `signup`
-- Include context in properties, not the name: `goal("purchase", { plan: "pro" })` not `goal("pro_purchase")`
-- Common goal names: `signup`, `purchase`, `download`, `contact_form`, `demo_request`
+- Put context in properties, not the name: `goal("purchase", { plan: "pro" })`, not `goal("pro_purchase")`
 
-### Viewing Goals in the Dashboard
+### Viewing goals
 
-Goals appear on the Dashboard under the Goals section. You can also filter all stats by goal completions.
+The Dashboard's **Top Goals** card lists the 10 goals with the most completions in the selected period. The same data comes from `GET /api/stats/goals`.
 
 ## Funnel Analysis
 
-Funnels track multi-step conversion flows (e.g., visit → signup → purchase).
+Funnels measure how many visitors move through a sequence of **page paths**, for example `/` → `/pricing` → `/signup` → `/welcome`. Goals are not funnel steps.
 
-### How It Works
+A visitor counts toward a step only if they viewed that page at or after the time they reached the step before it. A funnel takes 2 to 10 steps.
 
-1. Define goals that represent each step in your funnel
-2. Track them with `window.telemetry.goal()` on each step
-3. View funnel conversion rates on the Dashboard
+### Setting one up
 
-### Example: E-commerce Funnel
+1. Make sure each step is a separate page the script records a view for. In a single-page app, that means the [route change tracking](#single-page-apps) above.
+2. In the Dashboard's **Funnel Analysis** card, enter the paths in order and click **Analyze Funnel**.
 
-```javascript
-// Step 1: Product page view (automatic pageview)
-// No code needed - pageview is tracked automatically
+Paths must match what the script records, which is `location.pathname`: no query string, no hash. If your pages live under a prefix, include it: `/app/signup`, not `/signup`.
 
-// Step 2: Add to cart
-window.telemetry.goal("add_to_cart", { product_id: "abc123" });
-
-// Step 3: Checkout started
-window.telemetry.goal("checkout_started", { cart_total: 59.99 });
-
-// Step 4: Purchase completed
-window.telemetry.goal("purchase_completed", {
-  order_id: "ord_456",
-  amount: 59.99,
-});
-```
-
-### Example: SaaS Signup Funnel
-
-```javascript
-// Step 1: Landing page (automatic)
-
-// Step 2: Pricing page view (automatic)
-
-// Step 3: Signup started
-window.telemetry.goal("signup_started");
-
-// Step 4: Account created
-window.telemetry.goal("account_created", { plan: "free" });
-
-// Step 5: First action completed
-window.telemetry.goal("first_action_completed");
-```
-
-Funnel data is available via `POST /api/stats/funnels` and on the Dashboard.
+To measure a step with no URL of its own, such as a checkout modal, change the route when it opens, or track it as a goal and read it from **Top Goals**.
 
 ## Campaign Tracking
 
-UTM parameters are captured automatically from the URL. No code changes needed.
-
-### Supported UTM Parameters
+The script reads UTM parameters from the URL on each page view. No code needed.
 
 | Parameter      | Description      | Example                           |
 | -------------- | ---------------- | --------------------------------- |
@@ -131,80 +186,81 @@ UTM parameters are captured automatically from the URL. No code changes needed.
 | `utm_term`     | Paid search term | `analytics+tool`                  |
 | `utm_content`  | Ad variation     | `banner_a`, `cta_button`          |
 
-### Example URLs
-
 ```
 https://yoursite.com/pricing?utm_source=newsletter&utm_medium=email&utm_campaign=spring2026
-https://yoursite.com/?utm_source=twitter&utm_medium=social&utm_campaign=launch
 ```
 
-Campaign data is available via `GET /api/stats/campaigns` and the Sources section on the Dashboard.
+Campaign data shows in the Dashboard's Sources section and comes from `GET /api/stats/campaigns`.
 
 ## Outbound Link Tracking
 
-External link clicks are tracked automatically. No setup needed.
+The script records clicks on links whose hostname differs from the current page's hostname. It stores the full URL, the hostname and the path.
 
-When a user clicks a link to a different domain, Telemetry records:
+The check compares hostnames exactly, so a link from `example.com` to `www.example.com` counts as outbound.
 
-- The full URL
-- The domain
-- The path
+## Scroll Depth
 
-Internal links (same domain) are ignored.
+The script tracks the furthest point the visitor scrolls, as a percentage of the page, and sends that one number when the page goes away (`pagehide`). Pages too short to scroll and visitors who never scroll send nothing.
 
-## Scroll Depth Tracking
-
-Page scroll depth is tracked automatically at these markers:
-
-- **25%** - user started reading
-- **50%** - user is engaged
-- **75%** - user read most content
-- **100%** - user reached the bottom
-
-Only the maximum scroll depth per page is sent (on `beforeunload`). Data is available via `GET /api/stats/scroll-depth`.
+The Dashboard shows the average depth and how many visits reached 25%, 50%, 75% and 100%. Data comes from `GET /api/stats/scroll-depth`.
 
 ## Performance Metrics (Web Vitals)
 
-Core Web Vitals are collected automatically using the [web-vitals@3](https://www.npmjs.com/package/web-vitals) library loaded from CDN.
+The script loads [web-vitals](https://www.npmjs.com/package/web-vitals) 3.5.2 from jsDelivr, pinned with a Subresource Integrity hash. TTFB and FCP come straight from the browser's Performance API.
 
-| Metric   | What It Measures          | Good    | Poor    |
+| Metric   | What it measures          | Good    | Poor    |
 | -------- | ------------------------- | ------- | ------- |
 | **LCP**  | Largest Contentful Paint  | ≤2500ms | >4000ms |
 | **CLS**  | Cumulative Layout Shift   | ≤0.1    | >0.25   |
 | **INP**  | Interaction to Next Paint | ≤200ms  | >500ms  |
-| **FID**  | First Input Delay         | ≤100ms  | >300ms  |
 | **TTFB** | Time to First Byte        | -       | -       |
 | **FCP**  | First Contentful Paint    | -       | -       |
 
-Metrics are sent when the page becomes hidden (`visibilitychange`, `beforeunload`, `pagehide`). Data is available via `GET /api/stats/performance`.
+Metrics go out once per page load, when the page is hidden or closed. A metric the browser never reported is left out. INP, for example, needs at least one interaction, and FCP is read when the script starts, so it's missing if the page hasn't painted by then.
 
-## API Key Authentication
+The send step runs only after web-vitals loads. If your Content Security Policy blocks `cdn.jsdelivr.net`, no performance data gets sent at all.
 
-Each tenant has an API key (`tlv_1_...`) used to authenticate tracking requests.
+Data comes from `GET /api/stats/performance`.
 
-- The key is passed as `data-api-key` in the script tag
-- Legacy tenants without keys still work (backward compatible)
-- Find your key on the [Settings](/settings) page
+## API Key and Allowed Domains
 
-## Segment Filters
+Each site has an API key (`tlv_1_...`), passed as `data-api-key`.
 
-All stats endpoints support filtering by these dimensions:
+The key sits in your page's HTML where anyone can read it, so don't treat it as a secret. Your **allowed domains** are what stop other sites from sending events as you: browsers always send an `Origin` header on these requests, and Telemetry checks it against your list.
 
-| Filter      | Values                               | Example                 |
-| ----------- | ------------------------------------ | ----------------------- |
-| `browser`   | Chrome, Firefox, Safari, Edge, Opera | `?browser=Chrome`       |
-| `os`        | Windows, macOS, Linux, Android, iOS  | `?os=Windows`           |
-| `country`   | Country name                         | `?country=India`        |
-| `language`  | Browser language code                | `?language=en`          |
-| `device`    | mobile, tablet, desktop              | `?device=mobile`        |
-| `referrer`  | Referrer domain                      | `?referrer=google.com`  |
-| `utmSource` | UTM source value                     | `?utmSource=newsletter` |
+Sites created before API keys existed have no key and accept events without one.
+
+## Browser Only
+
+The tracking endpoint is built for browsers. Sending events from a server doesn't work well:
+
+- Requests with a missing or short User-Agent (under 10 characters, like Node's default `node`) get rejected as bots.
+- Visitor IDs come from the request's IP and User-Agent, so every event from one server collapses into one visitor.
+- The rate limit of 30 requests per minute applies per IP, so one server hits it fast.
+
+## Stats API and Segment Filters
+
+The `/api/stats/*` endpoints serve the Dashboard and need its signed-in session cookie. The API key does not work for them.
+
+They accept `period` (`24h`, `7d`, `30d`, `90d`), or `startDate` and `endDate` as ISO datetimes, plus these filters:
+
+| Filter      | Values                                                | Example                                |
+| ----------- | ----------------------------------------------------- | -------------------------------------- |
+| `browser`   | Chrome, Firefox, Safari, Edge, Opera, Other           | `?browser=Chrome`                      |
+| `os`        | Windows, macOS, Linux, Android, iOS, ChromeOS, Other  | `?os=Windows`                          |
+| `country`   | Country name                                          | `?country=India`                       |
+| `language`  | Browser language code, matched exactly                | `?language=en-US`                      |
+| `device`    | mobile, tablet, desktop                               | `?device=mobile`                       |
+| `referrer`  | Full referrer URL, matched exactly                    | `?referrer=https://www.google.com/`    |
+| `utmSource` | UTM source value                                      | `?utmSource=newsletter`                |
+
+`referrer` and `utmSource` exist only on page views, so filtering by them leaves goal, scroll, outbound and performance stats empty.
 
 ## Tracking API Reference
 
 ### POST /api/track
 
-Send events to Telemetry.
+The script sends events here. You only need this section to debug the script or build your own browser client.
 
 **Headers:**
 
@@ -212,7 +268,9 @@ Send events to Telemetry.
 Content-Type: application/json
 ```
 
-**Body (pageview):**
+`tenantId` must be the CUID from Settings. Fields not marked required are optional.
+
+**Body (pageview):** `hostname` and `path` required.
 
 ```json
 {
@@ -221,7 +279,7 @@ Content-Type: application/json
   "type": "pageview",
   "hostname": "example.com",
   "path": "/pricing",
-  "referrer": "https://google.com",
+  "referrer": "https://google.com/",
   "screenWidth": 1920,
   "screenHeight": 1080,
   "browser": "Chrome",
@@ -232,11 +290,13 @@ Content-Type: application/json
   "sessionId": "uuid-here",
   "utmSource": "newsletter",
   "utmMedium": "email",
-  "utmCampaign": "spring2026"
+  "utmCampaign": "spring2026",
+  "utmTerm": null,
+  "utmContent": null
 }
 ```
 
-**Body (goal):**
+**Body (goal):** `goalName` required. `properties` must be an object.
 
 ```json
 {
@@ -249,7 +309,7 @@ Content-Type: application/json
 }
 ```
 
-**Body (outbound):**
+**Body (outbound):** `url` (a full URL) and `domain` required.
 
 ```json
 {
@@ -263,7 +323,7 @@ Content-Type: application/json
 }
 ```
 
-**Body (scroll):**
+**Body (scroll):** `scrollDepth` (integer, 0 to 100) required.
 
 ```json
 {
@@ -276,7 +336,7 @@ Content-Type: application/json
 }
 ```
 
-**Body (performance):**
+**Body (performance):** every metric optional.
 
 ```json
 {
@@ -287,7 +347,6 @@ Content-Type: application/json
   "lcp": 1200,
   "cls": 0.05,
   "inp": 150,
-  "fid": 80,
   "ttfb": 200,
   "fcp": 800,
   "sessionId": "uuid-here"
@@ -296,17 +355,17 @@ Content-Type: application/json
 
 **Responses:**
 
-- `201` - Event recorded
-- `400` - Invalid request body
-- `403` - Bot detected or invalid API key
-- `404` - Tenant not found
-- `429` - Rate limit exceeded (30 req/min per IP)
-- `500` - Internal server error
+- `201`: event recorded
+- `400`: body failed validation
+- `403`: bot User-Agent, wrong API key, or an `Origin` not in your allowed domains. The body's `message` says which.
+- `404`: tenant not found
+- `429`: rate limit exceeded (30 requests per minute per IP)
+- `500`: server error
 
 ## Privacy
 
-- **No cookies** - session tracking uses `sessionStorage` (tab-scoped, cleared on close)
-- **Pseudonymous visitor IDs** - a salted hash of IP + User-Agent + tenant, with the salt rotating every quarter
-- **No third-party requests** - all data stays on your server
-- **Location data** - country and city are derived from the request IP, which is never stored; whether you need consent for it depends on your jurisdiction
-- **Bot filtering** - crawlers and bots are automatically excluded
+- **No cookies.** The session ID lives in `sessionStorage`, scoped to one tab and cleared when it closes.
+- **Pseudonymous visitor IDs.** Each is a SHA-256 hash of IP + User-Agent + site, salted with a value that rotates every quarter. The raw IP is never written to the database.
+- **Location lookup.** To get country and city, the server sends each event's IP to [ipwho.is](https://ipwho.is), a third-party service. Whether you need consent for this depends on your jurisdiction.
+- **Web Vitals library.** Visitors' browsers download web-vitals from `cdn.jsdelivr.net`, so jsDelivr sees their IP and your site's origin.
+- **Bot filtering.** Requests whose User-Agent matches common crawlers, headless browsers, HTTP libraries and monitoring tools get rejected and never stored.
