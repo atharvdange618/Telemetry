@@ -98,7 +98,12 @@ export const statsQuerySchema = z.object({
 
 export const tenantBodySchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters." }),
-  domains: z.array(z.string().url()).optional(),
+  // Stored as bare, deduplicated origins: the exact form browsers send in
+  // the Origin header that /api/track compares against.
+  domains: z
+    .array(z.url({ protocol: /^https?$/ }))
+    .transform((domains) => [...new Set(domains.map((d) => new URL(d).origin))])
+    .optional(),
 });
 
 export const tenantParamsSchema = z.object({
