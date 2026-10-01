@@ -41,6 +41,13 @@ describe("parseDashboardSearch", () => {
     expect(s.startDate).toBeNull();
     expect(s.endDate).toBe("2026-10-01");
   });
+
+  it("drops dates that don't exist on the calendar", () => {
+    const s = parse("startDate=2026-13-45&endDate=2026-02-31");
+    expect(s.startDate).toBeNull();
+    expect(s.endDate).toBeNull();
+    expect(isCustomRange(s)).toBe(false);
+  });
 });
 
 describe("isCustomRange and toDateRange", () => {

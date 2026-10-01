@@ -38,6 +38,15 @@ function isOneOf<T extends string>(list: readonly T[], value: string | null): va
   return value !== null && (list as readonly string[]).includes(value);
 }
 
+// Validates that a string is a valid calendar date: matches YYYY-MM-DD format
+// and the date actually exists (rejects 2026-13-45, 2026-02-31, etc).
+function isCalendarDate(value: string): boolean {
+  if (!DATE_PATTERN.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(`${value}T00:00:00`);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
 // Bad or stale values fall back to defaults, so a hand-edited URL never
 // sends something the API rejects.
 export function parseDashboardSearch(search: URLSearchParams): DashboardSearch {
@@ -55,8 +64,8 @@ export function parseDashboardSearch(search: URLSearchParams): DashboardSearch {
 
   return {
     period: isOneOf(PERIODS, period) ? period : "24h",
-    startDate: startDate && DATE_PATTERN.test(startDate) ? startDate : null,
-    endDate: endDate && DATE_PATTERN.test(endDate) ? endDate : null,
+    startDate: startDate && isCalendarDate(startDate) ? startDate : null,
+    endDate: endDate && isCalendarDate(endDate) ? endDate : null,
     segments,
   };
 }
