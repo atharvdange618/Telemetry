@@ -130,7 +130,8 @@ signupButton.addEventListener('click', () => {
               Privacy by Design
             </h5>
             <p className="text-muted-foreground text-sm">
-              No cookies or local storage are used. Visitor identification is
+              No cookies or local storage are used. A random session ID lives in
+              sessionStorage until the tab closes. Visitor identification is
               done anonymously using a hashed IP and User Agent, ensuring GDPR
               compliance without consent banners.
             </p>

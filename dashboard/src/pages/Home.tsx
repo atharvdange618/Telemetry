@@ -48,7 +48,7 @@ export default function Home() {
       </a>
       <SEO
         title="Privacy-First Open-Source Web Analytics"
-        description="Telemetry is a cookieless, privacy-focused open-source analytics platform. Get clear, aggregated visitor insights without cookie banners, tracking scripts, or personal data collection."
+        description="Telemetry is a cookieless, privacy-focused open-source analytics platform. See which pages people read and where they came from, without cookies or personal data."
         keywords="analytics, web analytics, privacy-first, cookieless, open source, self-hosted, telemetry, visitor tracking"
         canonicalPath="/"
         schema={homeSchema}

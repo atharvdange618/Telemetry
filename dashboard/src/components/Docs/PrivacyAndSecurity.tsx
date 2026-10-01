@@ -40,7 +40,7 @@ const PrivacyAndSecurity = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <Cookie className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">No cookies or localStorage used.</span>
+                <span className="text-muted-foreground">No cookies or localStorage. Only a random session ID in sessionStorage, deleted when the tab closes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <Fingerprint className="w-5 h-5 text-primary mt-0.5 shrink-0" />
