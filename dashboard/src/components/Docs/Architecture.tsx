@@ -125,8 +125,8 @@ const Architecture = () => {
               <Server className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               <p className="font-semibold text-foreground">Fastify API</p>
               <p className="text-xs text-muted-foreground">
-                Ingests, validates, and anonymizes data. Handles auth and serves
-                stats.
+                Ingests, validates, and hashes visitor IDs. Handles auth
+                and serves stats.
               </p>
             </div>
             <ArrowRight className="w-6 h-6 mx-auto text-muted-foreground hidden md:block" />
@@ -135,7 +135,7 @@ const Architecture = () => {
               <Database className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               <p className="font-semibold text-foreground">PostgreSQL DB</p>
               <p className="text-xs text-muted-foreground">
-                Stores all anonymized event, user, and site data.
+                Stores events under hashed visitor IDs, plus user and site records.
               </p>
             </div>
           </div>
@@ -151,9 +151,9 @@ const Architecture = () => {
               Privacy by Design
             </h5>
             <p className="text-muted-foreground text-sm">
-              No cookies or PII stored. Visitor identification uses a
-              non-reversible hash, ensuring compliance and respecting user
-              privacy.
+              No cookies are set, and the raw IP is never stored.
+              Visitor IDs are a salted hash of IP, browser, and site, with
+              the salt rotating every quarter.
             </p>
           </div>
           <div className="border border-border rounded-lg p-6">
@@ -162,8 +162,9 @@ const Architecture = () => {
               Self-Hosted First
             </h5>
             <p className="text-muted-foreground text-sm">
-              Gives you complete data ownership and control. The entire stack is
-              open-source and runs on your infrastructure.
+              The database runs on your infrastructure, so you can read and
+              delete the underlying rows yourself. The entire stack is
+              open-source.
             </p>
           </div>
           <div className="border border-border rounded-lg p-6">

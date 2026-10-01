@@ -3,11 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Dashboard](https://img.shields.io/badge/Dashboard-usetelemetry.vercel.app-blue.svg)](https://usetelemetry.vercel.app)
 [![API Server](https://img.shields.io/badge/API-usetelemetry.hogyoku.cloud-green.svg)](https://usetelemetry.hogyoku.cloud)
-[![Privacy First](https://img.shields.io/badge/Privacy-Cookieless-success.svg)](#privacy--compliance)
+[![Privacy First](https://img.shields.io/badge/Privacy-Cookieless-success.svg)](#why-telemetry)
 
-Telemetry is a professional, privacy-first, open-source web analytics platform. Cookieless by design, fully GDPR/CCPA compliant, with a tracking script around 3KB gzipped, it offers complete visitor insights with just one line of code.
+Telemetry is a professional, privacy-first, open-source web analytics platform. Cookieless by design, with no raw IPs stored and a tracking script around 3KB gzipped, it reports page views, visitors, referrers, funnels, and Core Web Vitals from a single line of code.
 
-Eliminate intrusive cookie banners, keep your site lightning fast, and retain absolute ownership of your data.
+Drop the cookie banner from your stack, keep your site lightning fast, and retain ownership of your data.
 
 **Get Started on the Cloud:** [usetelemetry.vercel.app](https://usetelemetry.vercel.app)
 
@@ -15,10 +15,10 @@ Eliminate intrusive cookie banners, keep your site lightning fast, and retain ab
 
 ## Why Telemetry?
 
-- **Zero Cookies, Zero Banner Fatigue**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. The only thing it stores is a random session ID in `sessionStorage`, which the browser deletes when the tab closes. You don't need a privacy banner to use Telemetry, improving your site's conversion rates.
-- **Privacy-First & Compliant**: Built from the ground up to respect user privacy. We anonymize and aggregate session details immediately on the server. Fully GDPR, CCPA, and PECR compliant.
-- **Small Script (~3KB gzipped)**: Traditional trackers bloat your bundle size and impact SEO performance. Telemetry loads asynchronously in milliseconds and sends events as cookieless keepalive requests that survive page unloads.
-- **Absolute Data Ownership**: Keep your data safe from advertising giants. Self-host it on your own server or run it securely on our managed cloud.
+- **Zero Cookies, Zero Banner Code**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. The only thing it stores in the browser is a random session ID in `sessionStorage`, which the browser deletes when the tab closes. There's no consent dialog to ship for it, though whether your site needs one for the rest of its stack is your call.
+- **Pseudonymous Visitor IDs**: The server hashes IP, User-Agent, and tenant ID with a salt that rotates every quarter, then discards the raw IP. Country and city are stored too, since the dashboard charts them, so treat the data as personal and decide what to disclose yourself.
+- **Small Script (~3KB gzipped)**: One small script, loaded asynchronously in milliseconds. Events go out as cookieless keepalive requests, so sending them never blocks the page and never gets dropped when a visitor navigates away.
+- **Your Data, Your Server**: Self-host it on your own server or run it securely on our managed cloud. Nothing is shared with advertising networks.
 
 ---
 
@@ -40,9 +40,13 @@ Define multi-step user paths (e.g., Landing Page → Pricing → Sign Up) to tra
 
 Visualize weekly user retention cohorts to measure long-term engagement and product stickiness over time.
 
-### Automated Insights & Anomaly Detection
+### Period-Over-Period Insights
 
-Get automatically flagged for traffic spikes, drop-offs, or behavioral anomalies, ensuring you never miss a critical event.
+When you open the dashboard, it compares the period you selected against the one immediately before it and cards anything worth a second look: page views or visitors moving more than 10%, a top-five page growing more than 50%, or a referrer pulling in over ten visits. Fixed thresholds, recomputed on each load, no model.
+
+### Ingestion Alerts
+
+If `ALERT_WEBHOOK_URL` is set, the server checks hourly and posts to that webhook when a site's last 24 hours fall under 30% of its 7-day average. Sites under 20 events a day are skipped, since normal swings look like outages at that volume. One alert per site per day. Set it to a Discord webhook to get pinged when tracking quietly breaks.
 
 ### Location & Device Analytics
 
@@ -89,6 +93,7 @@ window.telemetry?.goal("purchase", { plan: "pro", amount: 49 });
 Telemetry includes built-in protections for the event ingestion endpoint:
 
 - **Bot Detection**: Known bots, crawlers, and scrapers (Googlebot, GPTBot, curl, etc.) are automatically blocked from sending events.
+- **Ingestion Alerts**: If `ALERT_WEBHOOK_URL` is set, an hourly check posts to that webhook when a site's last 24 hours fall under 30% of its 7-day average. Catches tracking that broke silently. Off when the variable is unset.
 - **Rate Limiting**: The `/api/track` endpoint is rate-limited to 30 requests per minute per IP address. Dashboard API calls are not affected.
 - **API Key Authentication**: Each tenant has a unique API key (`tlv_1_...`). When set, only requests with a valid key are accepted. Legacy tenants without a key remain accessible for backwards compatibility.
 
@@ -192,7 +197,7 @@ Telemetry exposes a rich HTTP REST API for exporting metrics or posting events d
 | `/api/stats/pages`    | GET    | Most-visited pages                                  |
 | `/api/stats/funnels`  | POST   | Query conversion funnel reports                     |
 | `/api/stats/cohorts`  | GET    | Retrieve user cohort retention metrics              |
-| `/api/stats/insights` | GET    | Get automated anomalies and highlights              |
+| `/api/stats/insights` | GET    | Compare the selected period against the previous one |
 | `/api/export/events`  | GET    | Export raw event datasets as CSV/JSON               |
 
 For full endpoint definitions and query options, see the [PROJECT_DETAILS.md](PROJECT_DETAILS.md) file.

@@ -52,11 +52,11 @@ const PrivacyAndSecurity = () => {
               </li>
               <li className="flex items-start gap-3">
                 <FileCheck2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">GDPR & CCPA compliant by design.</span>
+                <span className="text-muted-foreground">Visitor IDs are salted hashes that rotate every quarter, so they can't be traced back to a person.</span>
               </li>
               <li className="flex items-start gap-3">
                 <Home className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">Self-hosted for complete data ownership.</span>
+                <span className="text-muted-foreground">Self-hosted, so the events live in a database you control.</span>
               </li>
             </ul>
           </div>
@@ -140,12 +140,16 @@ const PrivacyAndSecurity = () => {
                 Compliance
               </h4>
             </div>
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-              <h5 className="font-medium text-green-600 dark:text-green-400 mb-2">GDPR & CCPA</h5>
-              <p className="text-green-600/80 dark:text-green-300/80 text-sm">
-                By not collecting personal data and not using cookies, Telemetry
-                helps you comply with privacy regulations without needing
-                consent banners.
+            <div className="bg-muted border border-border rounded-lg p-4">
+              <h5 className="font-medium text-foreground mb-2">
+                Your Responsibility
+              </h5>
+              <p className="text-muted-foreground text-sm">
+                Telemetry stores country and city derived from the request IP
+                alongside the hashed visitor ID, and sets no cookies or
+                persistent identifiers. What you still have to disclose, and
+                whether you need consent for it, depends on your jurisdiction
+                and the rest of your stack.
               </p>
             </div>
           </div>

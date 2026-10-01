@@ -6,9 +6,9 @@ const Installation = () => {
       <h2 className="text-3xl font-bold text-foreground mb-6">Installation</h2>
       <div className="bg-card rounded-lg border border-border p-6">
         <p className="text-muted-foreground mb-6">
-          Telemetry is designed to be self-hosted, giving you complete control
-          over your analytics data. Follow these steps to get your own instance
-          running.
+          Telemetry is designed to be self-hosted, so the analytics data
+          stays on a server you control. Follow these steps to get your own
+          instance running.
         </p>
 
         <h3 className="text-xl font-semibold text-foreground mb-3">

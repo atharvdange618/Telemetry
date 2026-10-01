@@ -131,9 +131,10 @@ signupButton.addEventListener('click', () => {
             </h5>
             <p className="text-muted-foreground text-sm">
               No cookies or local storage are used. A random session ID lives in
-              sessionStorage until the tab closes. Visitor identification is
-              done anonymously using a hashed IP and User Agent, ensuring GDPR
-              compliance without consent banners.
+              sessionStorage until the tab closes. Visitors are counted by a
+              salted hash of IP, browser, and site, and the salt rotates every
+              quarter, so an ID can't be traced back to a person or carried into
+              the next quarter.
             </p>
           </div>
         </div>

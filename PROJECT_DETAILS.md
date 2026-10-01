@@ -2,14 +2,14 @@
 
 ## 1. Project Overview
 
-**Telemetry** is a privacy-focused, open-source analytics platform designed to provide meaningful insights without compromising user privacy. It's built for creators, developers, and anyone who believes in a more transparent and honest web.
+**Telemetry** is a privacy-focused, open-source analytics platform. It's built for creators and developers who want to see how a site performs without collecting more about their visitors than the numbers require.
 
 ### Guiding Principles
 
-- **Privacy is Paramount**: Telemetry is cookieless by design. It does not track individuals across the web and avoids collecting unnecessary personal data. The focus is on aggregated insights that respect visitor privacy.
+- **Privacy is Paramount**: Telemetry is cookieless by design and does not track individuals across the web. What it stores per event is a hashed visitor ID, country and city, page and referrer, device and screen size, and UTM parameters. The raw IP is used to look up country and city, then discarded.
 - **Clarity Over Clutter**: The dashboard provides simple, actionable metrics like page views, unique visitors, and bounce rates, presented in a clean and intuitive interface.
-- **You Own Your Data**: As a self-hosted solution, your website's data resides on your own infrastructure, giving you complete control.
-- **Built with Passion**: The project is crafted using modern technologies like Fastify, React, and TypeScript, reflecting a commitment to quality and maintainability.
+- **You Own Your Data**: Self-hosted, your website's data resides on your own infrastructure and you can query the Postgres tables directly.
+- **Small Stack, Clear Code**: Fastify, React, and TypeScript, with no build-time magic between you and the query that answers your question.
 
 ## 2. Technology Stack
 
@@ -167,7 +167,7 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
 - **`GET /api/stats/outbound`**: Returns top 20 outbound links by click count.
 - **`POST /api/stats/funnels`**: Accepts `{ tenantId, steps: ["/page1", "/page2", ...], period }` and returns conversion rates between steps.
 - **`GET /api/stats/cohorts`**: Returns weekly cohort retention matrix.
-- **`GET /api/stats/insights`**: Returns automated insights (trending pages, significant changes, top referrers).
+- **`GET /api/stats/insights`**: Compares the selected period against the period of equal length immediately before it and returns cards for page views or visitors that moved more than 10%, a top-five page that grew more than 50%, or a referrer with more than 10 visits. Recomputed per request.
 - **`GET /api/export/events`**: Exports events as CSV or JSON. Params: `tenantId`, `format` (csv/json), `startDate`, `endDate`, `limit`.
 
 ## 4. Database Schema
@@ -178,9 +178,46 @@ The schema is defined in `prisma/schema.prisma`.
 - **`Account`**: Links a `User` to an OAuth provider (e.g., GitHub).
 - **`Tenant`**: Represents a website being tracked. Includes an optional `apiKey` field for authenticated event ingestion.
 - **`TenantUser`**: A join table linking `User` and `Tenant`, defining roles (e.g., 'ADMIN', 'MEMBER').
-- **`Event`**: The central table for all analytics data. It stores pageviews, goals, outbound clicks, performance metrics, scroll depth, location data, browser/OS/language info, session tracking, UTM parameters, custom event properties, and the anonymized `visitorId`.
+- **`Event`**: The central table for all analytics data. It stores pageviews, goals, outbound clicks, performance metrics, scroll depth, location data, browser/OS/language info, session tracking, UTM parameters, custom event properties, and the hashed `visitorId`.
 
 ## 5. Changelog
+
+### 2026-10-01: `feat(alerts), per-tenant domain checks, stats corrections, and dev tooling`
+
+- **Ingestion Alerts**: New `src/lib/ingestion-alert.ts`. When `ALERT_WEBHOOK_URL` is set, an hourly check posts to that webhook if a site's last 24h falls under 30% of its 7-day average. Sites below 20 events/day are skipped so normal swings don't read as outages. One alert per site per day, list capped at 15 to stay under Discord's 2000-character limit, and `allowed_mentions` is pinned empty so a site name can't ping `@everyone`. Unset variable disables it with a warning.
+- **Per-Tenant Domain Checks**: `/api/track` now validates the request `Origin` against that tenant's `domains` list rather than relying on global CORS config. Domains are stored as bare origins, and requests with no `Origin` are treated as servers and authenticated by API key instead.
+- **Simpler Event Requests**: Events are sent with `fetch` and `credentials: "omit"` instead of `sendBeacon`. A beacon always carries cookies, which turns the preflight into a credentialed one that `/api/track` refuses by design. `keepalive: true` preserves the ability to finish a request after the page unloads, so scroll-depth on `beforeunload` still lands.
+- **Export Fixes**: `/api/export/events` accepts the dashboard's date range and segment filters, and writes ISO dates plus the `inp` column.
+- **Site Deletion Cascade**: Deleting a tenant now deletes its events instead of leaving them orphaned.
+- **Metrics Corrections**: Location stats count only pageviews, durations are rounded before aggregation, views-over-time is bucketed in the viewer's timezone rather than UTC, `avgPagesPerSession` is computed per session rather than per visitor, and funnel conversion enforces step order.
+- **Vitest**: Added with a build config that excludes test files. Coverage for the visitor salt, track route, metrics, and alert logic.
+- **Local Development**: Added `docker-compose.yml` for Postgres plus both services, and `prisma/seed.ts` for generating fake local traffic.
+- **Dashboard**: UX audit fixes, and dark mode state is shared so toasts follow the theme.
+
+### 2026-08-20: `fix: security hardening, quarterly visitor salt rotation, and stats correctness`
+
+- **Quarterly Salt Rotation**: `visitorId` is now `sha256(ip + userAgent + tenantId + HMAC(VISITOR_SALT, quarter-label))`. The rotation bounds how long an ID stays stable for the same browser without breaking the 90-day period and 8-week cohort windows that rely on that continuity.
+- **Proxy Trust**: `trustProxy` is set to `1` instead of `true`. One nginx hop sits in front of the process, so trusting only what nginx appended prevents a client from spoofing `request.ip` through a self-supplied `X-Forwarded-For` chain and bypassing the `/api/track` rate limiter.
+- **CORS Credentials**: Scoped to the dashboard origin only.
+- **Constant-Time Key Comparison**: Tenant API keys are compared with `timingSafeEqual`.
+- **HTTPS Geolocation**: IP geolocation lookups moved to HTTPS.
+- **CDN Integrity**: The `web-vitals` script tag is version-pinned and integrity-checked.
+- **API Key on Signup**: Tenants created through GitHub sign-up now get an API key automatically.
+- **Shared Metric Calculators**: Dashboard and share-link routes now read from the same calculators, so a shared view can't disagree with the live dashboard.
+
+### 2026-06-30: `fix: remove AI slop design patterns and improve UI consistency`
+
+- **Design Pass**: Removed filler styling from the dashboard and tightened spacing and color consistency.
+- **Table Overflow**: `SimpleTable` scrolls when rows exceed `maxRows` instead of clipping them.
+
+### 2026-06-28: `feat: share links, funnel and cohort UI, custom charts, and INP tracking`
+
+- **Shareable Views**: New share-link routes let a dashboard view (including filters and period) be opened by someone without a session, with link management in the UI.
+- **Funnel and Cohort UI**: Funnel analysis and cohort retention wired into the dashboard with explanatory tooltips, plus tooltips across the metrics cards.
+- **INP**: Added an `inp` column to the `Event` table and replaced the hand-rolled performance observers with the `web-vitals` v3 library.
+- **Chart Library**: Replaced the chart component with a custom animated set plus a shadcn registry config and chart CSS variables.
+- **Share Auth Fix**: Resolved dashboard sharing auth and added a global `TooltipProvider`.
+- **Bot Detection**: Consolidated the bot pattern regex and removed unused dependencies.
 
 ### 2026-06-25: `feat: bot protection, rate limiting, API key auth, and SQL injection fix`
 
@@ -207,9 +244,9 @@ The schema is defined in `prisma/schema.prisma`.
 - **Outbound Link Tracking**: New endpoint `/api/stats/outbound` showing most-clicked external links.
 - **Funnel Analysis**: New `POST /api/stats/funnels` endpoint accepting page path steps, returning conversion rates between each step.
 - **Cohort/Retention Analysis**: New `GET /api/stats/cohorts` endpoint grouping visitors by first-visit week with weekly retention matrix.
-- **Automated Insights**: New `GET /api/stats/insights` endpoint detecting significant metric changes, trending pages, and top referrers.
+- **Period-Over-Period Insights**: New `GET /api/stats/insights` endpoint that compares the selected period against the equal-length period before it and returns cards for page views or visitors moving more than 10%, a top-five page growing more than 50%, or a referrer with more than 10 visits. Fixed thresholds, recomputed per request.
 - **Data Export**: New `GET /api/export/events` endpoint supporting CSV and JSON formats with date range filtering.
-- **Dashboard UI**: Added custom date range picker, segment filter bar (browser/OS/country/language/device), automated insights cards, session metrics, scroll depth cards, browser/OS/language tables, outbound links table, Core Web Vitals panel with color-coded p75 values, and data export button.
+- **Dashboard UI**: Added custom date range picker, segment filter bar (browser/OS/country/language/device), period-comparison insight cards, session metrics, scroll depth cards, browser/OS/language tables, outbound links table, Core Web Vitals panel with color-coded p75 values, and data export button.
 
 ### 2026-06-23: `feat: advanced analytics, dynamic CORS, and UI overhaul`
 

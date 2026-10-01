@@ -306,7 +306,7 @@ Content-Type: application/json
 ## Privacy
 
 - **No cookies** - session tracking uses `sessionStorage` (tab-scoped, cleared on close)
-- **No personal data** - visitor IDs are hashed (IP + User-Agent + tenant salt)
+- **Pseudonymous visitor IDs** - a salted hash of IP + User-Agent + tenant, with the salt rotating every quarter
 - **No third-party requests** - all data stays on your server
-- **GDPR compliant** - no consent banner needed
+- **Location data** - country and city are derived from the request IP, which is never stored; whether you need consent for it depends on your jurisdiction
 - **Bot filtering** - crawlers and bots are automatically excluded

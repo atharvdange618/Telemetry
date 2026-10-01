@@ -49,11 +49,11 @@ const Metrics = () => {
               the selected period.
             </p>
             <p className="text-muted-foreground text-sm italic">
-              <strong>How it's counted:</strong> This is the total count of
-              unique <code>visitorId</code> hashes. Each hash is an anonymous
-              signature generated for a 24-hour period from the visitor's IP,
-              User-Agent, and a server-side salt. This provides an accurate,
-              privacy-safe way to measure your audience size.
+              <strong>How it's counted:</strong> Each distinct <code>visitorId</code>{" "}
+              hash counts as one visitor. The hash is built from the visitor's
+              IP, User-Agent, your site ID, and a server-side salt. The salt
+              rotates each quarter, so the same browser counts once within a
+              quarter and starts fresh after the rotation.
             </p>
           </div>
 

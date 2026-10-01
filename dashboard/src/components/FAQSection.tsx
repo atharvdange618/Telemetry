@@ -7,12 +7,12 @@ const faqs = [
   {
     question: "Do I need to show cookie banners?",
     answer:
-      "No. Since Telemetry doesn't use cookies or persistent identifiers, you typically don't need cookie consent banners. We collect anonymous, aggregated data that doesn't personally identify visitors.",
+      "There's no cookie banner built in, since the script sets no cookies. But a pageview still records the hashed visitor ID and country and city, so whether your site needs consent depends on your jurisdiction and what else you collect.",
   },
   {
     question: "How accurate is cookieless tracking?",
     answer:
-      "Our cookieless approach provides accurate analytics for understanding your audience and content performance. While we can't track individual user journeys across sessions, we provide comprehensive insights into page views, referrers, and behavior patterns.",
+      "Visitors are counted by a salted hash of IP, browser, and site rather than a cookie, so a person who clears cookies or blocks storage still shows up in your numbers. Within a quarter the same browser counts once; after the salt rotates it's counted as a new visitor.",
   },
   {
     question: "Can I migrate from Google Analytics?",
