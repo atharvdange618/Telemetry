@@ -113,11 +113,10 @@ export const funnelBodySchema = z.object({
   endDate: z.string().datetime().optional(),
 });
 
-export const exportQuerySchema = z.object({
-  tenantId: z.string().cuid(),
+// Accepts the same range and segment params as the stats endpoints, so an
+// export matches what the dashboard shows.
+export const exportQuerySchema = statsQuerySchema.extend({
   format: z.enum(["csv", "json"]).default("json"),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
   limit: z.coerce.number().int().min(1).max(100000).default(10000),
 });
 

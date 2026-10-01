@@ -307,6 +307,7 @@ export async function statsRoutes(app: FastifyInstance) {
         where: {
           tenantId: parsed.tenantId,
           createdAt: { gte: startDate, lte: endDate },
+          ...segmentFilters(parsed as Record<string, any>),
         },
         orderBy: { createdAt: "desc" },
         take: parsed.limit,
@@ -334,6 +335,7 @@ export async function statsRoutes(app: FastifyInstance) {
           "utmCampaign",
           "scrollDepth",
           "lcp",
+          "inp",
           "fid",
           "cls",
           "ttfb",
@@ -348,7 +350,8 @@ export async function statsRoutes(app: FastifyInstance) {
           const row = headers.map((h) => {
             const val = (e as any)[h];
             if (val === null || val === undefined) return "";
-            const str = String(val);
+            // ISO 8601 so spreadsheets parse it as a date and it sorts as text.
+            const str = val instanceof Date ? val.toISOString() : String(val);
             return str.includes(",") || str.includes('"') || str.includes("\n")
               ? `"${str.replace(/"/g, '""')}"`
               : str;
