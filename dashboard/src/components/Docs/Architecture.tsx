@@ -92,8 +92,8 @@ const Architecture = () => {
               <li className="flex items-start gap-3">
                 <GitBranch className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <strong>TanStack Query:</strong> Powerful server-state
-                  management for fetching and caching data.
+                  <strong>TanStack Query:</strong> Fetches and caches API
+                  data for the dashboard.
                 </div>
               </li>
               <li className="flex items-start gap-3">

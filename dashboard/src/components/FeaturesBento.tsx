@@ -1,10 +1,10 @@
-import { Shield, BarChart3, Globe, Code, Zap, Lock, Bot } from "lucide-react";
+import { Shield, BarChart3, Code, Zap, Bot } from "lucide-react";
 
 const features = [
   {
     icon: Shield,
-    title: "Privacy by Design",
-    description: "No cookies, no fingerprinting, no personal data collection. Your visitors stay anonymous, and you still see top pages and referrers.",
+    title: "No cookies, no raw IPs",
+    description: "The script sets no cookies. Each visitor is counted by a salted hash of IP, browser, and site, the salt rotates every quarter, and the raw IP never reaches the database.",
     large: true,
   },
   {
@@ -13,25 +13,14 @@ const features = [
     description: "Every stat reads raw events when you open the dashboard. A visit from a minute ago is already counted.",
   },
   {
-    icon: Globe,
-    title: "Self-Hosted",
-    description: "Own your data completely. Run on your infrastructure.",
-  },
-  {
-    icon: Code,
-    title: "Open Source",
-    description: "Transparent codebase. Audit, contribute, or fork. No vendor lock-in.",
-  },
-  {
     icon: Zap,
     title: "About 3KB Gzipped",
     description: "One small script. Events go out as keepalive requests with no cookies, so sending them never blocks the page.",
   },
   {
-    icon: Lock,
-    title: "GDPR Compliant",
-    description: "Built for compliance from day one. No cookie banners needed. Works across EU and global regulations.",
-    large: true,
+    icon: Code,
+    title: "Open Source, Self-Hostable",
+    description: "Read the code, run it on your own server, and query the Postgres tables directly.",
   },
   {
     icon: Bot,
@@ -47,10 +36,10 @@ export function FeaturesBento() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-16">
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 text-balance">
-            Built for developers who care about privacy
+            What it tracks, and what it leaves out
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl">
-            Pages, referrers, goals, funnels, and Core Web Vitals, with no personal data stored.
+            Every number on the dashboard comes from a hashed visitor ID, never a cookie or a raw IP.
           </p>
         </div>
 

@@ -2,7 +2,7 @@ const faqs = [
   {
     question: "How is Telemetry different from Google Analytics?",
     answer:
-      "Telemetry is built with privacy as the foundation. We don't use cookies, don't track users across sites, and give you complete ownership of your data. Unlike Google Analytics, we're open source, self-hostable, and designed to be GDPR compliant by default.",
+      "Telemetry sets no cookies, doesn't follow visitors across sites, and never stores a raw IP address. Unlike Google Analytics, it's open source and you can host it yourself.",
   },
   {
     question: "Do I need to show cookie banners?",

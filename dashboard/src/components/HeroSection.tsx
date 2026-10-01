@@ -1,4 +1,4 @@
-import { Github, ArrowRight, Shield, BarChart3, Globe, Code } from "lucide-react";
+import { Github, ArrowRight, Code } from "lucide-react";
 import { Button } from "./ui/button";
 
 export const AccentText = ({
@@ -19,14 +19,14 @@ export function HeroSection() {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="animate-slide-in-left">
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl text-foreground mb-6 text-balance leading-[1.05]">
-              Analytics with a{" "}
-              <AccentText>Soul</AccentText>
+            <h1 className="font-heading text-5xl md:text-6xl text-foreground mb-6 text-balance leading-[1.05]">
+              Know which pages work without knowing{" "}
+              <AccentText>who read them</AccentText>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg mb-10 leading-relaxed">
-              See which pages people read and where they came from, without
-              storing who they are. Open source, self-hostable, no cookies.
+              Pages, referrers, goals, funnels, and Core Web Vitals from one
+              3KB script. No cookies, open source, self-hostable.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -63,12 +63,7 @@ export function HeroSection() {
             <div className="relative">
               <div className="relative rounded-2xl border border-border bg-card p-1">
                 <div className="rounded-xl bg-background p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                    <span className="ml-2 text-xs text-muted-foreground font-mono">dashboard</span>
-                  </div>
+                  <div className="mb-6 text-xs text-muted-foreground font-mono">dashboard</div>
 
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {[
@@ -100,20 +95,6 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mt-20 text-sm text-muted-foreground animate-fade-in-up delay-300">
-          {[
-            { icon: Globe, text: "No cookies" },
-            { icon: Shield, text: "GDPR compliant" },
-            { icon: BarChart3, text: "Web Vitals included" },
-            { icon: Code, text: "Open source" },
-          ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-2">
-              <Icon className="w-4 h-4 text-primary/70" />
-              {text}
-            </div>
-          ))}
         </div>
       </div>
     </section>

@@ -1,15 +1,15 @@
 import { Check, X } from "lucide-react";
 
 const features = [
-  { name: "Cookie-free", telemetry: true, analytics: false },
-  { name: "Data Ownership", telemetry: true, analytics: false },
-  { name: "GDPR by Default", telemetry: true, analytics: false },
-  { name: "Open Source", telemetry: true, analytics: false },
-  { name: "Self-Hosted Option", telemetry: true, analytics: false },
-  { name: "Lightweight Script", telemetry: true, analytics: false },
-  { name: "Built-in Bot Filtering", telemetry: true, analytics: false },
-  { name: "API Key Authentication", telemetry: true, analytics: false },
-  { name: "No Data Retention Limit", telemetry: true, analytics: false },
+  { name: "No cookies", telemetry: true, analytics: false },
+  { name: "Open source", telemetry: true, analytics: false },
+  { name: "Self-hostable", telemetry: true, analytics: false },
+  { name: "Script around 3KB gzipped", telemetry: true, analytics: false },
+  { name: "No raw-event retention limit", telemetry: true, analytics: false },
+  { name: "Raw IPs never stored", telemetry: true, analytics: true },
+  { name: "Known bots filtered", telemetry: true, analytics: true },
+  { name: "Goals and funnels", telemetry: true, analytics: true },
+  { name: "Free", telemetry: true, analytics: true },
 ];
 
 export function ComparisonSection() {
@@ -20,7 +20,7 @@ export function ComparisonSection() {
           Telemetry vs. Google Analytics
         </h2>
         <p className="text-muted-foreground text-lg mb-12 text-center max-w-xl mx-auto">
-          See how privacy-first analytics compares.
+          Where the two differ, and where they don&rsquo;t.
         </p>
 
         <div className="rounded-2xl border border-border bg-card overflow-hidden">

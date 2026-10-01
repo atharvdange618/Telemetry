@@ -13,13 +13,8 @@ export function HowItWorksSection() {
         </p>
 
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-secondary/30">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-            </div>
-            <span className="ml-2 text-xs text-muted-foreground font-mono">index.html</span>
+          <div className="px-5 py-3 border-b border-border bg-secondary/30 text-left">
+            <span className="text-xs text-muted-foreground font-mono">index.html</span>
           </div>
           <div className="p-5 text-left overflow-x-auto">
             <code className="text-sm md:text-base font-mono text-green-500/90">

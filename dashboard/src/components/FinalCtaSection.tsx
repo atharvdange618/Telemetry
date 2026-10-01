@@ -8,10 +8,10 @@ export function FinalCtaSection() {
     <section className="py-24 px-6 lg:px-8 border-t border-border/50">
       <div className="max-w-3xl mx-auto text-center">
         <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl text-foreground mb-4 text-balance">
-          Ready to reclaim your analytics?
+          Add it to your site in a minute
         </h2>
         <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-          Free, open source, and privacy-first. Set up in under a minute.
+          Sign in with GitHub, add your site, and paste one script tag.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

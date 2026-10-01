@@ -6,7 +6,6 @@ import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { Navigation } from "@/components/Navigation";
-import { PrivacyManifestoSection } from "@/components/PrivacyManifestoSection";
 import { SEO } from "@/components/SEO";
 
 export default function Home() {
@@ -58,7 +57,6 @@ export default function Home() {
       <FeaturesBento />
       <HowItWorksSection />
       <ComparisonSection />
-      <PrivacyManifestoSection />
       <FAQSection />
       <FinalCtaSection />
       <Footer />
