@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { OutboundResponse } from "@/lib/types/dashboard.types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,4 +40,14 @@ export function normalizePath(input: string): string {
 export function toDateInputValue(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// Outbound links show by hostname; the full URL is too long for a table row.
+export function toOutboundRows(
+  data: OutboundResponse | undefined,
+): { url: string; clicks: number }[] {
+  return (data?.outboundLinks ?? []).map((o) => ({
+    url: new URL(o.url).hostname,
+    clicks: o.clicks,
+  }));
 }

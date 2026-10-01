@@ -23,19 +23,19 @@ import type {
   SharedViewResponse,
 } from "@/lib/types/dashboard.types";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Users, TrendingUp, BarChart3, Timer, Scroll, AlertCircle } from "lucide-react";
+import { Eye, Users, TrendingUp, BarChart3, Timer, Scroll, AlertCircle, ExternalLink, FileText, Link2, MapPin, Megaphone, Target } from "lucide-react";
 import { useSearchParams, useParams } from "react-router-dom";
 import { useMemo } from "react";
 
 import { StatCard } from "@/components/dashboard/StatCard";
 import { LocationSection } from "@/components/dashboard/LocationSection";
-import { PagesReferrersSection } from "@/components/dashboard/PagesReferrersSection";
+import { TableCard } from "@/components/dashboard/TableCard";
 import { TechSection } from "@/components/dashboard/TechSection";
-import { GoalsSection } from "@/components/dashboard/GoalsSection";
 import { PerformanceSection } from "@/components/dashboard/PerformanceSection";
 import { CampaignsSection } from "@/components/dashboard/CampaignsSection";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { toOutboundRows } from "@/lib/utils";
 
 const fetchAPI = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url);
@@ -303,19 +303,65 @@ export default function SharedDashboardPage() {
         )}
 
         <LocationSection data={locationsData} />
-        <PagesReferrersSection pages={pages} referrers={referrers} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <TableCard
+            className="lg:col-span-2"
+            title="Top Pages"
+            icon={FileText}
+            data={pages?.pages ?? []}
+            labelKey="path"
+            valueKey="views"
+            valueLabel="Views"
+          />
+          <TableCard
+            title="Top Referrers"
+            icon={Link2}
+            data={referrers?.referrers ?? []}
+            labelKey="referrer"
+            valueKey="views"
+            valueLabel="Views"
+          />
+        </div>
         <TechSection
           browsers={browsersData}
           os={osData}
           languages={languagesData}
           devices={devicesData}
         />
-        <GoalsSection
-          goals={goalsData}
-          sources={sourcesData}
-          cities={citiesData}
-          outbound={outboundData}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <TableCard
+            title="Top Goals"
+            icon={Target}
+            data={goalsData?.goals ?? []}
+            labelKey="name"
+            valueKey="completions"
+            valueLabel="Count"
+          />
+          <TableCard
+            title="Top Sources"
+            icon={Megaphone}
+            data={sourcesData?.sources ?? []}
+            labelKey="source"
+            valueKey="views"
+            valueLabel="Views"
+          />
+          <TableCard
+            title="Top Cities"
+            icon={MapPin}
+            data={citiesData?.cities ?? []}
+            labelKey="city"
+            valueKey="views"
+            valueLabel="Views"
+          />
+          <TableCard
+            title="Outbound Links"
+            icon={ExternalLink}
+            data={toOutboundRows(outboundData)}
+            labelKey="url"
+            valueKey="clicks"
+            valueLabel="Clicks"
+          />
+        </div>
         <PerformanceSection data={perfData} />
         <CampaignsSection data={campaignsData} />
       </main>
