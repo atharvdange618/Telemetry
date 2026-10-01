@@ -46,7 +46,6 @@ export default function Home() {
       >
         Skip to content
       </a>
-      <div className="noise" />
       <SEO
         title="Privacy-First Open-Source Web Analytics"
         description="Telemetry is a cookieless, privacy-focused open-source analytics platform. Get clear, aggregated visitor insights without cookie banners, tracking scripts, or personal data collection."

@@ -303,7 +303,6 @@ export default function DashboardPage() {
   return (
     <TooltipProvider>
       <div className="p-4 md:p-8 min-h-screen relative">
-        <div className="noise" />
         <SEO
           title={`${tenantName} Overview`}
           description="View privacy-friendly website analytics."

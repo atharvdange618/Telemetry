@@ -223,7 +223,6 @@ export default function SharedDashboardPage() {
 
   return (
     <div className="p-4 md:p-8 min-h-screen relative">
-      <div className="noise" />
       <SEO title={`${label} - Shared`} description="Shared analytics dashboard view" noindex={true} />
 
       <header className="mb-8">

@@ -5,62 +5,38 @@ const features = [
     icon: Shield,
     title: "Privacy by Design",
     description: "No cookies, no fingerprinting, no personal data collection. Your visitors stay anonymous, and you still see top pages and referrers.",
-    color: "text-primary",
-    bg: "bg-primary/5",
-    border: "border-primary/10",
     large: true,
   },
   {
     icon: BarChart3,
     title: "No Batch Delay",
     description: "Every stat reads raw events when you open the dashboard. A visit from a minute ago is already counted.",
-    color: "text-chart-2",
-    bg: "bg-chart-2/5",
-    border: "border-chart-2/10",
-    borderless: true,
   },
   {
     icon: Globe,
     title: "Self-Hosted",
     description: "Own your data completely. Run on your infrastructure.",
-    color: "text-chart-4",
-    bg: "bg-chart-4/5",
-    border: "border-chart-4/10",
   },
   {
     icon: Code,
     title: "Open Source",
     description: "Transparent codebase. Audit, contribute, or fork. No vendor lock-in.",
-    color: "text-chart-3",
-    bg: "bg-chart-3/5",
-    border: "border-chart-3/10",
-    borderless: true,
   },
   {
     icon: Zap,
     title: "About 3KB Gzipped",
     description: "One small script. Events go out through sendBeacon, so sending them never blocks the page.",
-    color: "text-accent",
-    bg: "bg-accent/5",
-    border: "border-accent/10",
   },
   {
     icon: Lock,
     title: "GDPR Compliant",
     description: "Built for compliance from day one. No cookie banners needed. Works across EU and global regulations.",
-    color: "text-chart-5",
-    bg: "bg-chart-5/5",
-    border: "border-chart-5/10",
     large: true,
-    borderless: true,
   },
   {
     icon: Bot,
     title: "AI Agent Friendly",
     description: "Machine-readable integration guide at /docs.md. AI agents can fetch this file to automatically generate correct telemetry implementations.",
-    color: "text-chart-1",
-    bg: "bg-chart-1/5",
-    border: "border-chart-1/10",
     link: "https://usetelemetry.hogyoku.cloud/docs.md",
   },
 ];
@@ -82,14 +58,12 @@ export function FeaturesBento() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className={`group relative rounded-2xl p-6 transition-all duration-300 ${
-                feature.borderless
-                  ? "bg-secondary/50 hover:bg-secondary/70"
-                  : "border border-border bg-card hover:border-border/20 hover:bg-card/80"
-              } ${feature.large ? "lg:col-span-2" : ""}`}
+              className={`group relative rounded-2xl border border-border bg-card p-6 transition-colors duration-300 hover:border-foreground/20 ${
+                feature.large ? "lg:col-span-2" : ""
+              }`}
             >
-              <div className={`inline-flex p-2.5 rounded-xl ${feature.bg} ${feature.border} border mb-4`}>
-                <feature.icon className={`w-5 h-5 ${feature.color}`} />
+              <div className="inline-flex p-2.5 rounded-xl bg-primary/5 mb-4">
+                <feature.icon className="w-5 h-5 text-primary" />
               </div>
               <h3 className="font-heading text-lg text-foreground mb-2">
                 {feature.title}
