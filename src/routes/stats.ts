@@ -58,7 +58,13 @@ function parseQuery(request: any): MetricsParams {
   const parsed = statsQuerySchema.parse(request.query);
   const { startDate, endDate } = resolveDateRange(parsed);
   const segments = segmentFilters(parsed as Record<string, any>);
-  return { tenantId: parsed.tenantId, startDate, endDate, segments };
+  return {
+    tenantId: parsed.tenantId,
+    startDate,
+    endDate,
+    segments,
+    timeZone: parsed.tz,
+  };
 }
 
 export async function statsRoutes(app: FastifyInstance) {

@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { tenantBodySchema } from "./schemas";
+import { statsQuerySchema, tenantBodySchema } from "./schemas";
+
+describe("statsQuerySchema tz", () => {
+  const tenantId = "csitea0000000000000000001";
+
+  it("accepts IANA timezones and leaves tz optional", () => {
+    expect(statsQuerySchema.parse({ tenantId, tz: "Asia/Kolkata" }).tz).toBe("Asia/Kolkata");
+    expect(statsQuerySchema.parse({ tenantId }).tz).toBeUndefined();
+  });
+
+  it("rejects names that aren't timezones", () => {
+    expect(statsQuerySchema.safeParse({ tenantId, tz: "Mars/Olympus" }).success).toBe(false);
+  });
+});
 
 const parseDomains = (domains: string[]) =>
   tenantBodySchema.parse({ name: "My site", domains }).domains;

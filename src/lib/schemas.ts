@@ -82,8 +82,19 @@ export const githubEmailSchema = z.object({
   verified: z.boolean(),
 });
 
+export function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const statsQuerySchema = z.object({
   tenantId: z.string().cuid(),
+  // The viewer's IANA timezone, so chart days start at their midnight.
+  tz: z.string().refine(isValidTimeZone, "Unknown timezone").optional(),
   period: z.enum(["24h", "7d", "30d", "90d"]).default("24h"),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),

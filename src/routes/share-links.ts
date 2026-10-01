@@ -3,7 +3,11 @@ import { ZodError } from "zod";
 import { randomBytes } from "crypto";
 import { authHook } from "../hooks/auth";
 import { prisma } from "../lib/prisma";
-import { shareLinkBodySchema, shareLinkParamsSchema } from "../lib/schemas";
+import {
+  isValidTimeZone,
+  shareLinkBodySchema,
+  shareLinkParamsSchema,
+} from "../lib/schemas";
 import * as metrics from "../lib/metrics";
 import { MetricsParams } from "../lib/metrics";
 
@@ -228,6 +232,8 @@ export async function shareLinksRoutes(app: FastifyInstance) {
         startDate,
         endDate,
         segments,
+        timeZone:
+          query.tz && isValidTimeZone(query.tz) ? query.tz : undefined,
       });
       return data;
     } catch (error) {

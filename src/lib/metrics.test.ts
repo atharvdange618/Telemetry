@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "./prisma";
 import {
+  bucketKeyFormatter,
   calcPercentile,
   classifyDevice,
   deviceSegmentFilter,
@@ -9,6 +10,7 @@ import {
   getEngagement,
   getLocations,
   getSummary,
+  getViewsOverTime,
   type MetricsParams,
 } from "./metrics";
 
@@ -136,6 +138,57 @@ describe("getEngagement", () => {
       returningVisitors: 1,
       totalVisitors: 2,
     });
+  });
+});
+
+describe("bucketKeyFormatter", () => {
+  // India is UTC+5:30, so its midnight is 18:30 UTC the day before.
+  const daily = bucketKeyFormatter("Asia/Kolkata", false);
+
+  it("starts days at the viewer's midnight, not UTC's", () => {
+    expect(daily(new Date("2026-10-01T18:29:00Z"))).toBe("2026-10-01T00:00");
+    expect(daily(new Date("2026-10-01T18:31:00Z"))).toBe("2026-10-02T00:00");
+  });
+
+  it("buckets hours on the viewer's clock, including half-hour offsets", () => {
+    const hourly = bucketKeyFormatter("Asia/Kolkata", true);
+    expect(hourly(new Date("2026-10-01T00:29:00Z"))).toBe("2026-10-01T05:00");
+    expect(hourly(new Date("2026-10-01T00:31:00Z"))).toBe("2026-10-01T06:00");
+  });
+
+  it("writes midnight as 00, never 24", () => {
+    expect(bucketKeyFormatter("UTC", true)(new Date("2026-10-01T00:05:00Z"))).toBe("2026-10-01T00:00");
+  });
+
+  it("returns keys the browser reads back as local wall-clock time", () => {
+    // No offset in the key, so new Date() treats it as local time.
+    const key = daily(new Date("2026-10-01T12:00:00Z"));
+    expect(key).not.toMatch(/Z|[+-]\d\d:\d\d$/);
+  });
+});
+
+describe("getViewsOverTime", () => {
+  it("counts views per day in the viewer's timezone, in order", async () => {
+    findManyReturns([
+      { createdAt: new Date("2026-09-02T10:00:00Z") },
+      { createdAt: new Date("2026-09-02T18:29:00Z") },
+      { createdAt: new Date("2026-09-02T18:31:00Z") },
+    ]);
+
+    const { views } = await getViewsOverTime({ ...params, timeZone: "Asia/Kolkata" });
+
+    expect(views).toEqual([
+      { date: "2026-09-02T00:00", views: 2 },
+      { date: "2026-09-03T00:00", views: 1 },
+    ]);
+  });
+
+  it("falls back to UTC days when no timezone is given", async () => {
+    findManyReturns([{ createdAt: new Date("2026-09-02T18:31:00Z") }]);
+
+    const { views } = await getViewsOverTime(params);
+
+    expect(views).toEqual([{ date: "2026-09-02T00:00", views: 1 }]);
   });
 });
 

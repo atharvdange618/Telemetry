@@ -57,7 +57,9 @@ export default function SharedDashboardPage() {
 
   const endpoint = `${APP_URL}/api/shared/${token}/stats`;
   const queryParams = useMemo(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams({
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
     const period = searchParams.get("period") || viewData?.config?.period || "24h";
     const startDate = searchParams.get("startDate") || viewData?.config?.startDate;
     const endDate = searchParams.get("endDate") || viewData?.config?.endDate;

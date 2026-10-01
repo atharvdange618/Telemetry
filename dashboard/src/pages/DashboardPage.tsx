@@ -143,7 +143,11 @@ export default function DashboardPage() {
   // Tenant and range without segments. The filter dropdowns read their options
   // from this, so picking one browser doesn't hide every other browser.
   const baseParams = useMemo(() => {
-    const params = new URLSearchParams({ tenantId: selectedTenantId || "" });
+    const params = new URLSearchParams({
+      tenantId: selectedTenantId || "",
+      // So the chart's days start at the viewer's midnight, not the server's.
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
     for (const [key, value] of Object.entries(range)) {
       if (value) params.set(key, value);
     }

@@ -5,6 +5,32 @@ export interface MetricsParams {
   startDate: Date;
   endDate: Date;
   segments: Record<string, any>;
+  /** IANA timezone of the viewer, for time buckets. Defaults to UTC. */
+  timeZone?: string;
+}
+
+// Bucket keys are wall-clock times in the viewer's timezone with no offset,
+// like "2026-10-01T05:00". Browsers parse that form as local time, so day
+// and hour boundaries land where the viewer expects. (A bare "2026-10-01"
+// would be parsed as UTC.) ponytail: during a DST fall-back the repeated
+// hour merges into one bucket.
+export function bucketKeyFormatter(
+  timeZone: string,
+  hourly: boolean,
+): (date: Date) => string {
+  const format = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+  });
+  return (date) => {
+    const part: Record<string, string> = {};
+    for (const { type, value } of format.formatToParts(date)) part[type] = value;
+    return `${part.year}-${part.month}-${part.day}T${hourly ? part.hour : "00"}:00`;
+  };
 }
 
 // Single source of truth for the mobile/tablet/desktop screenWidth cutoffs,
@@ -139,6 +165,7 @@ export async function getViewsOverTime({
   startDate,
   endDate,
   segments,
+  timeZone = "UTC",
 }: MetricsParams) {
   const diffMs = endDate.getTime() - startDate.getTime();
   const isHourly = diffMs < 2 * 24 * 60 * 60 * 1000;
@@ -154,20 +181,10 @@ export async function getViewsOverTime({
     orderBy: { createdAt: "asc" },
   });
 
+  const toBucket = bucketKeyFormatter(timeZone, isHourly);
   const buckets = new Map<string, number>();
   for (const e of events) {
-    const d = new Date(e.createdAt);
-    let key: string;
-    if (isHourly) {
-      key = new Date(
-        d.getFullYear(),
-        d.getMonth(),
-        d.getDate(),
-        d.getHours(),
-      ).toISOString();
-    } else {
-      key = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
-    }
+    const key = toBucket(e.createdAt);
     buckets.set(key, (buckets.get(key) || 0) + 1);
   }
 
