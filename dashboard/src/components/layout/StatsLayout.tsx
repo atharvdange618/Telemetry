@@ -102,7 +102,8 @@ export function StatsLayout() {
           onClearSegments={params.clearSegments}
         />
         {site && site.domains.length === 0 && <SetupWarning siteName={site.name} />}
-        <Outlet />
+        {/* Wait for the site list, so a stale or mistyped site id never fires stats requests. */}
+        {site && <Outlet />}
       </div>
     </>
   );
