@@ -11,7 +11,9 @@ import {
   Outlet,
   RouterProvider,
   useLocation,
+  useParams,
 } from "react-router-dom";
+import { dashboardPath } from "./lib/dashboard-params";
 import { useEffect } from "react";
 import { AppLayout } from "./components/layout/AppLayout";
 import { StatsLayout } from "./components/layout/StatsLayout";
@@ -72,10 +74,17 @@ const ProtectedRoute: React.FC = () => {
   return <Outlet />;
 };
 
-// /dashboard/:siteId on its own opens Overview, keeping range and filters.
+// /dashboard/:siteId on its own, or unknown page slugs, open Overview, keeping
+// range and filters.
 const ToOverview: React.FC = () => {
+  const { siteId } = useParams<{ siteId: string }>();
   const { search } = useLocation();
-  return <Navigate to={{ pathname: "overview", search }} replace />;
+
+  if (!siteId) {
+    return <Navigate to={`/dashboard${search}`} replace />;
+  }
+
+  return <Navigate to={dashboardPath(siteId, "overview", search)} replace />;
 };
 
 const router = createBrowserRouter([
