@@ -11,6 +11,15 @@ declare module "fastify" {
   }
 }
 
+// Shared by login and logout: a browser only replaces a cookie whose
+// attributes match, so clearing with different ones can leave it in place.
+const SESSION_COOKIE = {
+  path: "/",
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+} as const;
+
 export async function authRoutes(app: FastifyInstance) {
   app.register(fastifyOAuth2, {
     name: "githubOAuth",
@@ -124,11 +133,8 @@ export async function authRoutes(app: FastifyInstance) {
       }
 
       reply.setCookie("userId", user.id, {
-        path: "/",
+        ...SESSION_COOKIE,
         signed: true,
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
 
@@ -162,7 +168,7 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   app.get("/logout", async (_request, reply) => {
-    reply.clearCookie("userId", { path: "/" });
+    reply.clearCookie("userId", SESSION_COOKIE);
     return reply.send({ message: "Logged out" });
   });
 }
