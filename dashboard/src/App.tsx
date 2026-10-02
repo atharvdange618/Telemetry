@@ -17,6 +17,11 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { StatsLayout } from "./components/layout/StatsLayout";
 import { DashboardIndexRedirect } from "./components/layout/DashboardIndexRedirect";
 import OverviewPage from "./pages/dashboard/OverviewPage";
+import ContentPage from "./pages/dashboard/ContentPage";
+import SourcesPage from "./pages/dashboard/SourcesPage";
+import AudiencePage from "./pages/dashboard/AudiencePage";
+import ConversionsPage from "./pages/dashboard/ConversionsPage";
+import PerformancePage from "./pages/dashboard/PerformancePage";
 import SharedDashboardPage from "./pages/SharedDashboardPage";
 import React from "react";
 import SettingsPage from "./components/SettingsPage";
@@ -95,6 +100,11 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <ToOverview /> },
               { path: "overview", element: <OverviewPage /> },
+              { path: "content", element: <ContentPage /> },
+              { path: "sources", element: <SourcesPage /> },
+              { path: "audience", element: <AudiencePage /> },
+              { path: "conversions", element: <ConversionsPage /> },
+              { path: "performance", element: <PerformancePage /> },
             ],
           },
           { path: "/settings", element: <SettingsPage /> },
