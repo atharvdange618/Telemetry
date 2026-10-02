@@ -53,6 +53,8 @@ export default function SharedDashboardPage() {
       queryKey: ["shared", token],
       queryFn: () => fetchAPI(`${APP_URL}/api/shared/${token}`),
       enabled: !!token,
+      // An expired or bad link gets its own error screen.
+      meta: { silentError: true },
     });
 
   const endpoint = `${APP_URL}/api/shared/${token}/stats`;
@@ -126,7 +128,7 @@ export default function SharedDashboardPage() {
     enabled,
   });
 
-  const { data: engagementData } = useQuery<EngagementResponse>({
+  const { data: engagementData, isPending: engagementPending } = useQuery<EngagementResponse>({
     queryKey: [...queryKey, "engagement"],
     queryFn: () => fetchAPI(`${endpoint}/engagement?${queryParams}`),
     enabled,
@@ -156,13 +158,13 @@ export default function SharedDashboardPage() {
     enabled,
   });
 
-  const { data: sessionsData } = useQuery<SessionsResponse>({
+  const { data: sessionsData, isPending: sessionsPending } = useQuery<SessionsResponse>({
     queryKey: [...queryKey, "sessions"],
     queryFn: () => fetchAPI(`${endpoint}/sessions?${queryParams}`),
     enabled,
   });
 
-  const { data: scrollData } = useQuery<ScrollDepthResponse>({
+  const { data: scrollData, isPending: scrollPending } = useQuery<ScrollDepthResponse>({
     queryKey: [...queryKey, "scrollDepth"],
     queryFn: () => fetchAPI(`${endpoint}/scroll-depth?${queryParams}`),
     enabled,
@@ -261,7 +263,7 @@ export default function SharedDashboardPage() {
             title="Pages / Session"
             value={engagementData?.avgPagesPerSession ?? "\u2014"}
             icon={TrendingUp}
-            isLoading={!engagementData}
+            isLoading={engagementPending}
           />
           <StatCard
             title="Bounce Rate"
@@ -276,25 +278,25 @@ export default function SharedDashboardPage() {
             title="Sessions"
             value={sessionsData?.totalSessions ?? "\u2014"}
             icon={Timer}
-            isLoading={!sessionsData}
+            isLoading={sessionsPending}
           />
           <StatCard
             title="Avg Session"
             value={sessionsData?.avgDurationFormatted ?? "\u2014"}
             icon={Timer}
-            isLoading={!sessionsData}
+            isLoading={sessionsPending}
           />
           <StatCard
             title="Avg Scroll"
             value={scrollData?.avgScrollDepth ? `${scrollData.avgScrollDepth}%` : "\u2014"}
             icon={Scroll}
-            isLoading={!scrollData}
+            isLoading={scrollPending}
           />
           <StatCard
             title="Scroll (100%)"
             value={scrollData?.distribution?.at100 ?? "\u2014"}
             icon={Scroll}
-            isLoading={!scrollData}
+            isLoading={scrollPending}
           />
         </div>
 

@@ -33,14 +33,14 @@ export default function ContentPage() {
           title="Pages / Session"
           value={engagement.data?.avgPagesPerSession ?? "—"}
           icon={TrendingUp}
-          isLoading={!engagement.data}
+          isLoading={engagement.isPending}
           tooltip="Average number of pages a person looks at during a single visit. Higher usually means your content is engaging."
         />
         <StatCard
           title="Avg Scroll"
           value={scroll.data?.avgScrollDepth ? `${scroll.data.avgScrollDepth}%` : "—"}
           icon={Scroll}
-          isLoading={!scroll.data}
+          isLoading={scroll.isPending}
           tooltip="How far down the page people typically scroll. 100% means they reached the bottom."
         />
       </div>

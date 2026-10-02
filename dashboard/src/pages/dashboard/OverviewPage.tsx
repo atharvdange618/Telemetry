@@ -34,7 +34,7 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Unique Visitors"
-          value={summary.data?.uniqueVisitors ?? 0}
+          value={summary.data?.uniqueVisitors ?? "—"}
           icon={Users}
           change={compare.data?.uniqueVisitors?.change}
           isLoading={summary.isLoading}
@@ -42,7 +42,7 @@ export default function OverviewPage() {
         />
         <StatCard
           title="Page Views"
-          value={summary.data?.pageViews ?? 0}
+          value={summary.data?.pageViews ?? "—"}
           icon={Eye}
           change={compare.data?.pageViews?.change}
           isLoading={summary.isLoading}
@@ -59,7 +59,7 @@ export default function OverviewPage() {
           title="Avg Session"
           value={sessions.data?.avgDurationFormatted ?? "—"}
           icon={Timer}
-          isLoading={!sessions.data}
+          isLoading={sessions.isPending}
           tooltip="How long, on average, people spend on your site per visit. Longer usually means they find your content useful."
         />
       </div>

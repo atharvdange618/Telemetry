@@ -1,9 +1,5 @@
-import {
-  keepPreviousData,
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { createQueryClient } from "./lib/query-client";
 import { useAuthStore } from "./lib/state/auth";
 import {
   createBrowserRouter,
@@ -34,11 +30,7 @@ import "./hooks/useDarkMode";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/sonner";
 
-// Keep the last result on screen while a new period or filter loads, so
-// sections don't unmount and the page doesn't jump on every change.
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { placeholderData: keepPreviousData } },
-});
+const queryClient = createQueryClient();
 
 const ProtectedRoute: React.FC = () => {
   const { user, setUser } = useAuthStore();
@@ -55,6 +47,8 @@ const ProtectedRoute: React.FC = () => {
       return res.json();
     },
     retry: false,
+    // Signed out is expected here; the route redirects instead.
+    meta: { silentError: true },
   });
 
   useEffect(() => {

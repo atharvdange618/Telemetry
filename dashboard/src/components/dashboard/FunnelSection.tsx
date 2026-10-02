@@ -40,6 +40,8 @@ export function FunnelSection({ tenantId, range }: FunnelSectionProps) {
         body: JSON.stringify({ tenantId, steps: submittedSteps, ...range }),
       }),
     enabled: !!tenantId && !!submittedSteps,
+    // The section shows its own error message.
+    meta: { silentError: true },
   });
   const result = funnelQuery.data;
 
