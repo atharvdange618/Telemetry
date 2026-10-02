@@ -78,11 +78,12 @@
     "vitest": "^5.0.3"
   },
   "overrides": {
-    "react-is": "^19.1.0"
+    "react-is": "^19.1.0",
+    "rollup": "4.63.6"
   },
   "allowScripts": {
     "@swc/core@1.13.3": true,
     "@tailwindcss/oxide@4.1.11": true,
-    "esbuild@0.25.8": true
+    "esbuild@0.28.2": true
   }
 }
