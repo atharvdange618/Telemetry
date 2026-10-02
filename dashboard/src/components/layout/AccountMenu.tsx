@@ -60,7 +60,7 @@ export function AccountMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={handleLogout}
-          className="text-destructive focus:text-destructive"
+          variant="destructive"
         >
           <LogOut className="h-4 w-4 mr-2" /> Log out
         </DropdownMenuItem>
