@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { SimpleTable } from "./SimpleTable";
+import { SimpleTable, type CellKey } from "./SimpleTable";
 
-interface TableCardProps {
+interface TableCardProps<T extends object> {
   title: string;
   icon: LucideIcon;
-  data: object[];
-  labelKey: string;
-  valueKey: string;
+  data: T[];
+  labelKey: CellKey<T>;
+  valueKey: CellKey<T>;
   valueLabel: string;
   /** Show only the first N rows, for previews. */
   limit?: number;
@@ -18,7 +18,7 @@ interface TableCardProps {
   className?: string;
 }
 
-export function TableCard({
+export function TableCard<T extends object>({
   title,
   icon: Icon,
   data,
@@ -28,7 +28,7 @@ export function TableCard({
   limit,
   moreHref,
   className,
-}: TableCardProps) {
+}: TableCardProps<T>) {
   return (
     <Card className={cn("transition-all duration-300 hover:border-border/20", className)}>
       <CardHeader className="flex flex-row items-center gap-2">

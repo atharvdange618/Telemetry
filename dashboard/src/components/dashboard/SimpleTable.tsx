@@ -7,16 +7,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function SimpleTable({
+export type Cell = string | number | null | undefined;
+
+// Keys of T whose values fit in a table cell, so a typo in labelKey or
+// valueKey fails to compile instead of rendering a blank column.
+export type CellKey<T> = {
+  [K in keyof T]: T[K] extends Cell ? K : never;
+}[keyof T] &
+  string;
+
+export function SimpleTable<T extends object>({
   data,
   labelKey,
   valueKey,
   valueLabel,
   maxRows = 8,
 }: {
-  data: object[];
-  labelKey: string;
-  valueKey: string;
+  data: T[];
+  labelKey: CellKey<T>;
+  valueKey: CellKey<T>;
   valueLabel: string;
   maxRows?: number;
 }) {
@@ -37,16 +46,15 @@ export function SimpleTable({
         </TableHeader>
         <TableBody>
           {data?.length ? (
-            data.map((item, i) => {
-              const row = item as Record<
-                string,
-                string | number | boolean | null | undefined
-              >;
-              const val = row[valueKey];
+            data.map((row, i) => {
+              // CellKey guarantees these are Cell values; TypeScript can't
+              // follow that through a generic index.
+              const label = row[labelKey] as Cell;
+              const val = row[valueKey] as Cell;
               return (
                 <TableRow key={i}>
                   <TableCell className="font-medium text-sm">
-                    {row[labelKey]}
+                    {label}
                   </TableCell>
                   <TableCell className="text-right text-sm text-muted-foreground font-mono tabular-nums">
                     {typeof val === "number" ? val.toLocaleString() : val}
