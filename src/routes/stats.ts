@@ -257,7 +257,7 @@ export async function statsRoutes(app: FastifyInstance) {
         cohortWeek,
         { visitors: visitorIds, weekStart },
       ] of sortedCohorts.slice(-8)) {
-        const cohortData: Record<string, number> = { cohort: visitorIds.size };
+        const cohortData: Record<string, number> = {};
 
         for (let w = 0; w <= 7; w++) {
           const wStart = dayjs(weekStart).add(w, "week").toDate();
