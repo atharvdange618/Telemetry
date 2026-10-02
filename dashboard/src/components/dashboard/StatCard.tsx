@@ -31,9 +31,8 @@ export function StatCard({
   tooltip?: string;
 }) {
   return (
-    <Card className="group relative overflow-hidden transition-all duration-300 hover:border-border/20 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
-      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -translate-y-8 translate-x-8 group-hover:bg-primary/8 transition-colors duration-500" />
-      <CardHeader className="flex flex-row items-center justify-between pb-2 relative">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex items-center gap-1.5">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             {title}
@@ -44,7 +43,7 @@ export function StatCard({
           <Icon className="h-3.5 w-3.5 text-primary/70" />
         </div>
       </CardHeader>
-      <CardContent className="relative">
+      <CardContent>
         <div className="flex items-baseline gap-2">
           <div className="text-2xl md:text-3xl font-bold tracking-tight font-mono tabular-nums">
             {isLoading ? (

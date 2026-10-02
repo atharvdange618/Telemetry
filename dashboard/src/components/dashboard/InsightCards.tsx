@@ -8,7 +8,7 @@ export function InsightCards({ data }: { data: InsightsResponse | undefined }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {data.insights.map((insight, i) => (
-        <Card key={i} className="border-l-2 border-l-primary/30 transition-all duration-300 hover:border-l-primary/60 hover:border-border/20">
+        <Card key={i}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
               <div className="p-1.5 rounded-lg bg-primary/8 shrink-0">
