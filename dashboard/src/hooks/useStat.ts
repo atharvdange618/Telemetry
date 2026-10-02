@@ -12,11 +12,13 @@ interface UseStatOptions {
 // With no filter active, unfiltered and filtered calls share a cache key,
 // so the filter dropdowns cost no extra requests.
 export function useStat<T>(name: string, { unfiltered = false, enabled = true }: UseStatOptions = {}) {
-  const { siteId, search, statsQuery, optionsQuery } = useDashboardParams();
+  const { siteId, search, range, statsQuery, optionsQuery } = useDashboardParams();
   const segments = unfiltered ? {} : search.segments;
 
   return useQuery<T>({
-    queryKey: ["stats", siteId, search.period, search.startDate, search.endDate, segments, name],
+    // range holds either the period or the custom dates, matching what the
+    // request sends, so a leftover period never splits the cache.
+    queryKey: ["stats", siteId, range, segments, name],
     queryFn: () =>
       fetchJSON<T>(`${API_URL}/api/stats/${name}?${unfiltered ? optionsQuery : statsQuery}`),
     enabled: enabled && siteId !== "",
