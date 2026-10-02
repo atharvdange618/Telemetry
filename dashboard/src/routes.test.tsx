@@ -7,6 +7,12 @@ import { createQueryClient } from "./lib/query-client";
 import { useAuthStore } from "./lib/state/auth";
 import { routes } from "./routes";
 
+// jsdom has no matchMedia, and useDarkMode reads it on import.
+vi.hoisted(() => {
+  window.matchMedia = (query: string) =>
+    ({ matches: false, media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList;
+});
+
 // Redirects are what's under test, so pages render their name and nothing else.
 vi.mock("./pages/dashboard/OverviewPage", () => ({ default: () => <p>overview page</p> }));
 vi.mock("./pages/dashboard/ContentPage", () => ({ default: () => <p>content page</p> }));
@@ -53,10 +59,6 @@ beforeEach(() => {
   useAuthStore.setState({ user: null });
   fetchMock.mockClear();
   vi.stubGlobal("fetch", fetchMock);
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
-  );
 });
 
 afterEach(() => {
@@ -101,7 +103,8 @@ describe("dashboard redirects", () => {
   it("keeps the page title with a trailing slash", async () => {
     renderAt("/dashboard/s1/content/?period=30d");
     expect(await screen.findByRole("heading", { name: "Content" })).toBeTruthy();
-    expect(screen.getByText("content page")).toBeTruthy();
+    // The page body waits for the site list, so it lands after the header.
+    expect(await screen.findByText("content page")).toBeTruthy();
   });
 
   it("sends an account with no sites to /sites", async () => {
