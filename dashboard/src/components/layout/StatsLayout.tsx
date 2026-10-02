@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useMatch } from "react-router-dom";
 import { useIsFetching } from "@tanstack/react-query";
 import { SEO } from "@/components/SEO";
 import { FiltersBar } from "@/components/dashboard/FiltersBar";
@@ -22,7 +22,8 @@ import { StatsToolbar } from "./StatsToolbar";
 export function StatsLayout() {
   const params = useDashboardParams();
   const { siteId, search, customRange } = params;
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const statsMatch = useMatch("/dashboard/:siteId/:page");
   const { data: tenantsData } = useTenants();
   const [showFilters, setShowFilters] = useState(false);
   // Old data stays on screen while a new period or filter loads, so say so.
@@ -36,9 +37,9 @@ export function StatsLayout() {
 
   const site = tenantsData?.tenants.find((t) => t.id === siteId);
   // A deleted site, or one this account can't see.
-  if (tenantsData && !site) return <Navigate to="/dashboard" replace />;
+  if (tenantsData && !site) return <Navigate to={{ pathname: "/dashboard", search: location.search }} replace />;
 
-  const page = DASHBOARD_PAGES.find((p) => pathname.endsWith(`/${p.slug}`));
+  const page = DASHBOARD_PAGES.find((p) => p.slug === statsMatch?.params.page);
   const hasActiveFilters = Object.values(search.segments).some(Boolean);
 
   const toggleCustomRange = () => {

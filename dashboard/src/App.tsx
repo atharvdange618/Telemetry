@@ -105,6 +105,7 @@ const router = createBrowserRouter([
               { path: "audience", element: <AudiencePage /> },
               { path: "conversions", element: <ConversionsPage /> },
               { path: "performance", element: <PerformancePage /> },
+              { path: "*", element: <ToOverview /> },
             ],
           },
           { path: "/sites", element: <SitesPage /> },
