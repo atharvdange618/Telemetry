@@ -8,11 +8,9 @@ import {
 } from "@/components/ui/card";
 import { SEO } from "@/components/SEO";
 import { Input } from "@/components/ui/input";
-import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
 import type { Tenant } from "@/lib/types/dashboard.types";
 import { Badge } from "@/components/ui/badge";
 import { X, Copy, Check, Pencil } from "lucide-react";
@@ -28,6 +26,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { ShareLinksDialog } from "@/components/dashboard/ShareLinksDialog";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -47,7 +47,7 @@ const fetchAPI = async (url: string, options?: RequestInit) => {
   return res.json();
 };
 
-const SettingsPage = () => {
+const SitesPage = () => {
   const queryClient = useQueryClient();
   const [newSiteName, setNewSiteName] = useState("");
   const [newSiteDomains, setNewSiteDomains] = useState("");
@@ -177,20 +177,15 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 bg-background min-h-screen">
+    <>
       <SEO
-        title="Settings"
+        title="Sites"
         description="Configure your tracked domains, view tracking snippet integration scripts, and manage site parameters."
         noindex={true}
       />
-      <div className="flex items-center justify-between mb-8">
-        <Button asChild variant="outline">
-          <Link to="/dashboard">← Back to Dashboard</Link>
-        </Button>
-        <DarkModeToggle />
-      </div>
-
-      <Card>
+      <PageHeader title="Sites" />
+      <div className="p-4 md:p-6">
+        <Card>
         <CardHeader>
           <CardTitle>Create New Site</CardTitle>
           <CardDescription>Add a new website to your account.</CardDescription>
@@ -349,7 +344,8 @@ const SettingsPage = () => {
                   </Button>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                  <ShareLinksDialog tenantId={tenant.id} />
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -389,6 +385,7 @@ const SettingsPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
-export default SettingsPage;
+export default SitesPage;

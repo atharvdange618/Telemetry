@@ -24,7 +24,7 @@ import ConversionsPage from "./pages/dashboard/ConversionsPage";
 import PerformancePage from "./pages/dashboard/PerformancePage";
 import SharedDashboardPage from "./pages/SharedDashboardPage";
 import React from "react";
-import SettingsPage from "./components/SettingsPage";
+import SitesPage from "./pages/SitesPage";
 import Home from "./pages/Home";
 // Applies the saved theme to <html> as soon as the app loads.
 import "./hooks/useDarkMode";
@@ -107,7 +107,8 @@ const router = createBrowserRouter([
               { path: "performance", element: <PerformancePage /> },
             ],
           },
-          { path: "/settings", element: <SettingsPage /> },
+          { path: "/sites", element: <SitesPage /> },
+          { path: "/settings", element: <Navigate to="/sites" replace /> },
         ],
       },
     ],
