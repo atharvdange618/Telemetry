@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useMe } from "@/hooks/useMe";
 
 export function FinalCtaSection() {
   const API_URL = import.meta.env.VITE_API_URL;
+  const signedIn = Boolean(useMe().data?.user);
 
   return (
     <section className="py-24 px-6 lg:px-8 border-t border-border/50">
@@ -35,9 +38,13 @@ export function FinalCtaSection() {
             asChild
             className="cursor-pointer rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-12 px-6 text-sm font-medium"
           >
-            <a href={`${API_URL}/login/github`}>
-              Sign in with GitHub
-            </a>
+            {signedIn ? (
+              <Link to="/dashboard">Go to dashboard</Link>
+            ) : (
+              <a href={`${API_URL}/login/github`}>
+                Sign in with GitHub
+              </a>
+            )}
           </Button>
         </div>
       </div>

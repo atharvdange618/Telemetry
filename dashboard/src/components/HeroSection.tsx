@@ -1,4 +1,6 @@
 import { Github, ArrowRight, Code } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useMe } from "@/hooks/useMe";
 import { Button } from "./ui/button";
 
 export const AccentText = ({
@@ -13,6 +15,7 @@ export const AccentText = ({
 
 export function HeroSection() {
   const API_URL = import.meta.env.VITE_API_URL;
+  const signedIn = Boolean(useMe().data?.user);
 
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden">
@@ -35,11 +38,18 @@ export function HeroSection() {
                 asChild
                 className="cursor-pointer rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-12 px-6 text-sm font-medium group"
               >
-                <a href={`${API_URL}/login/github`}>
-                  <Github className="h-4 w-4 mr-2" />
-                  Get Started Free
-                  <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
-                </a>
+                {signedIn ? (
+                  <Link to="/dashboard">
+                    Go to dashboard
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                ) : (
+                  <a href={`${API_URL}/login/github`}>
+                    <Github className="h-4 w-4 mr-2" />
+                    Get Started Free
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                )}
               </Button>
               <Button
                 size="lg"

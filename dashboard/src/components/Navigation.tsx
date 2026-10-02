@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Github, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMe } from "@/hooks/useMe";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { Button } from "./ui/button";
 
@@ -9,6 +10,7 @@ export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  const signedIn = Boolean(useMe().data?.user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,10 +76,14 @@ export function Navigation() {
                 asChild
                 className="cursor-pointer rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-sm h-9 px-4"
               >
-                <a href={`${import.meta.env.VITE_API_URL}/login/github`}>
-                  <Github className="h-3.5 w-3.5 mr-1.5" />
-                  Sign in
-                </a>
+                {signedIn ? (
+                  <Link to="/dashboard">Go to dashboard</Link>
+                ) : (
+                  <a href={`${import.meta.env.VITE_API_URL}/login/github`}>
+                    <Github className="h-3.5 w-3.5 mr-1.5" />
+                    Sign in
+                  </a>
+                )}
               </Button>
             </div>
 
@@ -131,10 +137,14 @@ export function Navigation() {
                   asChild
                   className="cursor-pointer rounded-full bg-primary text-primary-foreground"
                 >
-                  <a href={`${import.meta.env.VITE_API_URL}/login/github`}>
-                    <Github className="h-4 w-4 mr-2" />
-                    Sign in with GitHub
-                  </a>
+                  {signedIn ? (
+                    <Link to="/dashboard">Go to dashboard</Link>
+                  ) : (
+                    <a href={`${import.meta.env.VITE_API_URL}/login/github`}>
+                      <Github className="h-4 w-4 mr-2" />
+                      Sign in with GitHub
+                    </a>
+                  )}
                 </Button>
               </div>
             </div>
