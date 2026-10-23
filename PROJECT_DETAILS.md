@@ -6,7 +6,7 @@
 
 ### Guiding Principles
 
-- **Privacy is Paramount**: Telemetry is cookieless by design and does not track individuals across the web. What it stores per event is a hashed visitor ID, country and city, page and referrer, device and screen size, and UTM parameters. The raw IP is used to look up country and city, then discarded.
+- **Privacy is Paramount**: Telemetry is cookieless by design and does not track individuals across the web. What it stores per event is a hashed visitor ID, country and city, page and referrer, device and screen size, and UTM parameters. The raw IP is used to look up country and city in a local GeoLite2 database, so it never leaves the server, then discarded.
 - **Clarity Over Clutter**: The dashboard provides simple, actionable metrics like page views, unique visitors, and bounce rates, presented in a clean and intuitive interface.
 - **You Own Your Data**: Self-hosted, your website's data resides on your own infrastructure and you can query the Postgres tables directly.
 - **Small Stack, Clear Code**: Fastify, React, and TypeScript, with no build-time magic between you and the query that answers your question.
@@ -116,7 +116,7 @@ The backend is a Fastify server. All API routes are defined in the `src/routes/`
   4. Verifies that the `tenantId` exists.
   5. **API Key Validation**: If the tenant has an `apiKey` set, the request must include a matching `apiKey` in the body. Returns `403` on mismatch.
   6. Anonymizes the user by creating a unique `visitorId` hash from their IP address, User-Agent, and a server-side salt. This ensures privacy as the raw IP is not stored with the event.
-  7. Uses the `ip-api.com` service to perform a GeoIP lookup on the request IP to determine the country and city.
+  7. Looks up the country and city in a local MaxMind GeoLite2 database (`src/lib/geo.ts`), so the IP never leaves the server.
   8. Saves the event to the `Event` table in the database.
 - **Response**: `201 Created` on success.
 
@@ -181,6 +181,10 @@ The schema is defined in `prisma/schema.prisma`.
 - **`Event`**: The central table for all analytics data. It stores pageviews, goals, outbound clicks, performance metrics, scroll depth, location data, browser/OS/language info, session tracking, UTM parameters, custom event properties, and the hashed `visitorId`.
 
 ## 5. Changelog
+
+### 2026-10-23: `feat(track): look up location in a local GeoLite2 database`
+
+- **Local GeoIP**: `/api/track` no longer sends visitor IPs to ipwho.is. New `src/lib/geo.ts` reads MaxMind's GeoLite2 City database from `GEOIP_DB_PATH` (default `./GeoLite2-City.mmdb`) at startup and reloads it when geoipupdate replaces the file. The lookup is local and synchronous, so ingestion no longer waits on a third-party call. A missing file logs a warning and stores null locations. Three MaxMind country names map back to the names already stored ("The Netherlands" to "Netherlands", "Türkiye" to "Turkey", "Czechia" to "Czech Republic").
 
 ### 2026-10-01: `feat(alerts), per-tenant domain checks, stats corrections, and dev tooling`
 

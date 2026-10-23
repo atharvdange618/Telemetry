@@ -366,6 +366,6 @@ Content-Type: application/json
 
 - **No cookies.** The session ID lives in `sessionStorage`, scoped to one tab and cleared when it closes.
 - **Pseudonymous visitor IDs.** Each is a SHA-256 hash of IP + User-Agent + site, salted with a value that rotates every quarter. The raw IP is never written to the database.
-- **Location lookup.** To get country and city, the server sends each event's IP to [ipwho.is](https://ipwho.is), a third-party service. Whether you need consent for this depends on your jurisdiction.
+- **Location lookup.** The server looks up country and city in a local copy of MaxMind's GeoLite2 database. The IP never leaves the server.
 - **Web Vitals library.** Visitors' browsers download web-vitals from `cdn.jsdelivr.net`, so jsDelivr sees their IP and your site's origin.
 - **Bot filtering.** Requests whose User-Agent matches common crawlers, headless browsers, HTTP libraries and monitoring tools get rejected and never stored.

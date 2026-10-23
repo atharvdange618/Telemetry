@@ -16,7 +16,7 @@ Drop the cookie banner from your stack, keep your site lightning fast, and retai
 ## Why Telemetry?
 
 - **Zero Cookies, Zero Banner Code**: Telemetry does not use cookies, local storage, or persistent cross-site tracking. The only thing it stores in the browser is a random session ID in `sessionStorage`, which the browser deletes when the tab closes. There's no consent dialog to ship for it, though whether your site needs one for the rest of its stack is your call.
-- **Pseudonymous Visitor IDs**: The server hashes IP, User-Agent, and tenant ID with a salt that rotates every quarter, then discards the raw IP. Country and city are stored too, since the dashboard charts them, so treat the data as personal and decide what to disclose yourself.
+- **Pseudonymous Visitor IDs**: The server hashes IP, User-Agent, and tenant ID with a salt that rotates every quarter. It looks up country and city in a local MaxMind GeoLite2 database, so the IP never leaves your server, then discards the raw IP without writing it to the database. Country and city are stored too, since the dashboard charts them, so treat the data as personal and decide what to disclose yourself.
 - **Small Script (~3KB gzipped)**: One small script, loaded asynchronously in milliseconds. Events go out as cookieless keepalive requests, so sending them never blocks the page and never gets dropped when a visitor navigates away.
 - **Your Data, Your Server**: Self-host it on your own server or run it securely on our managed cloud. Nothing is shared with advertising networks.
 
@@ -135,9 +135,18 @@ VISITOR_SALT=another_random_32_char_string
 # Application URLs
 BASE_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:5173
+
+# Optional: where the GeoIP database lives (defaults to ./GeoLite2-City.mmdb)
+GEOIP_DB_PATH=./GeoLite2-City.mmdb
 ```
 
-### 3. Run Migrations & Start
+### 3. Download the GeoIP Database
+
+Country and city come from MaxMind's free GeoLite2 City database, read locally. Create a free [MaxMind account](https://www.maxmind.com/en/geolite2/signup), download `GeoLite2-City.mmdb`, and put it in the repo root. Without it the server still runs, but events have no location.
+
+The file is gitignored: MaxMind's license doesn't allow redistributing it.
+
+### 4. Run Migrations & Start
 
 ```bash
 # Push database schema
@@ -156,7 +165,7 @@ Visit `http://localhost:5173` to access your self-hosted dashboard.
 
 ### Or: Run Everything with Docker
 
-Skip steps 1 and 3. With a `.env` holding your GitHub OAuth and security secrets (step 2), run:
+Skip steps 1 and 4. With the GeoIP database in the repo root (step 3) and a `.env` holding your GitHub OAuth and security secrets (step 2), run:
 
 ```bash
 docker compose up
@@ -184,6 +193,15 @@ Alternatively, process managers like PM2 can be used:
 pm2 start ecosystem.config.cjs
 ```
 
+MaxMind updates GeoLite2 twice a week. On the server, install MaxMind's [geoipupdate](https://github.com/maxmind/geoipupdate), put your account ID and license key in `/etc/GeoIP.conf`, and run it from cron:
+
+```bash
+# Tuesdays and Fridays at 06:00
+0 6 * * 2,5 geoipupdate
+```
+
+geoipupdate writes to `/usr/share/GeoIP` by default, so set `GEOIP_DB_PATH=/usr/share/GeoIP/GeoLite2-City.mmdb` in `.env`. The server watches the file and reloads it when it changes, with no restart.
+
 ---
 
 ## API Reference (Integration)
@@ -210,3 +228,5 @@ For full endpoint definitions and query options, see the [PROJECT_DETAILS.md](PR
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui
 - **Deployment**: Vercel (Dashboard), CloudPanel / Hostinger KVM VPS (API backend)
 - **License**: MIT
+
+This product includes GeoLite2 data created by MaxMind, available from [https://www.maxmind.com](https://www.maxmind.com).

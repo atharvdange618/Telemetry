@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { createEventSchema, CreateEventInput } from "../lib/schemas";
 import { createHash, timingSafeEqual } from "crypto";
 import { getRotatingSalt } from "../lib/visitor-salt";
+import { getGeoLocation } from "../lib/geo";
 
 // Hashing both sides to a fixed-length digest before comparing sidesteps
 // timingSafeEqual's requirement that both buffers be the same length,
@@ -41,20 +42,6 @@ function isTrackRateLimited(ip: string): boolean {
   fresh.push(now);
   trackHits.set(ip, fresh);
   return false;
-}
-
-async function getGeoLocation(ip: string): Promise<{ country: string | null; city: string | null }> {
-  if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.")) {
-    return { country: null, city: null };
-  }
-  try {
-    const res = await fetch(`https://ipwho.is/${ip}`);
-    const data = await res.json();
-    if (!data.success) return { country: null, city: null };
-    return { country: data.country || null, city: data.city || null };
-  } catch {
-    return { country: null, city: null };
-  }
 }
 
 // Domains are stored as the user entered them, so compare origins: a stored
@@ -146,7 +133,7 @@ export async function trackRoutes(app: FastifyInstance) {
         }
 
         const ip = request.ip;
-        const { country, city } = await getGeoLocation(ip);
+        const { country, city } = getGeoLocation(ip);
 
         const userAgent = request.headers["user-agent"] || "";
         const salt = getRotatingSalt(process.env.VISITOR_SALT!);
