@@ -155,3 +155,8 @@ public/test.html.mimocode/
 design.md
 
 /test-pages
+
+# MaxMind GeoIP: license key and database (GeoLite2 license forbids redistribution)
+GeoIP.conf
+*.mmdb
+GeoLite2-*.tar.gz
